@@ -6854,8 +6854,10 @@ let isPlaying = false; // 現在の音声再生状態
 let currentAudio = null;
 
 function playWord(word) {
- 
-	if (!audioAllowed || !word) return;
+	if (!word) {
+        alert("単語が指定されていません。");
+        return;
+    }
 	    // 既存の再生があれば止める
     if (currentAudio) {
         currentAudio.pause();
