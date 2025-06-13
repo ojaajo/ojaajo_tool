@@ -1,11 +1,178 @@
 <!DOCTYPE html>
+
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>韓国語単語アプリ</title>
-    <style>
-        body {
+<head><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&amp;display=swap" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>韓国語単語暗記ツール</title>
+<style>body, header, h1, h2, h3, label, select, button {
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background-color: #f9f9fb;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 15px 0;
+  text-align: center;
+  font-size: 28px;
+}
+.container {
+  max-width: 600px;
+  background-color: #fff;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+h3 {
+  margin-top: 15px;
+  font-size: 20px;
+  border-left: 6px solid #007BFF;
+  padding-left: 10px;
+}
+button {
+  display: inline-block;
+  margin: 10px 5px 10px 0;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007BFF;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: all 0.2s ease-in-out;
+}
+button:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+.form-group {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+.form-group label {
+  font-size: 14px;
+  margin: 0;
+  white-space: nowrap;
+}
+.form-group select {
+  padding: 4px 8px;
+  font-size: 14px;
+}
+.page-range {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.checkbox-group {
+  margin: 10px 0;
+}
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  gap: 5px;
+}
+select.level-select {
+  width: 160px;
+}
+
+body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: #f9f9fb;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 15px 0;
+      text-align: center;
+      font-size: 24px;
+    }
+    .container {
+      max-width: 600px;
+      background-color: #fff;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+    h3 {
+      margin-top: 15px;
+      font-size: 20px;
+      border-left: 6px solid #007BFF;
+      padding-left: 10px;
+    }
+    button {
+      display: inline-block;
+      margin: 10px 5px 10px 0;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: all 0.2s ease-in-out;
+    }
+    button:hover {
+      background-color: #0056b3;
+      transform: translateY(-1px);
+    }
+    .form-group {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .form-group label {
+      font-size: 14px;
+      margin: 0;
+      white-space: nowrap;
+    }
+    .form-group select {
+      padding: 4px 8px;
+      font-size: 14px;
+    }
+    .page-range {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .checkbox-group {
+      margin: 10px 0;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      gap: 5px;
+    }
+    select.level-select {
+    width: 160px; /* 表示ページセレクト2個＋～と同じくらいの幅に調整 */
+    }
+
+body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
@@ -59,32 +226,32 @@
         th {
             background: #f4f4f9;
         }
-.scrollable-table {
-    max-height: 450px;  /* テーブルの最大高さ */
-    overflow-y: auto;   /* 縦スクロールを許可 */
-    border: 1px solid #ddd;
-    position: relative;
-    padding: 0;
-    margin: 0;
-    -webkit-overflow-scrolling: touch;  /* iOSのスムーズスクロールを有効化 */
-    touch-action: auto;  /* タッチスクロールを有効化 */
-}
+        .scrollable-table {
+            max-height: 450px;  /* テーブルの最大高さ */
+            overflow-y: auto;   /* 縦スクロールを許可 */
+            border: 1px solid #ddd;
+            position: relative;
+            padding: 0;
+            margin: 0;
+            -webkit-overflow-scrolling: touch;  /* iOSのスムーズスクロールを有効化 */
+            touch-action: auto;  /* タッチスクロールを有効化 */
+        }
 
-.scrollable-table table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0;
-    padding: 0;
-}
+        .scrollable-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            padding: 0;
+        }
 
-.scrollable-table thead th {
-    position: sticky;
-    top: 0;
-    background-color: #f4f4f4;
-    z-index: 2;
-    height: 30px;
-    line-height: 30px;
-}
+        .scrollable-table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f4f4f4;
+            z-index: 2;
+            height: 30px;
+            line-height: 30px;
+        }
         td.green {
             color: green;
             background-color: #d4edda;
@@ -109,196 +276,471 @@
         #word {
             margin-right: 2px; /* スピーカーアイコンとの間に適切なスペースを追加 */
         }
-table th, table td {
-    height: 20px;   /* 各行の高さを50pxに設定 */
-}
-/* モーダルのスタイル */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+        table th, table td {
+            height: 20px;   /* 各行の高さを50pxに設定 */
+        }
+        /* モーダルのスタイル */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 300px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #modal-yes {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #modal-no {
+            background-color: #f44336;
+            color: white;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;  /* 水平方向に中央揃え */
+            align-items: center;      /* 垂直方向にも中央揃え */
+            gap: 10px;
+            margin-top: 20px;         /* ボタンとカードの間にスペースを追加（必要に応じて調整） */
+        }
+
+
+        #correct-btn, #incorrect-btn {
+            font-size: 24px;
+            width: 170px;            /* 幅を適切に設定 */
+            height: 50px;           /* 高さを適切に設定 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 10px;
+            line-height: 1;
+            box-sizing: border-box;
+        }
+
+        #card {
+            width: 100%;
+            max-width: 450px;
+            height: auto; /* 高さは内容に応じて可変 */
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #e0e0e0; /* グレーのカード色 */
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column; /* 縦に並べる */
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+#word-container {
     display: flex;
-    justify-content: center;
+    justify-content: center;  /* 単語を中央揃え */
     align-items: center;
-    z-index: 1000;
+    width: 100%;  /* 親要素の幅を均等に */
 }
 
-.modal.hidden {
-    display: none;
-}
-
-.modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    width: 300px;
-}
-
-.modal-buttons {
+#word-wrapper {
     display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
+    align-items: center;  /* 単語と🔊を縦中央揃え */
+    justify-content: center;  /* 🔊マークを単語の右に配置 */
+    gap: 8px;  /* 単語と🔊マークの間隔 */
+    min-width: 200px;  /* 単語の幅を一定にし、意味と揃えやすくする */
 }
 
-.modal-buttons button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
+#word {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;  /* 長い単語でも折り返さない */
+}
+
+#speaker-icon {
+    font-size: 20px;
     cursor: pointer;
 }
 
-#modal-yes {
-    background-color: #4CAF50;
-    color: white;
+#meaning {
+    display: block;
+    font-size: 18px;
+    color: #555;
+    text-align: center;  /* 単語の意味も中央揃え */
+    margin-top: 10px;
+    min-width: 200px;  /* `#word-wrapper` と同じ幅を設定 */
+}
+.progress-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+/* 〇×ボタンの下に黒線を引いて、矢印ボタンを配置 */
+.button-container {
+    display: flex;
+    justify-content: center;  /* 水平方向に中央揃え */
+    align-items: center;      /* 垂直方向にも中央揃え */
+    gap: 10px;
+    margin-top: 20px;         /* ボタンとカードの間にスペースを追加（必要に応じて調整） */
 }
 
-#modal-no {
-    background-color: #f44336;
-    color: white;
+/* 黒線を引くためのスタイル */
+.line-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px; /* ボタンと黒線の間にスペース */
 }
 
-    </style>
+/* 黒線 */
+.black-line {
+    width: 100%;
+    height: 2px;
+    background-color: rgba(0, 0, 0, 0.1);  /* 薄い黒線 */
+    margin-bottom: 10px;  /* 黒線と矢印ボタンの間にスペース */
+}
+
+/* 矢印ボタンのスタイル */
+.arrows-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;  /* 親要素いっぱいに広がる */
+    padding: 0 10px;  /* 両端に適切な余白を追加 */
+}
+.word-list-controls {
+    display: flex;
+    justify-content: space-between; /* 左右に配置 */
+    align-items: center; /* 高さを揃える */
+    width: 100%; /* 横幅いっぱいに広げる */
+    margin-top: 10px; /* テーブルとの間隔 */
+}
+
+.word-list-buttons {
+    display: flex;
+    gap: 10px; /* ボタン同士の間隔 */
+}
+
+.word-list-buttons button {
+    padding: 5px 10px;
+    font-size: 20px;
+}
+#toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    font-size: 0.9em;
+    z-index: 9999;
+    display: none;   /* 初期状態は非表示 */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+#toast.show {
+    display: block;
+    opacity: 1;
+}
+
+    .container {
+      max-width: 600px;
+      background-color: #fff;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+    h3 {
+      margin-top: 15px;
+      font-size: 20px;
+      border-left: 6px solid #007BFF;
+      padding-left: 10px;
+    }
+    .form-group {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .form-group label {
+      font-size: 14px;
+      margin: 0;
+      white-space: nowrap;
+    }
+    .form-group select {
+      padding: 4px 8px;
+      font-size: 14px;
+    }
+    .page-range {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .page-range select {
+      width: 60px;
+    }
+    .level-select {
+      width: 160px;
+    }
+    .checkbox-group {
+      margin: 10px 0;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      gap: 5px;
+    }
+ #word-list-body td:nth-child(1),
+#word-list-body td:nth-child(2) {
+  text-align: left;
+  padding-left: 20px;
+}
+#word-list table td:nth-child(1),
+#word-list table th:nth-child(1) {
+  width: 120px;
+}
+
+#word-list table td:nth-child(2),
+#word-list table th:nth-child(2) {
+  width: 270px;
+}
+
+#word-list table td:nth-child(3),
+#word-list table th:nth-child(3) {
+  width: 70px;
+}
+select {
+  max-height: 260px;
+  overflow-y: auto;
+  display: block;
+}
+/* 表現力UPモード時に単語一覧の文字を小さくする */
+#scrollable-table.small-text-mode table {
+  font-size: 12px;
+}
+
+</style>
 </head>
 <body>
-    <header>
-        <h1>韓国語単語クイズ</h1>
-    </header>
-    <div class="container">
-        
-        <!-- 出題範囲選択 -->
-        <div id="range-selection" class="section">
-            <button onclick="startQuiz()">クイズを始める</button>
-            <p style="font-size: 14px; margin: 10px 0;">※出題範囲を選択してください※</p>
-    	    <label for="beginner-quiz">
-        	<input type="radio" id="beginner-quiz" name="quiz-level" checked> 初級
-    	    </label>
-    	    <label for="intermediate-quiz">
-        	<input type="radio" id="intermediate-quiz" name="quiz-level"> 中級
-    	    </label>	    <br>
-            <label for="start-page">開始ページ:</label>
-            <select id="start-page"></select>
-            <label for="end-page">終了ページ:</label>
-            <select id="end-page"></select>
-            <br>
-            <label>
-                <input type="checkbox" id="only-incorrect"> 不正解の単語一覧からのみ出題する
-            </label>
-            <br>
-            <label>
-                <input type="checkbox" id="auto-speak" onchange="toggleAutoSpeak()"> 自動読み上げ機能をONにする
-            </label>
-            <br><br>
-            <button id="beginner-word-list-btn">初級単語一覧を見る</button>
-	    <br>
-            <label for="beginner-start-page">表示ページ:</label>
-            <select id="beginner-start-page">
-            </select>
-            <label for="beginner-end-page"> ～ </label>
-            <select id="beginner-end-page">
-            </select>
-            <br>
+<header>
+<h1>韓国語単語暗記ツール</h1>
+</header>
+<div class="container">
+<!-- 出題範囲選択 -->
+<div class="section" id="range-selection"><h3>📋 単語一覧表示</h3><button id="word-list-show-btn">単語一覧を見る</button>
+<div class="form-group">
+<label for="wordlist-level-select">難易度:</label>
+<select class="level-select" id="wordlist-level-select">
+<option value="beginner">初級</option>
+<option value="intermediate">中級</option>
+<option value="advanced">上級</option>
+<option value="expressionup">表現力UP</option>
+</select>
+</div>
+<div class="form-group">
+<label>表示ページ:</label>
+<div class="page-range">
+<select id="wordlist-start-page"></select>
+<span>～</span>
+<select id="wordlist-end-page"></select>
+</div>
+</div>
+<div class="checkbox-group">
+<label><input id="wordlist-shuffle" type="checkbox"/> 単語をランダムに並び替えて表示</label>
+</div>
+<h3>🃏 フラッシュカード出題</h3><button onclick="startQuiz()">フラッシュカード開始</button>
+<div class="form-group">
+<label for="quiz-level-select">難易度:</label>
+<select class="level-select" id="quiz-level-select">
+<option value="beginner">初級</option>
+<option value="intermediate">中級</option>
+<option value="advanced">上級</option>
+<option value="expressionup">表現力UP</option>
+</select>
+</div>
+<div class="form-group">
+<label>出題ページ:</label>
+<div class="page-range">
+<select id="start-page"></select>
+<span>～</span>
+<select id="end-page"></select>
+</div>
+</div>
+<div class="checkbox-group">
+<label><input id="only-incorrect" type="checkbox"/> 未暗記の単語一覧からのみ出題する</label>
+<label><input id="auto-speak" onchange="toggleAutoSpeak()" type="checkbox"/> 自動読み上げ機能をONにする</label>
+</div>
+<div>
+<button onclick="exportProgress()">暗記状況を保存</button>
+<input accept=".json" id="import-file" onchange="importProgress(event)" style="display:none;" type="file"/>
+<button onclick="document.getElementById('import-file').click()">暗記状況を読み込む</button>
+<div id="toast" style="
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #ff4d4d;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  font-size: 0.9em;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+"></div>
+</div>
+</div>
+<!-- 出題セクション -->
+<div class="section hidden" id="quiz-section">
+<!-- 進行状況と戻るボタンを横並びにするためのコンテナ -->
+<div class="progress-container">
+<span>進行状況: <span id="progress">0/0</span></span>
+<button onclick="showRangeSelection()">🏠ホーム</button>
+</div>
+<div id="card">
+<div id="word-container">
+<div id="word-wrapper">
+<span id="word">ここに単語が表示されます</span>
+<span id="speaker-icon" onclick="playWord(document.getElementById('word').textContent)">🔊</span>
+</div>
+</div>
+<div id="meaning">（意味が表示されます）</div>
+</div>
+<div class="button-container">
+<button id="incorrect-btn" onclick="markAnswer(false)">×</button>
+<button id="correct-btn" onclick="markAnswer(true)">⚪︎</button>
+<button id="next-btn" onclick="nextQuestion()" style="display: none;">次へ</button>
+</div>
+<!-- ここに黒線と矢印ボタンを配置 -->
+<div class="line-container">
+<div class="black-line"></div> <!-- 薄い黒線 -->
+<div class="arrows-container">
+<button id="prev-btn" onclick="moveToPrevious()">←</button>
+<button id="next-btn" onclick="moveToNext()">→</button>
+</div>
+</div>
+<p id="result"></p>
+</div>
+<!-- 単語一覧表示 -->
+<div class="table-container hidden" id="word-list">
+<h2>単語一覧</h2>
+<div>
 <label>
-    <input type="checkbox" id="shuffle-beginner-words"> 初級単語をランダムに並び替えて表示
-</label>
-<br><br>
-            <button id="intermediate-word-list-btn">中級単語一覧を見る</button>
-	    <br>
-            <label for="intermediate-start-page">表示ページ:</label>
-            <select id="intermediate-start-page">
-            </select>
-            <label for="intermediate-end-page"> ～ </label>
-            <select id="intermediate-end-page">
-            </select>
-	    <br>
+<input id="hide-correct" onchange="filterWordList()" type="checkbox"/> 暗記済非表示
+                </label>
 <label>
-    <input type="checkbox" id="shuffle-intermediate-words"> 中級単語をランダムに並び替えて表示
-</label>
-        </div>
-
-        <!-- 出題セクション -->
-        <div id="quiz-section" class="section hidden">
-            <div id="word-container">
-                <span id="word">ここに単語が表示されます</span>
-                <span onclick="playWord(document.getElementById('word').textContent)" style="font-size: 12px; cursor: pointer;" id="speaker-icon">🔊</span>
-            </div>
-            <input type="text" id="answer" placeholder="意味を入力してください" autofocus>
-            <button id="submit-answer" onclick="checkAnswer()">解答する</button>
-            <p id="result"></p>
-            <div id="memorized-check-container" class="hidden">
-                <label>
-                    <input type="checkbox" id="memorized-check"> この単語を覚えましたか？
+<input id="hide-incorrect" onchange="filterWordList()" type="checkbox"/> 未暗記非表示
                 </label>
-                <p style="font-size: 12px; color: #555;">※チェックを入れると不正解一覧から削除されます。</p>
-            </div>
-            <button id="next-question" class="hidden" onclick="nextQuestion()">次の問題</button>
-            <button onclick="showRangeSelection()">戻る</button>
-        </div>
-
-        <!-- 単語一覧表示 -->
-        <div id="word-list" class="table-container hidden">
-            <h2>単語一覧</h2>
-            <div>
-                <label>
-                    <input type="checkbox" id="hide-correct" onchange="filterWordList()"> 正解非表示
+<label>
+<input id="hide-unattempted" onchange="filterWordList()" type="checkbox"/> 未解答非表示
                 </label>
-                <label>
-                    <input type="checkbox" id="hide-incorrect" onchange="filterWordList()"> 不正解非表示
-                </label>
-                <label>
-                    <input type="checkbox" id="hide-unattempted" onchange="filterWordList()"> 未解答非表示
-                </label>
-            </div>
-
-            <div class="scrollable-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>
+</div>
+<div class="scrollable-table" id="scrollable-table" tabindex="0">
+<table>
+<thead>
+<tr>
+<th>
                                 単語
                                 <label>
-                                    <input type="checkbox" id="toggle-korean" onchange="toggleKorean()"> 非表示
+<input id="toggle-korean" onchange="toggleKorean()" type="checkbox"/> 非表示
                                 </label>
-                            </th>
-                            <th>
+</th>
+<th>
                                 意味
                                 <label>
-                                    <input type="checkbox" id="toggle-meaning" onchange="toggleMeaning()"> 非表示
+<input id="toggle-meaning" onchange="toggleMeaning()" type="checkbox"/> 非表示
                                 </label>
-                            </th>
-                            <th>解答結果</th>
-                        </tr>
-                    </thead>
-                    <tbody id="word-list-body">
-                        <!-- 動的に生成される内容 -->
-                    </tbody>
-                </table>
-            </div>
-            <button onclick="showRangeSelection()">戻る</button>
-        </div>
-    </div>
-<!-- モーダル -->
-<div id="quiz-modal" class="modal hidden">
-    <div class="modal-content">
-        <p id="modal-message">前回途中で終了したクイズがあります。再開しますか？</p>
-        <div class="modal-buttons">
-            <button id="modal-no">No</button>
-            <button id="modal-yes">Yes</button>
-        </div>
-    </div>
+</th>
+<th>暗記状況</th>
+</tr>
+</thead>
+<tbody id="word-list-body">
+<!-- 動的に生成される内容 -->
+</tbody>
+</table>
 </div>
+<div class="word-list-controls">
+<button onclick="showRangeSelection()">🏠ホーム</button>
+<div class="word-list-buttons">
+<button id="up-button" onclick="playPreviousWord()">↑</button>
+<button id="down-button" onclick="playNextWord()">↓</button>
+<button id="repeat-button" onclick="repeatLastWord()">♻︎</button>
+</div>
+</div>
+</div>
+<!-- モーダル -->
+<div class="modal hidden" id="quiz-modal">
+<div class="modal-content">
+<p id="modal-message">前回途中で終了したクイズがあります。再開しますか？※Noを選択すると履歴がリセットされます。</p>
+<div class="modal-buttons">
+<button id="modal-no">No</button>
+<button id="modal-yes">Yes</button>
+</div>
+</div>
+</div>
+<div class="hidden" id="toast"></div><div class="hidden" id="json-output" style="margin-top:20px;"><p>🔒 進捗データを下からコピーして、メモ帳やiCloud Driveに貼り付けて保存してください。</p><textarea id="json-text" readonly="" rows="10" style="width:100%; font-family: monospace; font-size:14px;"></textarea><button onclick="copyToClipboard()" style="margin-top: 10px;">コピーする</button></div>
 
-    <script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').then(() => {
+      console.log("Service Worker registered");
+    });
+  });
+}
+</script>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4CAF50">
+<script>
         // JSONデータ（例: PDFから抽出されたデータ）
-const beginnerWords = [
+        const beginnerWords = [
 {"word": "가게", "meaning": "店", "page": 1},
 {"word": "가격", "meaning": "価格", "page": 1},
 {"word": "가구", "meaning": "家具", "page": 1},
 {"word": "가깝다", "meaning": "近い", "page": 1},
-{"word": "가끔", "meaning": "時々", "page": 1},
+{"word": "가끔", "meaning": "時々", "page": 1}, 
 {"word": "가다", "meaning": "行く", "page": 1},
 {"word": "가르치다", "meaning": "教える", "page": 1},
 {"word": "가방", "meaning": "鞄", "page": 1},
@@ -2009,7 +2451,7 @@ const intermediateWords = [
 {"word": "감기다", "meaning": "巻かれる", "page": 1},
 {"word": "감독", "meaning": "監督", "page": 1},
 {"word": "감동적", "meaning": "感動的", "page": 1},
-{"word": "감상", "meaning": "鑑賞", "page": 1},
+{"word": "감상", "meaning": "鑑賞、感傷", "page": 1},
 {"word": "감소", "meaning": "減少", "page": 1},
 {"word": "감정", "meaning": "感情", "page": 1},
 {"word": "감탄", "meaning": "感嘆、感歎", "page": 1},
@@ -3235,7 +3677,7 @@ const intermediateWords = [
 {"word": "세계적", "meaning": "世界的", "page": 16},
 {"word": "세금", "meaning": "税金", "page": 16},
 {"word": "세기", "meaning": "世紀", "page": 16},
-{"word": "세다", "meaning": "数える", "page": 16},
+{"word": "세다", "meaning": "数える、強い", "page": 16},
 {"word": "세대", "meaning": "世代", "page": 16},
 {"word": "세련", "meaning": "洗練", "page": 16},
 {"word": "세면대", "meaning": "洗面台", "page": 16},
@@ -3314,7 +3756,7 @@ const intermediateWords = [
 {"word": "수면제", "meaning": "睡眠薬", "page": 17},
 {"word": "수명", "meaning": "寿命", "page": 17},
 {"word": "수산물", "meaning": "水産物", "page": 17},
-{"word": "수상", "meaning": "首相", "page": 17},
+{"word": "수상", "meaning": "首相、水上、受賞", "page": 17},
 {"word": "수선", "meaning": "修繕", "page": 17},
 {"word": "수선하다", "meaning": "修理する、修繕する", "page": 17},
 {"word": "수수료", "meaning": "手数料", "page": 17},
@@ -4199,7 +4641,7 @@ const intermediateWords = [
 {"word": "쫓아내다", "meaning": "追い出す", "page": 28},
 {"word": "쫓아다니다", "meaning": "追い回す", "page": 28},
 {"word": "쭉", "meaning": "ずらりと、ずっと", "page": 28},
-{"word": "찌다", "meaning": "（肉が）つく、太る", "page": 28},
+{"word": "찌다", "meaning": "蒸す、（肉が）つく、太る", "page": 28},
 {"word": "찜질", "meaning": "チムジル、温療法", "page": 28},
 {"word": "찜통더위", "meaning": "蒸し暑さ", "page": 28},
 {"word": "찢다", "meaning": "破る、裂く", "page": 28},
@@ -4456,7 +4898,7 @@ const intermediateWords = [
 {"word": "하마터면", "meaning": "危うく", "page": 32},
 {"word": "하품", "meaning": "あくび", "page": 32},
 {"word": "학과", "meaning": "学科", "page": 32},
-{"word": "학력", "meaning": "学歴", "page": 32},
+{"word": "학력", "meaning": "学歴、学力", "page": 32},
 {"word": "학문", "meaning": "学問", "page": 32},
 {"word": "학비", "meaning": "学費", "page": 32},
 {"word": "학습", "meaning": "学習", "page": 32},
@@ -4630,54 +5072,1459 @@ const intermediateWords = [
 {"word": "힘껏", "meaning": "力の限り、精一杯", "page": 34}
 ];
 
+const advancedWords = [
+{"word": "가공", "meaning": "架空、加工", "page": 1},
+{"word": "가까스로", "meaning": "やっとのことで、ようやく", "page": 1},
+{"word": "가꾸기", "meaning": "育てること、手入れ", "page": 1},
+{"word": "가늠하다", "meaning": "見積もる、見当をつける", "page": 1},
+{"word": "가동", "meaning": "稼働", "page": 1},
+{"word": "가라앉히다", "meaning": "沈める、静める", "page": 1},
+{"word": "가락", "meaning": "旋律、管、音調", "page": 1},
+{"word": "가려내다", "meaning": "選び出す、選り分ける", "page": 1},
+{"word": "가려지다", "meaning": "隠される、遮られる", "page": 1},
+{"word": "가령", "meaning": "仮に、例えば", "page": 1},
+{"word": "가로", "meaning": "横", "page": 1},
+{"word": "가로막다", "meaning": "遮る、立ち塞がる", "page": 1},
+{"word": "가루", "meaning": "粉", "page": 1},
+{"word": "가르침", "meaning": "教え", "page": 1},
+{"word": "가면", "meaning": "仮面", "page": 1},
+{"word": "가문", "meaning": "家門", "page": 1},
+{"word": "가미하다", "meaning": "加味する、取り入れる", "page": 1},
+{"word": "가설", "meaning": "仮説", "page": 1},
+{"word": "가속화되다", "meaning": "加速される", "page": 1},
+{"word": "가시적", "meaning": "可視的", "page": 1},
+{"word": "가열하다", "meaning": "加熱する", "page": 1},
+{"word": "가장자리", "meaning": "端、縁", "page": 1},
+{"word": "가죽", "meaning": "革", "page": 1},
+{"word": "가지런하다", "meaning": "、揃っている、整っている", "page": 1},
+{"word": "가파르다", "meaning": "急だ、険しい", "page": 1},
+{"word": "가하다", "meaning": "加える", "page": 1},
+{"word": "가해자", "meaning": "加害者", "page": 1},
+{"word": "가혹하다", "meaning": "過酷だ、厳しい", "page": 1},
+{"word": "각광", "meaning": "脚光", "page": 1},
+{"word": "각국", "meaning": "各国", "page": 1},
+{"word": "각인되다", "meaning": "刻印される", "page": 1},
+{"word": "간결하다", "meaning": "簡潔だ", "page": 1},
+{"word": "간과되다", "meaning": "見逃される", "page": 1},
+{"word": "간섭", "meaning": "干渉", "page": 1},
+{"word": "간소", "meaning": "簡素", "page": 1},
+{"word": "간주되다", "meaning": "見なされる", "page": 1},
+{"word": "간지럽다", "meaning": "くすぐったい", "page": 1},
+{"word": "간파하다", "meaning": "見抜く、見破る", "page": 1},
+{"word": "간혹", "meaning": "たまに、時折", "page": 1},
+{"word": "갈증", "meaning": "渇き、喉の渇き", "page": 1},
+{"word": "감당하다", "meaning": "耐える、堪える", "page": 1},
+{"word": "감돌다", "meaning": "（考えが）ちらつく、（香りが）漂う", "page": 1},
+{"word": "감면", "meaning": "減免", "page": 1},
+{"word": "감성", "meaning": "感性", "page": 1},
+{"word": "감수하다", "meaning": "甘受する", "page": 1},
+{"word": "감시", "meaning": "監視", "page": 1},
+{"word": "감지하다", "meaning": "感知する", "page": 1},
+{"word": "감칠맛", "meaning": "うま味", "page": 1},
+{"word": "감행하다", "meaning": "敢行する", "page": 1},
+{"word": "감히", "meaning": "あえて", "page": 1},
+{"word": "갑갑하다", "meaning": "退屈だ、窮屈だ、", "page": 1},
+{"word": "갑작스럽다", "meaning": "突然だ", "page": 1},
+{"word": "값비싸다", "meaning": "高価だ", "page": 1},
+{"word": "강당", "meaning": "講堂", "page": 1},
+{"word": "강도", "meaning": "強度、強盗", "page": 1},
+{"word": "강력하다", "meaning": "強力だ", "page": 1},
+{"word": "강점", "meaning": "強み", "page": 1},
+{"word": "강행하다", "meaning": "強行する", "page": 1},
+{"word": "강화", "meaning": "強化", "page": 1},
+{"word": "개념", "meaning": "概念", "page": 1},
+{"word": "개량하다", "meaning": "改良する", "page": 1},
+{"word": "개론", "meaning": "概論", "page": 1},
+{"word": "개미", "meaning": "アリ", "page": 1},
+{"word": "개설하다", "meaning": "開設する", "page": 1},
+{"word": "개수", "meaning": "個数", "page": 1},
+{"word": "개업식", "meaning": "開業式", "page": 1},
+{"word": "개울", "meaning": "小川", "page": 1},
+{"word": "개인차", "meaning": "個人差", "page": 1},
+{"word": "개입하다", "meaning": "介入する", "page": 1},
+{"word": "개장", "meaning": "開場", "page": 1},
+{"word": "개체", "meaning": "個体", "page": 1},
+{"word": "개혁하다", "meaning": "改革する", "page": 1},
+{"word": "개회식", "meaning": "開会式", "page": 1},
+{"word": "갱신하다", "meaning": "更新する", "page": 1},
+{"word": "갸웃하다", "meaning": "かしげる", "page": 1},
+{"word": "거닐다", "meaning": "徘徊する、歩き回る", "page": 1},
+{"word": "거대하다", "meaning": "巨大だ", "page": 1},
+{"word": "거두다", "meaning": "得る、刈り取る", "page": 1},
+{"word": "거들다", "meaning": "手伝う", "page": 1},
+{"word": "거듭하다", "meaning": "繰り返す", "page": 1},
+{"word": "거뜬하다", "meaning": "軽々としている", "page": 2},
+{"word": "거론되다", "meaning": "（問題などが）取り上げられる", "page": 2},
+{"word": "거부", "meaning": "拒否", "page": 2},
+{"word": "거스르다", "meaning": "逆らう", "page": 2},
+{"word": "거창하다", "meaning": "大げさだ", "page": 2},
+{"word": "건", "meaning": "件", "page": 2},
+{"word": "건드리다", "meaning": "触る、刺激する", "page": 2},
+{"word": "건립", "meaning": "建立", "page": 2},
+{"word": "건성", "meaning": "うわの空", "page": 2},
+{"word": "건의하다", "meaning": "建議する、申し述べる", "page": 2},
+{"word": "걷기", "meaning": "ウォーキング", "page": 2},
+{"word": "걸러내다", "meaning": "ふるいにかける、取り除く", "page": 2},
+{"word": "걸림돌", "meaning": "障害、妨げ", "page": 2},
+{"word": "걸쭉하다", "meaning": "とろみがある、どろどろ", "page": 2},
+{"word": "검증", "meaning": "検証", "page": 2},
+{"word": "검진", "meaning": "検診", "page": 2},
+{"word": "검토", "meaning": "検討", "page": 2},
+{"word": "겁나다", "meaning": "怖い、怖がる", "page": 2},
+{"word": "겉면", "meaning": "表面", "page": 2},
+{"word": "게재되다", "meaning": "掲載される", "page": 2},
+{"word": "겨냥하다", "meaning": "狙う、狙いをつける", "page": 2},
+{"word": "겨루다", "meaning": "競う、張り合う", "page": 2},
+{"word": "겨를", "meaning": "暇", "page": 2},
+{"word": "격조", "meaning": "品格、格調", "page": 2},
+{"word": "격차", "meaning": "格差", "page": 2},
+{"word": "견고하다", "meaning": "堅固だ", "page": 2},
+{"word": "견과류", "meaning": "ナッツ類", "page": 2},
+{"word": "견제하다", "meaning": "けん制する", "page": 2},
+{"word": "견주다", "meaning": "比べる、比較する", "page": 2},
+{"word": "견해", "meaning": "見解", "page": 2},
+{"word": "결과물", "meaning": "成果物", "page": 2},
+{"word": "결재", "meaning": "決裁", "page": 2},
+{"word": "결정적", "meaning": "決定的", "page": 2},
+{"word": "결제", "meaning": "決済", "page": 2},
+{"word": "졀합", "meaning": "結合、連結", "page": 2},
+{"word": "겸비하다", "meaning": "兼ね備える、兼備する", "page": 2},
+{"word": "경각심", "meaning": "警戒心", "page": 2},
+{"word": "경건하다", "meaning": "敬虔だ", "page": 2},
+{"word": "경계", "meaning": "境界", "page": 2},
+{"word": "경관", "meaning": "景観", "page": 2},
+{"word": "경도", "meaning": "経度", "page": 2},
+{"word": "경로", "meaning": "経路", "page": 2},
+{"word": "경사", "meaning": "傾斜、慶事", "page": 2},
+{"word": "경청하다", "meaning": "傾聴する", "page": 2},
+{"word": "경쾌하다", "meaning": "軽快だ", "page": 2},
+{"word": "경품", "meaning": "景品", "page": 2},
+{"word": "경향", "meaning": "傾向", "page": 2},
+{"word": "곁", "meaning": "そば、横", "page": 2},
+{"word": "계기", "meaning": "きっかけ", "page": 2},
+{"word": "계발", "meaning": "啓発", "page": 2},
+{"word": "계열사", "meaning": "系列会社", "page": 2},
+{"word": "계절별", "meaning": "季節別", "page": 2},
+{"word": "계정", "meaning": "アカウント", "page": 2},
+{"word": "고가", "meaning": "高価", "page": 2},
+{"word": "고갈되다", "meaning": "枯渇する", "page": 2},
+{"word": "고대", "meaning": "古代", "page": 2},
+{"word": "고도", "meaning": "高度", "page": 2},
+{"word": "고려하다", "meaning": "考慮する", "page": 2},
+{"word": "고립시키다", "meaning": "孤立させる", "page": 2},
+{"word": "고무적", "meaning": "鼓舞的、励みになる", "page": 2},
+{"word": "고발하다", "meaning": "告発する", "page": 2},
+{"word": "고사하다", "meaning": "辞退する、固辞する", "page": 2},
+{"word": "고심하다", "meaning": "苦心する", "page": 2},
+{"word": "고안하다", "meaning": "考案する", "page": 2},
+{"word": "고용", "meaning": "雇用", "page": 2},
+{"word": "고이", "meaning": "そっと、きれいに、大事に", "page": 2},
+{"word": "고작", "meaning": "せいぜい", "page": 2},
+{"word": "고조되다", "meaning": "高まる、高調される", "page": 2},
+{"word": "고충", "meaning": "苦情、苦労", "page": 2},
+{"word": "고함", "meaning": "怒鳴り声", "page": 2},
+{"word": "곡", "meaning": "曲", "page": 2},
+{"word": "곤충", "meaning": "昆虫", "page": 2},
+{"word": "곧다", "meaning": "真っすぐだ", "page": 2},
+{"word": "곧잘", "meaning": "よく、かなり", "page": 2},
+{"word": "곧장", "meaning": "まっすぐ", "page": 2},
+{"word": "골라내다", "meaning": "選び出す", "page": 2},
+{"word": "골탕", "meaning": "困らせる、酷い迷惑", "page": 2},
+{"word": "공감", "meaning": "共感", "page": 2},
+{"word": "공개하다", "meaning": "公開する", "page": 2},
+{"word": "공격", "meaning": "攻撃", "page": 2},
+{"word": "공경하다", "meaning": "敬う", "page": 3},
+{"word": "공공연하다", "meaning": "公然だ、大っぴら", "page": 3},
+{"word": "공급", "meaning": "供給", "page": 3},
+{"word": "공모", "meaning": "公募", "page": 3},
+{"word": "공약", "meaning": "公約", "page": 3},
+{"word": "공연히", "meaning": "むなしく、むやみに", "page": 3},
+{"word": "공예", "meaning": "工芸", "page": 3},
+{"word": "공유", "meaning": "共有", "page": 3},
+{"word": "공정하다", "meaning": "公正だ", "page": 3},
+{"word": "공조", "meaning": "共助", "page": 3},
+{"word": "공지하다", "meaning": "告知する", "page": 3},
+{"word": "공허하다", "meaning": "虚しい、空しい", "page": 3},
+{"word": "공헌", "meaning": "貢献", "page": 3},
+{"word": "과감하다", "meaning": "果敢だ", "page": 3},
+{"word": "과도하다", "meaning": "過度だ", "page": 3},
+{"word": "과잉", "meaning": "過剰", "page": 3},
+{"word": "관념", "meaning": "観念", "page": 3},
+{"word": "관습", "meaning": "慣習", "page": 3},
+{"word": "관여하다", "meaning": "関与する", "page": 3},
+{"word": "관장하다", "meaning": "管掌する、管理、担当する", "page": 3},
+{"word": "관점", "meaning": "観点", "page": 3},
+{"word": "관중", "meaning": "観衆", "page": 3},
+{"word": "관하다", "meaning": "関する", "page": 3},
+{"word": "관행", "meaning": "慣行", "page": 3},
+{"word": "광경", "meaning": "光景", "page": 3},
+{"word": "광물", "meaning": "鉱物", "page": 3},
+{"word": "괴팍하다", "meaning": "気難しい、偏屈だ", "page": 3},
+{"word": "교류", "meaning": "交流", "page": 3},
+{"word": "교묘하다", "meaning": "巧妙だ、巧みだ", "page": 3},
+{"word": "교복", "meaning": "制服", "page": 3},
+{"word": "교역하다", "meaning": "交易する", "page": 3},
+{"word": "교장", "meaning": "校長", "page": 3},
+{"word": "교직", "meaning": "教職", "page": 3},
+{"word": "교훈", "meaning": "教訓", "page": 3},
+{"word": "구간", "meaning": "区間", "page": 3},
+{"word": "구독", "meaning": "購読", "page": 3},
+{"word": "구리", "meaning": "銅", "page": 3},
+{"word": "구미", "meaning": "好み、口当たり、欧米", "page": 3},
+{"word": "구비하다", "meaning": "備える、具備する", "page": 3},
+{"word": "구상하다", "meaning": "構想する", "page": 3},
+{"word": "구석", "meaning": "隅", "page": 3},
+{"word": "구설수에 오르다", "meaning": "うわさになる", "page": 3},
+{"word": "구차하다", "meaning": "窮屈だ、みっともない", "page": 3},
+{"word": "구청", "meaning": "区役所", "page": 3},
+{"word": "구체화하다", "meaning": "具体化する", "page": 3},
+{"word": "구축하다", "meaning": "構築する", "page": 3},
+{"word": "구현하다", "meaning": "具現する", "page": 3},
+{"word": "국숫집", "meaning": "うどん屋、蕎麦屋", "page": 3},
+{"word": "국정", "meaning": "国政", "page": 3},
+{"word": "국토", "meaning": "国土", "page": 3},
+{"word": "국회", "meaning": "国会", "page": 3},
+{"word": "굳어지다", "meaning": "固まる", "page": 3},
+{"word": "굴리다", "meaning": "転がす", "page": 3},
+{"word": "굴절", "meaning": "屈折", "page": 3},
+{"word": "굴하다", "meaning": "屈する", "page": 3},
+{"word": "굽실거리다", "meaning": "ぺこぺこする", "page": 3},
+{"word": "궁궐", "meaning": "宮殿", "page": 3},
+{"word": "궁중", "meaning": "宮中", "page": 3},
+{"word": "궁지", "meaning": "窮地", "page": 3},
+{"word": "궁핍하다", "meaning": "貧しい、窮乏する", "page": 3},
+{"word": "궂다", "meaning": "険しい、きつい", "page": 3},
+{"word": "권력", "meaning": "権力", "page": 3},
+{"word": "권리", "meaning": "権利", "page": 3},
+{"word": "권위", "meaning": "権威", "page": 3},
+{"word": "권장하다", "meaning": "勧める、勧奨する", "page": 3},
+{"word": "권한", "meaning": "権限", "page": 3},
+{"word": "귀담아듣다", "meaning": "耳を傾ける、注意深く聞く", "page": 3},
+{"word": "귀환", "meaning": "帰還", "page": 3},
+{"word": "규모", "meaning": "規模", "page": 3},
+{"word": "규약문", "meaning": "規約文", "page": 3},
+{"word": "규정", "meaning": "規定", "page": 3},
+{"word": "규제", "meaning": "規制", "page": 3},
+{"word": "균형", "meaning": "均衡", "page": 3},
+{"word": "그나마", "meaning": "それでも", "page": 3},
+{"word": "그다지", "meaning": "それほど、あまり", "page": 3},
+{"word": "그야말로", "meaning": "まさに", "page": 3},
+{"word": "극동", "meaning": "極東", "page": 3},
+{"word": "극복하다", "meaning": "克服する", "page": 3},
+{"word": "극심하다", "meaning": "極めて激しい、激甚だ", "page": 3},
+{"word": "근거", "meaning": "根拠", "page": 3},
+{"word": "근원", "meaning": "根源", "page": 4},
+{"word": "근접하다", "meaning": "接近する", "page": 4},
+{"word": "긁히다", "meaning": "引っかかれる", "page": 4},
+{"word": "금세", "meaning": "すぐ、たちまち", "page": 4},
+{"word": "금화", "meaning": "金貨", "page": 4},
+{"word": "급격하다", "meaning": "急激だ", "page": 4},
+{"word": "급급하다", "meaning": "せわしい、慌ただしい", "page": 4},
+{"word": "급락하다", "meaning": "急落する", "page": 4},
+{"word": "급변하다", "meaning": "急変する", "page": 4},
+{"word": "급속하다", "meaning": "急速だ", "page": 4},
+{"word": "급증", "meaning": "急増", "page": 4},
+{"word": "기관", "meaning": "機関", "page": 4},
+{"word": "기구", "meaning": "器具、機構", "page": 4},
+{"word": "기금", "meaning": "基金", "page": 4},
+{"word": "기기", "meaning": "機器", "page": 4},
+{"word": "기껏해야", "meaning": "せいぜい", "page": 4},
+{"word": "기막히다", "meaning": "あきれる、（感心するほど）素晴らしい", "page": 4},
+{"word": "기밀", "meaning": "機密", "page": 4},
+{"word": "기반", "meaning": "基盤", "page": 4},
+{"word": "기법", "meaning": "技法", "page": 4},
+{"word": "기상", "meaning": "気象", "page": 4},
+{"word": "기습", "meaning": "奇襲", "page": 4},
+{"word": "기승", "meaning": "勝ち気、負けん気", "page": 4},
+{"word": "기어가다", "meaning": "這って行く", "page": 4},
+{"word": "기인하다", "meaning": "起因する", "page": 4},
+{"word": "기재하다", "meaning": "記載する", "page": 4},
+{"word": "기존", "meaning": "既存", "page": 4},
+{"word": "기증", "meaning": "寄贈", "page": 4},
+{"word": "기치", "meaning": "旗印、スローガン", "page": 4},
+{"word": "기특하다", "meaning": "健気だ、奇特だ", "page": 4},
+{"word": "기피하다", "meaning": "忌避する、避ける", "page": 4},
+{"word": "기하다", "meaning": "期する", "page": 4},
+{"word": "기한", "meaning": "期限", "page": 4},
+{"word": "기형", "meaning": "奇形", "page": 4},
+{"word": "기획", "meaning": "企画", "page": 4},
+{"word": "긴급", "meaning": "緊急", "page": 4},
+{"word": "긴박하다", "meaning": "緊迫している", "page": 4},
+{"word": "길들이다", "meaning": "慣らす", "page": 4},
+{"word": "깊숙이", "meaning": "奥深く、深々と", "page": 4},
+{"word": "깊숙하다", "meaning": "奥深い", "page": 4},
+{"word": "까다로움", "meaning": "気難しさ、ややこしさ", "page": 4},
+{"word": "까닭", "meaning": "理由、訳、原因", "page": 4},
+{"word": "까먹다", "meaning": "忘れる、使い果たす", "page": 4},
+{"word": "깔끔하다", "meaning": "きれいだ、すっきりしている", "page": 4},
+{"word": "깔리다", "meaning": "敷かれる", "page": 4},
+{"word": "깜박", "meaning": "うっかり", "page": 4},
+{"word": "깨달음", "meaning": "気づき", "page": 4},
+{"word": "깨치다", "meaning": "悟る", "page": 4},
+{"word": "꺼리다", "meaning": "嫌がる", "page": 4},
+{"word": "껑충", "meaning": "ぴょんと", "page": 4},
+{"word": "꼬다", "meaning": "ねじ込む", "page": 4},
+{"word": "꼬물꼬물", "meaning": "もぞもぞ", "page": 4},
+{"word": "꼬박", "meaning": "まるまる、ぶっ通しで", "page": 4},
+{"word": "꼬집다", "meaning": "つねる", "page": 4},
+{"word": "꼬투리", "meaning": "（事の）きっかけ、手がかり", "page": 4},
+{"word": "꼴", "meaning": "格好、ありさま", "page": 4},
+{"word": "꼼지락거리다", "meaning": "もぞもぞ動く", "page": 4},
+{"word": "꼼짝하다", "meaning": "身動きする、ちょっと動く", "page": 4},
+{"word": "꼽다", "meaning": "挙げる、指折り数える", "page": 4},
+{"word": "꽂다", "meaning": "挿す", "page": 4},
+{"word": "꽃샘추위", "meaning": "花冷え（春の一時的な冷え込み）", "page": 4},
+{"word": "꾸리다", "meaning": "（外見を）飾る", "page": 4},
+{"word": "꾸물대다", "meaning": "もたもた、ぐずぐずする", "page": 4},
+{"word": "꾸준하다", "meaning": "根気がある、着実だ", "page": 4},
+{"word": "꾸중하다", "meaning": "叱る", "page": 4},
+{"word": "꿈틀대다", "meaning": "うごめく", "page": 4},
+{"word": "꿰다", "meaning": "刺す、通す", "page": 4},
+{"word": "끄덕이다", "meaning": "うなずく", "page": 4},
+{"word": "끈끈하다", "meaning": "ネバネバ、粘り気がある", "page": 4},
+{"word": "끈질기다", "meaning": "しつこい、粘り強い", "page": 4},
+{"word": "끌어당기다", "meaning": "引き寄せる", "page": 4},
+{"word": "끌어들이다", "meaning": "引き込む", "page": 4},
+{"word": "끔찍하다", "meaning": "ぞっとする", "page": 4},
+{"word": "끼", "meaning": "気質、素質、（食事の回数）〜食", "page": 4},
+{"word": "끼얹다", "meaning": "ぶっかける、被せる", "page": 4},
+{"word": "끼치다", "meaning": "及ぼす", "page": 4},
+{"word": "낌새", "meaning": "気配、兆候、兆し", "page": 4},
+{"word": "나뉘다", "meaning": "分かれる、分割される", "page": 4},
+{"word": "나르다", "meaning": "運ぶ", "page": 4},
+{"word": "나른하다", "meaning": "気だるい", "page": 4}
+];
+
+const expressionUpWords = [
+  {
+    "word": "입이 가볍다",
+    "meaning": "口が軽い → 秘密を守れない <br>例）그 사람한테 말하면 안 돼. 입이 가벼운 사람이야.",
+    "page": 1
+  },
+  {
+    "word": "눈을 감아주다",
+    "meaning": "目をつぶる → 大目に見る <br>例）이번 실수는 눈 감아 줄 테니까 다음부터 조심해.",
+    "page": 1
+  },
+  {
+    "word": "귀를 기울이다",
+    "meaning": "耳を傾ける → 注意深く聞く <br>例）선생님의 조언에 귀를 기울여야 해.",
+    "page": 1
+  },
+  {
+    "word": "발을 빼다",
+    "meaning": "足を抜く → 手を引く <br>例）그 일에서 발을 빼는 게 좋을 것 같아.",
+    "page": 1
+  },
+  {
+    "word": "한눈팔다",
+    "meaning": "よそ見をする → 気を取られる <br>例）운전할 때 한눈팔면 안 돼!",
+    "page": 1
+  },
+  {
+    "word": "속이 타다",
+    "meaning": "心が焼ける → 心配でたまらない <br>例）아들이 시험 결과를 안 알려 줘서 속이 타고 있어.",
+    "page": 1
+  },
+  {
+    "word": "골치 아프다",
+    "meaning": "頭が痛い → 面倒だ <br>例）이 문제는 너무 복잡해서 골치 아파.",
+    "page": 1
+  },
+  {
+    "word": "손을 씻다",
+    "meaning": "手を洗う → 悪事から足を洗う <br>例）그는 과거를 청산하고 완전히 손을 씻었어.",
+    "page": 1
+  },
+  {
+    "word": "입에 맞다",
+    "meaning": "口に合う → 好みに合う <br>例）한국 음식이 입에 맞아요?",
+    "page": 1
+  },
+  {
+    "word": "배가 아프다",
+    "meaning": "お腹が痛い → 妬ましい <br>例）친구가 로또에 당첨됐다고 해서 배 아파 죽겠어.",
+    "page": 1
+  },
+  {
+    "word": "머리를 식히다",
+    "meaning": "頭を冷やす → 気分転換する <br>例）스트레스를 받을 땐 산책하면서 머리를 식히는 게 좋아.",
+    "page": 1
+  },
+  {
+    "word": "시간이 금이다",
+    "meaning": "時間は金 → 時間は貴重だ <br>例）시간 낭비하지 마. 시간은 금이야.",
+    "page": 1
+  },
+  {
+    "word": "하늘의 별 따기",
+    "meaning": "空の星を取る → 非常に難しいこと <br>例）요즘 취업하기는 하늘의 별 따기야.",
+    "page": 1
+  },
+  {
+    "word": "두 손 두 발 다 들다",
+    "meaning": "両手両足を上げる → 降参する、諦める <br>例）아이가 말을 안 들어서 두 손 두 발 다 들었어.",
+    "page": 1
+  },
+  {
+    "word": "허리를 펴다",
+    "meaning": "腰を伸ばす → やっと一息つく <br>例）이번 프로젝트 끝나면 좀 허리를 펼 수 있겠네.",
+    "page": 1
+  },
+  {
+    "word": "눈에 밟히다",
+    "meaning": "目に引っかかる → 気にかかる、忘れられない <br>例）고향에 계신 부모님이 눈에 밟혀서 잠이 안 와.",
+    "page": 1
+  },
+  {
+    "word": "물을 끼얹다",
+    "meaning": "水をかける → 雰囲気や勢いを台無しにする <br>例）분위기 좋았는데 걔가 한마디 해서 완전 물을 끼얹었어.",
+    "page": 1
+  },
+  {
+    "word": "손이 모자라다",
+    "meaning": "手が足りない → 人手が足りない <br>例）요즘 너무 바빠서 손이 모자라.",
+    "page": 1
+  },
+  {
+    "word": "한 발 늦다",
+    "meaning": "一歩遅れる → タイミングを逃す <br>例）조금만 빨랐으면 살 수 있었는데 한 발 늦었어.",
+    "page": 1
+  },
+  {
+    "word": "입이 짧다",
+    "meaning": "口が短い → 少食だ <br>例）걔는 입이 짧아서 많이 못 먹어.",
+    "page": 1
+  },
+  {
+    "word": "속이 쓰리다",
+    "meaning": "胃が痛む → 心が痛む or 胃が荒れる <br>例）걔한테 그런 말 들으니까 속이 쓰려.",
+    "page": 2
+  },
+  {
+    "word": "눈에 띄다",
+    "meaning": "目に付く → 目立つ <br>例）저 사람은 어디 가도 눈에 띄네.",
+    "page": 2
+  },
+  {
+    "word": "손이 많이 가다",
+    "meaning": "手がたくさんかかる → 手間がかかる <br>例）이 요리는 맛있지만 손이 많이 가.",
+    "page": 2
+  },
+  {
+    "word": "기분이 꿀꿀하다",
+    "meaning": "気分が重い・どんよりする <br>例）이유는 없는데 그냥 기분이 꿀꿀해.",
+    "page": 2
+  },
+  {
+    "word": "바람 맞다",
+    "meaning": "風に吹かれる → ドタキャンされる <br>例）친구랑 약속했는데 바람 맞았어.",
+    "page": 2
+  },
+  {
+    "word": "코가 납작해지다",
+    "meaning": "鼻がぺしゃんこになる → 恥をかく <br>例）자랑하다가 틀린 거 지적받고 코가 납작해졌어.",
+    "page": 2
+  },
+  {
+    "word": "물불을 가리지 않다",
+    "meaning": "水も火も選ばない → 何でもする <br>例）목표를 위해서라면 물불을 가리지 않아.",
+    "page": 2
+  },
+  {
+    "word": "귀가 얇다",
+    "meaning": "耳が薄い → 人の話に流されやすい <br>例）걔는 귀가 얇아서 뭐든지 쉽게 믿어.",
+    "page": 2
+  },
+  {
+    "word": "등을 돌리다",
+    "meaning": "背を向ける → 関係を切る <br>例）친구였는데 이제는 서로 등을 돌렸어.",
+    "page": 2
+  },
+  {
+    "word": "눈에 불을 켜다",
+    "meaning": "目に火を灯す → 本気になる <br>例）걔는 경쟁이 생기면 눈에 불을 켜고 달려들어.",
+    "page": 2
+  },
+  {
+    "word": "화를 내다",
+    "meaning": "怒る <br>例）사소한 일로 화를 내면 안 돼.",
+    "page": 2
+  },
+  {
+    "word": "정신이 없다",
+    "meaning": "精神がない → 余裕がない、バタバタしている <br>例）아침부터 일이 너무 많아서 정신이 없어.",
+    "page": 2
+  },
+  {
+    "word": "말이 안 나오다",
+    "meaning": "言葉が出ない → 驚いた／呆れた <br>例）그렇게 무례하게 행동해서 말이 안 나왔어.",
+    "page": 2
+  },
+  {
+    "word": "발이 넓다",
+    "meaning": "足が広い → 顔が広い <br>例）그는 발이 넓어서 모르는 사람이 없어.",
+    "page": 2
+  },
+  {
+    "word": "낯이 익다",
+    "meaning": "顔なじみ → 見覚えがある <br>例）저 사람, 어디서 본 것 같아. 낯이 익어.",
+    "page": 2
+  },
+  {
+    "word": "기가 막히다",
+    "meaning": "気が詰まる → 驚く、呆れる、感心する <br>例）그런 말을 하다니 정말 기가 막혀.",
+    "page": 2
+  },
+  {
+    "word": "간이 크다",
+    "meaning": "肝が大きい → 度胸がある <br>例）혼자 그렇게 위험한 일을 하다니 간이 크네.",
+    "page": 2
+  },
+  {
+    "word": "콩깍지가 씌다",
+    "meaning": "豆のさやがかかる → 恋は盲目 <br>例）그렇게 안 좋은 점도 다 좋아 보이다니, 콩깍지가 씌었네.",
+    "page": 2
+  },
+  {
+    "word": "눈물이 나다",
+    "meaning": "涙が出る → 感動・悲しみ <br>例）영화가 너무 슬퍼서 눈물이 났어.",
+    "page": 2
+  },
+  {
+    "word": "살이 찌다",
+    "meaning": "太る <br>例）요즘 너무 많이 먹어서 살이 쪘어.",
+    "page": 2
+  },
+  {
+    "word": "마음이 놓이다",
+    "meaning": "心が置かれる → 安心する <br>例）무사히 도착했다는 말을 듣고 마음이 놓였어.",
+    "page": 3
+  },
+  {
+    "word": "기분이 상하다",
+    "meaning": "気分が傷つく → 気分を害する <br>例）그런 말을 들으니까 기분이 좀 상했어.",
+    "page": 3
+  },
+  {
+    "word": "속이 시원하다",
+    "meaning": "中がすっきりする → 胸がすく、すっきりする <br>例）하고 싶은 말을 다 하고 나니까 속이 시원해.",
+    "page": 3
+  },
+  {
+    "word": "손을 대다",
+    "meaning": "手を出す → 関与する／触れる <br>例）그 문제엔 아직 손을 못 댔어.",
+    "page": 3
+  },
+  {
+    "word": "바가지를 쓰다",
+    "meaning": "ひょうたんをかぶる → ぼったくられる <br>例）관광지에서 바가지를 썼어.",
+    "page": 3
+  },
+  {
+    "word": "기를 죽이다",
+    "meaning": "気を殺す → 落ち込ませる <br>例）그렇게 말하면 기를 죽이잖아.",
+    "page": 3
+  },
+  {
+    "word": "손에 익다",
+    "meaning": "手に慣れる → 習熟する <br>例）이제 일이 손에 익었어.",
+    "page": 3
+  },
+  {
+    "word": "머리를 싸매다",
+    "meaning": "頭をくるむ → 頑張って集中する <br>例）시험 준비하느라 요즘 머리를 싸매고 공부해.",
+    "page": 3
+  },
+  {
+    "word": "피가 끓다",
+    "meaning": "血が沸く → 情熱が湧く <br>例）그 말을 들으니까 피가 끓는 것 같았어.",
+    "page": 3
+  },
+  {
+    "word": "식은 땀이 나다",
+    "meaning": "冷や汗をかく <br>例）발표 중에 갑자기 질문 받아서 식은 땀이 났어.",
+    "page": 3
+  },
+  {
+    "word": "발등에 불이 떨어지다",
+    "meaning": "足の甲に火が落ちる → 差し迫った状況になる <br>例）마감이 내일이라 발등에 불이 떨어졌어.",
+    "page": 3
+  },
+  {
+    "word": "간이 떨어질 뻔했다",
+    "meaning": "肝が落ちかけた → 驚いて肝を冷やした <br>例）갑자기 소리 질러서 간이 떨어질 뻔했어.",
+    "page": 3
+  },
+  {
+    "word": "입에 침이 마르다",
+    "meaning": "口の唾が乾く → しつこく褒める <br>例）걔는 친구 자랑을 입에 침이 마르도록 하더라.",
+    "page": 3
+  },
+  {
+    "word": "눈을 의심하다",
+    "meaning": "目を疑う <br>例）내 이름이 당첨자 명단에 있어서 눈을 의심했어.",
+    "page": 3
+  },
+  {
+    "word": "목이 빠지게 기다리다",
+    "meaning": "首が抜けるほど待つ → 首を長くして待つ <br>例）택배를 목이 빠지게 기다렸어.",
+    "page": 3
+  },
+  {
+    "word": "허리를 굽히다",
+    "meaning": "腰を曲げる → 頭を下げる、へりくだる <br>例）그렇게 쉽게 허리를 굽히는 사람 아니야.",
+    "page": 3
+  },
+  {
+    "word": "눈코 뜰 새 없다",
+    "meaning": "目と鼻を開ける暇もない → めちゃくちゃ忙しい <br>例）요즘은 눈코 뜰 새 없이 바빠.",
+    "page": 3
+  },
+  {
+    "word": "뒤통수를 맞다",
+    "meaning": "後頭部を殴られる → 裏切られる <br>例）믿었던 친구한테 뒤통수를 맞았어.",
+    "page": 3
+  },
+  {
+    "word": "기분이 날아갈 듯하다",
+    "meaning": "気分が飛ぶようだ → 最高にうれしい <br>例）시험에 붙어서 기분이 날아갈 듯해.",
+    "page": 3
+  },
+  {
+    "word": "가슴이 답답하다",
+    "meaning": "胸が苦しい → もやもや・イライラする <br>例）말 못할 고민이 있어서 가슴이 답답해.",
+    "page": 3
+  },
+  {
+    "word": "손발이 맞다",
+    "meaning": "手足が合う → 相性・連携がいい <br>例）그 팀은 정말 손발이 잘 맞더라.",
+    "page": 4
+  },
+  {
+    "word": "입이 근질거리다",
+    "meaning": "口がムズムズする → 言いたくてたまらない <br>例）비밀인데 입이 근질거려 죽겠어.",
+    "page": 4
+  },
+  {
+    "word": "눈이 빠지도록 기다리다",
+    "meaning": "目が抜けるほど待つ <br>例）전화 오기를 눈이 빠지도록 기다렸어.",
+    "page": 4
+  },
+  {
+    "word": "뒷북치다",
+    "meaning": "後ろで太鼓を叩く → 何もかも遅れて言う <br>例）지금 그 말 하는 건 뒷북이야.",
+    "page": 4
+  },
+  {
+    "word": "속이 터지다",
+    "meaning": "胸が破裂する → イライラする <br>例）말을 안 들어서 속이 터져.",
+    "page": 4
+  },
+  {
+    "word": "눈치 보다",
+    "meaning": "顔色をうかがう <br>例）회식 때 상사 눈치 보느라 피곤했어.",
+    "page": 4
+  },
+  {
+    "word": "기를 살리다",
+    "meaning": "気を生かす → 元気づける <br>例）칭찬 한 마디로도 기를 살릴 수 있어.",
+    "page": 4
+  },
+  {
+    "word": "입맛이 없다",
+    "meaning": "食欲がない <br>例）요즘 스트레스로 입맛이 없어.",
+    "page": 4
+  },
+  {
+    "word": "머리를 자르다",
+    "meaning": "髪を切る → 心機一転 <br>例）기분 전환하려고 머리 잘랐어.",
+    "page": 4
+  },
+  {
+    "word": "귀찮게 굴다",
+    "meaning": "面倒くさくする → しつこくする <br>例）자꾸 귀찮게 굴지 마!",
+    "page": 4
+  },
+  {
+    "word": "손을 벌리다",
+    "meaning": "手を差し出す → 金銭を求める <br>例）또 부모님께 손 벌렸어.",
+    "page": 4
+  },
+  {
+    "word": "화를 삭이다",
+    "meaning": "怒りを抑える <br>例）참으려고 했는데 화가 안 삭여.",
+    "page": 4
+  },
+  {
+    "word": "입이 무겁다",
+    "meaning": "口が重い → 口が堅い <br>例）걔는 입이 무거우니까 안심해.",
+    "page": 4
+  },
+  {
+    "word": "허풍을 떨다",
+    "meaning": "大ぼらを吹く <br>例）또 허풍 떠는 거 아냐?",
+    "page": 4
+  },
+  {
+    "word": "피곤이 몰려오다",
+    "meaning": "疲れが押し寄せる <br>例）점심 먹고 나니까 피곤이 몰려왔어.",
+    "page": 4
+  },
+  {
+    "word": "밥 먹듯 하다",
+    "meaning": "ご飯を食べるようにする → 日常茶飯事 <br>例）거짓말을 밥 먹듯 하네.",
+    "page": 4
+  },
+  {
+    "word": "하늘이 무너진 것 같다",
+    "meaning": "空が崩れたようだ → 絶望的 <br>例）시험 떨어졌다는 소식 듣고 하늘이 무너지는 줄 알았어.",
+    "page": 4
+  },
+  {
+    "word": "손발이 오그라들다",
+    "meaning": "手足が縮む → 恥ずかしい・気まずい <br>例）옛날 영상 보니까 손발이 오그라들어.",
+    "page": 4
+  },
+  {
+    "word": "빈말을 하다",
+    "meaning": "口先だけのことを言う <br>例）그런 빈말 하지 마.",
+    "page": 4
+  },
+  {
+    "word": "물을 끼얹은 듯 조용하다",
+    "meaning": "水をかけたように静か → シーンとしている <br>例）발표 끝나고 나서 분위기가 물 끼얹은 듯 조용했어.",
+    "page": 4
+  },
+  {
+    "word": "입을 맞추다",
+    "meaning": "口を合わせる → 口裏を合わせる <br>例）거짓말하려고 친구랑 입을 맞췄어.",
+    "page": 5
+  },
+  {
+    "word": "한 귀로 듣고 한 귀로 흘리다",
+    "meaning": "片耳で聞いて片耳で流す → 聞き流す <br>例）뭐라 해도 한 귀로 듣고 한 귀로 흘려.",
+    "page": 5
+  },
+  {
+    "word": "가슴에 못을 박다",
+    "meaning": "胸に釘を打つ → 心を深く傷つける <br>例）그런 말은 정말 가슴에 못을 박는 거야.",
+    "page": 5
+  },
+  {
+    "word": "귀에 못이 박히다",
+    "meaning": "耳に釘が打たれる → 聞き飽きる <br>例）그 얘기 귀에 못이 박히도록 들었어.",
+    "page": 5
+  },
+  {
+    "word": "엎질러진 물이다",
+    "meaning": "こぼれた水だ → 取り返しがつかない <br>例）이미 엎질러진 물이야. 어쩔 수 없어.",
+    "page": 5
+  },
+  {
+    "word": "쥐구멍이라도 찾고 싶다",
+    "meaning": "ネズミの穴でも探したい → 恥ずかしくて逃げたい <br>例）실수했을 때 쥐구멍이라도 찾고 싶었어.",
+    "page": 5
+  },
+  {
+    "word": "바늘 도둑이 소 도둑 된다",
+    "meaning": "針泥棒が牛泥棒になる → 小さな罪が大きな罪に <br>例）바늘 도둑이 소 도둑 된다니까, 작은 일도 주의해야 해.",
+    "page": 5
+  },
+  {
+    "word": "손에 땀을 쥐다",
+    "meaning": "手に汗を握る → ハラハラする <br>例）그 영화 진짜 손에 땀을 쥐게 했어!",
+    "page": 5
+  },
+  {
+    "word": "속이 보이다",
+    "meaning": "中身が見える → 考えてることがバレバレ <br>例）그 말은 너무 속이 보여.",
+    "page": 5
+  },
+  {
+    "word": "머리가 하얘지다",
+    "meaning": "頭が真っ白になる <br>例）발표 시작하자마자 머리가 하얘졌어.",
+    "page": 5
+  },
+  {
+    "word": "목이 쉬다",
+    "meaning": "喉がかれる <br>例）어제 너무 떠들어서 목이 쉬었어.",
+    "page": 5
+  },
+  {
+    "word": "고개를 끄덕이다",
+    "meaning": "うなずく <br>例）선생님 말에 조용히 고개를 끄덕였어.",
+    "page": 5
+  },
+  {
+    "word": "말을 돌리다",
+    "meaning": "話をそらす <br>例）질문하니까 자꾸 말을 돌리더라.",
+    "page": 5
+  },
+  {
+    "word": "눈치 채다",
+    "meaning": "気づく <br>例）네 기분이 안 좋은 거 바로 눈치 챘어.",
+    "page": 5
+  },
+  {
+    "word": "간이 작다",
+    "meaning": "肝が小さい → 小心だ <br>例）그런 말도 못 하다니, 진짜 간이 작다.",
+    "page": 5
+  },
+  {
+    "word": "가슴이 뭉클하다",
+    "meaning": "胸がじーんとする <br>例）오래된 친구를 만나서 가슴이 뭉클했어.",
+    "page": 5
+  },
+  {
+    "word": "입이 딱 벌어지다",
+    "meaning": "口がぽかんと開く → 驚く <br>例）가격 보고 입이 딱 벌어졌어.",
+    "page": 5
+  },
+  {
+    "word": "화를 참다",
+    "meaning": "怒りをこらえる <br>例）정말 화났지만 꾹 참고 말 안 했어.",
+    "page": 5
+  },
+  {
+    "word": "한턱내다",
+    "meaning": "奢る <br>例）이번에 승진했으니까 한턱내!",
+    "page": 5
+  },
+  {
+    "word": "다리를 뻗고 자다",
+    "meaning": "足を伸ばして寝る → 安心してぐっすり寝る <br>例）시험 끝났으니 이제 다리 뻗고 잘 수 있겠다.",
+    "page": 5
+  },
+  {
+    "word": "말이 씨가 된다",
+    "meaning": "言葉が種になる → 言ったことが現実になる <br>例）농담으로 한 말인데 진짜 그렇게 돼서 말이 씨가 됐어.",
+    "page": 6
+  },
+  {
+    "word": "손에 물 한 방울 안 묻히다",
+    "meaning": "手に水一滴もつけない → 何もさせない・お姫様扱い <br>例）결혼 후에도 손에 물 한 방울 안 묻히게 한다고 하더라.",
+    "page": 6
+  },
+  {
+    "word": "코앞이다",
+    "meaning": "鼻先だ → すぐ近く・目前 <br>例）시험이 코앞인데 공부가 안 돼.",
+    "page": 6
+  },
+  {
+    "word": "길눈이 어둡다",
+    "meaning": "道の目が暗い → 方向音痴 <br>例）나 길눈이 어두워서 또 길 잃었어.",
+    "page": 6
+  },
+  {
+    "word": "속을 뒤집다",
+    "meaning": "中身をひっくり返す → イライラさせる <br>例）그 사람 말투는 진짜 속 뒤집어.",
+    "page": 6
+  },
+  {
+    "word": "말꼬리를 흐리다",
+    "meaning": "言葉の尻を濁す → はっきり言わない <br>例）왜 자꾸 말꼬리를 흐려?",
+    "page": 6
+  },
+  {
+    "word": "눈이 높다",
+    "meaning": "目が高い → 理想が高い <br>例）걔는 눈이 높아서 쉽게 만족 안 해.",
+    "page": 6
+  },
+  {
+    "word": "뼈가 있다",
+    "meaning": "骨がある → 含みのある言葉 <br>例）그 말엔 뼈가 있더라.",
+    "page": 6
+  },
+  {
+    "word": "도둑이 제 발 저리다",
+    "meaning": "泥棒が自分の足をしびれさせる → 後ろめたい人が反応する <br>例）아무도 안 물었는데 혼자 변명하네? 도둑이 제 발 저린 거 아냐?",
+    "page": 6
+  },
+  {
+    "word": "배보다 배꼽이 크다",
+    "meaning": "おへそが腹より大きい → 本末転倒 <br>例）선물보다 포장비가 더 비싸! 배보다 배꼽이 크잖아.",
+    "page": 6
+  },
+  {
+    "word": "속이 울렁거리다",
+    "meaning": "胸がムカムカする → 吐き気がする／気持ち悪い <br>例）멀미가 나서 속이 울렁거려.",
+    "page": 6
+  },
+  {
+    "word": "기가 막히다",
+    "meaning": "呆れる／すごすぎて言葉が出ない <br>例）그 사람 진짜 기가 막힌 아이디어 내더라.",
+    "page": 6
+  },
+  {
+    "word": "뒤죽박죽이다",
+    "meaning": "めちゃくちゃだ／ぐちゃぐちゃだ <br>例）방이 너무 어질러져서 완전 뒤죽박죽이야.",
+    "page": 6
+  },
+  {
+    "word": "입이 떨어지지 않다",
+    "meaning": "口が離れない → 言い出しにくい <br>例）미안하다고 말하고 싶은데 입이 안 떨어져.",
+    "page": 6
+  },
+  {
+    "word": "귀가 간지럽다",
+    "meaning": "耳がかゆい → 誰かに噂されている気がする <br>例）누가 내 얘기 하나 봐. 귀가 간질간질해.",
+    "page": 6
+  },
+  {
+    "word": "손이 꽉 차다",
+    "meaning": "手がいっぱい → 手一杯だ <br>例）요즘은 일 때문에 손이 꽉 차 있어.",
+    "page": 6
+  },
+  {
+    "word": "눈살을 찌푸리다",
+    "meaning": "眉をひそめる → 不快に思う <br>例）그런 말 들으면 누구든 눈살을 찌푸릴 거야.",
+    "page": 6
+  },
+  {
+    "word": "머리를 식히다",
+    "meaning": "頭を冷やす → 気分転換する <br>例）좀 걸으면서 머리 식히고 와.",
+    "page": 6
+  },
+  {
+    "word": "코웃음을 치다",
+    "meaning": "鼻で笑う → あざける <br>例）내가 한다니까 코웃음 쳤어.",
+    "page": 6
+  },
+  {
+    "word": "바람을 쐬다",
+    "meaning": "風に当たる → 外に出て気分転換する <br>例）기분 전환하려고 잠깐 바람 좀 쐬고 왔어.",
+    "page": 6
+  },
+  {
+    "word": "손에 장을 지지다",
+    "meaning": "手に醤を塗る → 絶対だと断言する <br>例）그건 절대 아니야! 아니면 손에 장을 지질게!",
+    "page": 7
+  },
+  {
+    "word": "목을 놓아 울다",
+    "meaning": "首を外して泣く → 声を張り上げて泣く <br>例）아이가 목 놓아 울어서 사람들이 다 쳐다봤어.",
+    "page": 7
+  },
+  {
+    "word": "눈을 붙이다",
+    "meaning": "目をくっつける → 少し寝る <br>例）피곤하니까 잠깐 눈 좀 붙일게.",
+    "page": 7
+  },
+  {
+    "word": "입이 무색하다",
+    "meaning": "口が恥ずかしくなる → 何も言えなくなるほど驚く <br>例）그렇게 잘할 줄 몰랐어. 내 입이 무색했지.",
+    "page": 7
+  },
+  {
+    "word": "가슴에 와 닿다",
+    "meaning": "胸に触れる → 感動する、共感する <br>例）그 말이 진짜 가슴에 와 닿았어.",
+    "page": 7
+  },
+  {
+    "word": "발 벗고 나서다",
+    "meaning": "靴を脱いで出る → 積極的に手伝う <br>例）친구 일이라면 언제든 발 벗고 나서지.",
+    "page": 7
+  },
+  {
+    "word": "뜨거운 감자다",
+    "meaning": "熱いジャガイモ → 触れにくい問題 <br>例）그 사건은 지금 정치권에서 뜨거운 감자야.",
+    "page": 7
+  },
+  {
+    "word": "말이 안 되다",
+    "meaning": "話にならない → 筋が通らない <br>例）그건 말이 안 돼! 어떻게 그런 일이 가능해?",
+    "page": 7
+  },
+  {
+    "word": "손이 크다",
+    "meaning": "手が大きい → 気前がいい <br>例）우리 엄마는 손이 커서 항상 음식을 많이 해.",
+    "page": 7
+  },
+  {
+    "word": "귀를 의심하다",
+    "meaning": "耳を疑う <br>例）네가 합격했다는 소식에 귀를 의심했어.",
+    "page": 7
+  },
+  {
+    "word": "입에 발린 말",
+    "meaning": "口に塗られた言葉 → お世辞 <br>例）그런 입에 발린 말 말고 진심을 말해 봐.",
+    "page": 7
+  },
+  {
+    "word": "기운이 빠지다",
+    "meaning": "気が抜ける → がっかりする、疲れる <br>例）결과 보고 기운이 확 빠졌어.",
+    "page": 7
+  },
+  {
+    "word": "꼬리를 내리다",
+    "meaning": "尻尾を下げる → 怯む／おとなしくなる <br>例）결국은 혼나고 꼬리 내렸지.",
+    "page": 7
+  },
+  {
+    "word": "속을 태우다",
+    "meaning": "中を焼く → 心配でたまらない <br>例）연락이 없어서 속을 다 태웠어.",
+    "page": 7
+  },
+  {
+    "word": "입을 모으다",
+    "meaning": "口を集める → 皆が同じことを言う <br>例）친구들이 입을 모아서 칭찬했어.",
+    "page": 7
+  },
+  {
+    "word": "눈치가 없다",
+    "meaning": "空気が読めない <br>例）그런 상황에서 그런 말을 하다니, 진짜 눈치 없다.",
+    "page": 7
+  },
+  {
+    "word": "진이 빠지다",
+    "meaning": "精が抜ける → 疲れ果てる <br>例）하루 종일 일했더니 진이 다 빠졌어.",
+    "page": 7
+  },
+  {
+    "word": "가시방석에 앉다",
+    "meaning": "トゲの座布団に座る → 居心地が悪い <br>例）다들 나만 쳐다봐서 가시방석에 앉은 기분이었어.",
+    "page": 7
+  },
+  {
+    "word": "화를 돋우다",
+    "meaning": "怒りをあおる <br>例）그런 말은 오히려 화만 돋워.",
+    "page": 7
+  },
+  {
+    "word": "김이 새다",
+    "meaning": "蒸気が抜ける → 気が抜ける、がっかりする <br>例）기대했는데 김 새는 결말이었어.",
+    "page": 7
+  },
+  {
+    "word": "입 밖에 내다",
+    "meaning": "口に出す <br>例）그런 말은 입 밖에 내지도 마!",
+    "page": 8
+  },
+  {
+    "word": "물불 가리지 않다",
+    "meaning": "水も火も選ばない → 手段を選ばない <br>例）성공을 위해서라면 물불 가리지 않아.",
+    "page": 8
+  },
+  {
+    "word": "발을 끊다",
+    "meaning": "足を切る → 関係を断つ、行かなくなる <br>例）그 가게는 서비스가 별로라서 발을 끊었어.",
+    "page": 8
+  },
+  {
+    "word": "말도 안 되다",
+    "meaning": "話にもならない → あり得ない <br>例）그게 말이 돼? 진짜 말도 안 되는 소리야.",
+    "page": 8
+  },
+  {
+    "word": "기분이 꿀꿀하다",
+    "meaning": "気分がもやもやする <br>例）오늘은 이유 없이 기분이 꿀꿀해.",
+    "page": 8
+  },
+  {
+    "word": "콩알만 해지다",
+    "meaning": "豆粒ほど小さくなる → 怯える <br>例）엄마한테 혼날까 봐 콩알만 해졌어.",
+    "page": 8
+  },
+  {
+    "word": "손이 떨리다",
+    "meaning": "手が震える → 緊張・怖さ <br>例）발표 전에 너무 긴장해서 손이 떨렸어.",
+    "page": 8
+  },
+  {
+    "word": "코가 비뚤어지다",
+    "meaning": "鼻がゆがむ → 酔っ払ってフラフラ <br>例）어제 코가 비뚤어지게 마셨대.",
+    "page": 8
+  },
+  {
+    "word": "눈을 의심하다",
+    "meaning": "目を疑う <br>例）가격 보고 눈을 의심했어.",
+    "page": 8
+  },
+  {
+    "word": "귀를 열다",
+    "meaning": "耳を開く → 素直に聞く <br>例）조언을 들으려면 귀부터 열어야지.",
+    "page": 8
+  },
+  {
+    "word": "낯이 두껍다",
+    "meaning": "顔の皮が厚い → 図々しい <br>例）그렇게 뻔뻔하게 행동하다니 낯이 두껍네.",
+    "page": 8
+  },
+  {
+    "word": "가방끈이 짧다",
+    "meaning": "カバンの紐が短い → 学歴が低い <br>例）나 가방끈이 짧아서 그런 건 잘 몰라.",
+    "page": 8
+  },
+  {
+    "word": "눈치를 보다",
+    "meaning": "顔色をうかがう <br>例）상사 눈치 보느라 아무 말도 못 했어.",
+    "page": 8
+  },
+  {
+    "word": "기분이 뒤숭숭하다",
+    "meaning": "気分がざわざわする → 落ち着かない <br>例）요즘은 기분이 좀 뒤숭숭해.",
+    "page": 8
+  },
+  {
+    "word": "발이 닳도록 다니다",
+    "meaning": "足がすり減るほど通う <br>例）그 카페에 발이 닳도록 다녔지.",
+    "page": 8
+  },
+  {
+    "word": "속이 후련하다",
+    "meaning": "中がすっきりする → 胸がすっとする <br>例）하고 싶은 말 다 하고 나니 속이 후련해.",
+    "page": 8
+  },
+  {
+    "word": "찜찜하다",
+    "meaning": "モヤモヤする／なんとなく気になる <br>例）그 사람 말, 왠지 찜찜해.",
+    "page": 8
+  },
+  {
+    "word": "발걸음이 떨어지지 않다",
+    "meaning": "足が離れない → 去りがたい <br>例）헤어진 후에도 발걸음이 떨어지지 않았어.",
+    "page": 8
+  },
+  {
+    "word": "불붙다",
+    "meaning": "火がつく → 盛り上がる、白熱する <br>例）응원전이 불붙었어!",
+    "page": 8
+  },
+  {
+    "word": "허리띠를 졸라매다",
+    "meaning": "ベルトを締める → 節約する／気合いを入れる <br>例）이번 달은 허리띠 졸라매고 살아야 해.",
+    "page": 8
+  },
+  {
+    "word": "헛소리를 하다",
+    "meaning": "でたらめを言う <br>例）술 마시더니 헛소리만 하더라.",
+    "page": 9
+  },
+  {
+    "word": "어깨가 무겁다",
+    "meaning": "肩が重い → 責任やプレッシャーを感じる <br>例）팀장이 되니까 어깨가 무거워졌어.",
+    "page": 9
+  },
+  {
+    "word": "속이 보이다",
+    "meaning": "心の内が見える → 下心がバレバレ <br>例）그런 말은 너무 속이 보여.",
+    "page": 9
+  },
+  {
+    "word": "발목을 잡히다",
+    "meaning": "足首をつかまれる → 足を引っ張られる <br>例）그 일에 발목 잡혀서 다른 걸 못 했어.",
+    "page": 9
+  },
+  {
+    "word": "물 쓰듯 하다",
+    "meaning": "水のように使う → お金を湯水のように使う <br>例）요즘 돈을 물 쓰듯 하더라.",
+    "page": 9
+  },
+  {
+    "word": "잠이 달아나다",
+    "meaning": "眠気が逃げる → 眠れなくなる <br>例）걱정이 많아서 잠이 달아났어.",
+    "page": 9
+  },
+  {
+    "word": "손이 닿다",
+    "meaning": "手が届く → 手が回る／届く <br>例）아직 거기까지 손이 안 닿았어.",
+    "page": 9
+  },
+  {
+    "word": "피를 말리다",
+    "meaning": "血を干す → 精神的に追い詰める <br>例）결과 기다리는 동안 진짜 피 말랐어.",
+    "page": 9
+  },
+  {
+    "word": "마음이 놓이다",
+    "meaning": "心が置かれる → 安心する <br>例）무사히 도착했다니까 마음이 놓이네.",
+    "page": 9
+  },
+  {
+    "word": "가슴이 뛰다",
+    "meaning": "胸が高鳴る <br>例）공연을 앞두고 가슴이 두근거렸어.",
+    "page": 9
+  },
+  {
+    "word": "손사래를 치다",
+    "meaning": "手を振って否定する → 強く断る <br>例）부탁하니까 손사래를 치며 거절하더라.",
+    "page": 9
+  },
+  {
+    "word": "쥐도 새도 모르게",
+    "meaning": "ネズミも鳥も知らずに → こっそりと <br>例）쥐도 새도 모르게 이사했어.",
+    "page": 9
+  },
+  {
+    "word": "눈이 침침하다",
+    "meaning": "目がかすむ <br>例）요즘 눈이 침침해서 글씨가 잘 안 보여.",
+    "page": 9
+  },
+  {
+    "word": "마음을 잡다",
+    "meaning": "心をつかむ／落ち着かせる <br>例）이제 마음 잡고 다시 시작해야지.",
+    "page": 9
+  },
+  {
+    "word": "귀를 기울이다",
+    "meaning": "耳を傾ける → 注意深く聞く <br>例）친구 얘기에 귀를 기울였어.",
+    "page": 9
+  },
+  {
+    "word": "머리를 굴리다",
+    "meaning": "頭を転がす → 知恵を絞る <br>例）어떻게든 해결하려고 머리를 굴리고 있어.",
+    "page": 9
+  },
+  {
+    "word": "입맛에 맞다",
+    "meaning": "好みに合う <br>例）이 반찬은 내 입맛에 딱 맞아.",
+    "page": 9
+  },
+  {
+    "word": "거품이 끼다",
+    "meaning": "泡が立つ → 無駄に高い／過剰 <br>例）가격에 거품이 너무 많이 꼈어.",
+    "page": 9
+  },
+  {
+    "word": "눈이 멀다",
+    "meaning": "目がくらむ → 欲や愛に溺れる <br>例）돈에 눈이 멀어서 판단을 잘못했어.",
+    "page": 9
+  },
+  {
+    "word": "시간이 쏜살같다",
+    "meaning": "時間が矢のようだ → あっという間だ <br>例）벌써 4월이라니, 시간이 쏜살같네.",
+    "page": 9
+  },
+  {
+    "word": "손에 쥐다",
+    "meaning": "手に握る → 手に入れる／得る <br>例）결국 원하는 직장을 손에 쥐었어.",
+    "page": 10
+  },
+  {
+    "word": "입을 막다",
+    "meaning": "口をふさぐ → 話せなくする／黙らせる <br>例）비밀이라서 입을 막았어.",
+    "page": 10
+  },
+  {
+    "word": "등골이 오싹하다",
+    "meaning": "背筋がぞくっとする → 怖くなる <br>例）그 이야기 듣고 등골이 오싹했어.",
+    "page": 10
+  },
+  {
+    "word": "화를 풀다",
+    "meaning": "怒りを解く → 機嫌を直す <br>例）이제 그만 화 풀어.",
+    "page": 10
+  },
+  {
+    "word": "목을 메다",
+    "meaning": "喉を詰まらせる → 感情が込み上げる <br>例）편지를 읽다가 목이 메였어.",
+    "page": 10
+  },
+  {
+    "word": "심장이 쿵하다",
+    "meaning": "心臓がドキッとする <br>例）연락이 와서 심장이 쿵했어.",
+    "page": 10
+  },
+  {
+    "word": "얼굴이 피다",
+    "meaning": "顔が咲く → 元気になって明るくなる <br>例）요즘 표정이 좋아. 얼굴이 폈네.",
+    "page": 10
+  },
+  {
+    "word": "입을 맞추다",
+    "meaning": "口を合わせる → 口裏を合わせる <br>例）둘이 미리 입을 맞춘 것 같아.",
+    "page": 10
+  },
+  {
+    "word": "어깨를 으쓱하다",
+    "meaning": "肩をすくめる／誇らしげにする <br>例）칭찬을 듣자 어깨를 으쓱했어.",
+    "page": 10
+  },
+  {
+    "word": "물을 흐리다",
+    "meaning": "水を濁す → 雰囲気を壊す <br>例）괜한 말로 분위기 물 흐리지 마.",
+    "page": 10
+  },
+  {
+    "word": "밑도 끝도 없다",
+    "meaning": "前も後ろもない → 根拠がない <br>例）밑도 끝도 없이 그런 말 하면 안 돼.",
+    "page": 10
+  },
+  {
+    "word": "귀가 번쩍 뜨이다",
+    "meaning": "耳がピクッとする → 興味を引く <br>例）그 말 듣고 귀가 번쩍 뜨였어.",
+    "page": 10
+  },
+  {
+    "word": "속이 쓰리다",
+    "meaning": "胸が痛む → 心が傷つく <br>例）그런 말 듣고 속이 쓰렸어.",
+    "page": 10
+  },
+  {
+    "word": "입이 심심하다",
+    "meaning": "口が寂しい → 何か食べたくなる <br>例）밥은 먹었는데 입이 심심하네.",
+    "page": 10
+  },
+  {
+    "word": "가슴이 철렁하다",
+    "meaning": "胸がヒヤッとする <br>例）휴대폰 잃어버린 줄 알고 가슴이 철렁했어.",
+    "page": 10
+  },
+  {
+    "word": "속을 알 수 없다",
+    "meaning": "中がわからない → 何を考えているのか分からない <br>例）걔는 항상 웃고 있어서 속을 알 수가 없어.",
+    "page": 10
+  },
+  {
+    "word": "티가 나다",
+    "meaning": "目立つ／バレバレだ <br>例）거짓말하는 게 티 나.",
+    "page": 10
+  },
+  {
+    "word": "눈을 떼다",
+    "meaning": "目を離す <br>例）눈을 뗀 사이에 애가 없어졌어!",
+    "page": 10
+  },
+  {
+    "word": "기를 펴다",
+    "meaning": "元気を出す／威張る <br>例）드디어 성적이 올라서 기 좀 폈지!",
+    "page": 10
+  },
+  {
+    "word": "속을 들여다보다",
+    "meaning": "中をのぞく → 本音を見抜く <br>例）그 사람은 남의 속을 들여다보는 데 능해.",
+    "page": 10
+  }
+];
+let completed = false;
 // どの単語リストを使うか選択するオプション（例: 変数selectedListを使用）
 let selectedList = intermediateWords; // 初期状態は中級単語を使う
 
 // 出題範囲に基づく単語リストを取得
 function getWordsInRange(start, end, onlyIncorrect) {
     // 現在選択されている単語リスト（selectedList）を使ってフィルタリング
-    return selectedList.filter(word => word.page >= start && word.page <= end && (!onlyIncorrect || word.status === "不正解"));
+    return selectedList.filter(word => word.page >= start && word.page <= end && (!onlyIncorrect || word.status === "未暗記"));
 }
 
 // 出題範囲選択に応じてリストを切り替える処理を追加
+
+
 function setWordList(listType) {
-    // listTypeで指定されたリストをselectedListにセット
-    if (listType === 'beginner') {
-        selectedList = beginnerWords;
+  if (listType === 'beginner') {
+    selectedList = beginnerWords;
+  } else if (listType === 'intermediate') {
+    selectedList = intermediateWords;
+  } else if (listType === 'advanced') {
+    selectedList = advancedWords;
+  } else if (listType === 'expressionup') {
+    selectedList = expressionUpWords;
+  }
+
+  const tableContainer = document.getElementById('scrollable-table');
+  if (tableContainer) {
+    if (listType === 'expressionup') {
+      tableContainer.classList.add('small-text-mode');
     } else {
-        selectedList = intermediateWords;
+      tableContainer.classList.remove('small-text-mode');
     }
+  }
+  else if (listType === 'intermediate') {
+    selectedList = intermediateWords;
+  } else if (listType === 'advanced') {
+    selectedList = advancedWords;
+  } else {
+    selectedList = expressionUpWords;
+  }
 }
+
+
 // 出題範囲選択に基づくページ範囲の変更
+
 function updatePageRange() {
-    const isBeginner = document.getElementById("beginner-quiz").checked;
-    const startPageSelect = document.getElementById("start-page");
-    const endPageSelect = document.getElementById("end-page");
-    
-    // 現在のドロップダウンリストをクリア
-    startPageSelect.innerHTML = '';
-    endPageSelect.innerHTML = '';
+  const level = document.getElementById("quiz-level-select").value;
+  let maxPage = 1;
+  if (level === "beginner") {
+    maxPage = 21;
+  } else if (level === "intermediate") {
+    maxPage = 34;
+  } else if (level === "advanced") {
+    maxPage = 23;
+  } else if (level === "expressionup") {
+    maxPage = 10;
+  }
 
-    // 初級の場合、ページ範囲 1〜21
-    const maxPage = isBeginner ? 21 : 34;
+  const startPageSelect = document.getElementById("start-page");
+  const endPageSelect = document.getElementById("end-page");
 
-    // 新しいページ範囲を追加
-    for (let i = 1; i <= maxPage; i++) {
-        const startOption = document.createElement("option");
-        startOption.value = i;
-        startOption.textContent = i;
-        startPageSelect.appendChild(startOption);
+  startPageSelect.innerHTML = "";
+  endPageSelect.innerHTML = "";
 
-        const endOption = document.createElement("option");
-        endOption.value = i;
-        endOption.textContent = i;
-        endPageSelect.appendChild(endOption);
-    }
+  for (let i = 1; i <= maxPage; i++) {
+    const opt1 = document.createElement("option");
+    opt1.value = i;
+    opt1.textContent = i;
+    startPageSelect.appendChild(opt1);
+
+    const opt2 = document.createElement("option");
+    opt2.value = i;
+    opt2.textContent = i;
+    endPageSelect.appendChild(opt2);
+  }
 }
-// 初級/中級の選択が変更された際にページ範囲を更新
-document.querySelectorAll('input[name="quiz-level"]').forEach(input => {
-    input.addEventListener("change", updatePageRange);
+
+
+
+function updateWordlistPageRange() {
+  const level = document.getElementById("wordlist-level-select").value;
+  let maxPage = 1;
+  if (level === "beginner") {
+    maxPage = 21;
+  } else if (level === "intermediate") {
+    maxPage = 34;
+  } else if (level === "advanced") {
+    maxPage = 23;
+  } else if (level === "expressionup") {
+    maxPage = 10;
+  }
+
+  const startSelect = document.getElementById("wordlist-start-page");
+  const endSelect = document.getElementById("wordlist-end-page");
+
+  startSelect.innerHTML = "";
+  endSelect.innerHTML = "";
+
+  for (let i = 1; i <= maxPage; i++) {
+    const opt1 = document.createElement("option");
+    opt1.value = i;
+    opt1.textContent = i;
+    startSelect.appendChild(opt1);
+
+    const opt2 = document.createElement("option");
+    opt2.value = i;
+    opt2.textContent = i;
+    endSelect.appendChild(opt2);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  updatePageRange();
+  updateWordlistPageRange();
+
+  const quizLevel = document.getElementById("quiz-level-select");
+  const wordlistLevel = document.getElementById("wordlist-level-select");
+
+  if (quizLevel) {
+    quizLevel.addEventListener("change", updatePageRange);
+  }
+
+  if (wordlistLevel) {
+    wordlistLevel.addEventListener("change", updateWordlistPageRange);
+  }
 });
+
+// 初級/中級の選択が変更された際にページ範囲を更新
+document.getElementById("quiz-level-select").addEventListener("change", updatePageRange);
 
 // 最初にページ範囲を更新（ページロード時や初期状態で呼び出す）
 updatePageRange();
@@ -4689,11 +6536,11 @@ updatePageRange();
             const startOption = document.createElement("option");
             startOption.value = i;
             startOption.textContent = i;
-            document.getElementById("intermediate-start-page").appendChild(startOption);
+            // document.getElementById("intermediate-start-page").appendChild(startOption);
             const endOption = document.createElement("option");
             endOption.value = i;
             endOption.textContent = i;
-            document.getElementById("intermediate-end-page").appendChild(endOption);
+            // document.getElementById("intermediate-end-page").appendChild(endOption);
         }
 	const beginnerStartPageSelect = document.getElementById("beginner-start-page");
 	const beginnerEndPageSelect = document.getElementById("beginner-end-page");
@@ -4703,17 +6550,17 @@ updatePageRange();
             const startOption = document.createElement("option");
             startOption.value = i;
             startOption.textContent = i;
-            document.getElementById("beginner-start-page").appendChild(startOption);
+            // document.getElementById("beginner-start-page").appendChild(startOption);
             const endOption = document.createElement("option");
             endOption.value = i;
             endOption.textContent = i;
-            document.getElementById("beginner-end-page").appendChild(endOption);
+            // document.getElementById("beginner-end-page").appendChild(endOption);
         }
 
 
         // 出題範囲に基づく単語リストを取得
 function getWordsInRange(start, end, onlyIncorrect) {
-    return selectedList.filter(word => word.page >= start && word.page <= end && (!onlyIncorrect || word.status === "不正解"));
+    return selectedList.filter(word => word.page >= start && word.page <= end && (!onlyIncorrect || word.status === "未暗記"));
 }
 
 // クイズ進行状態のフラグを追加
@@ -4745,10 +6592,10 @@ function startQuiz() {
     const startPage = parseInt(document.getElementById("start-page").value);
     const endPage = parseInt(document.getElementById("end-page").value);
     const onlyIncorrect = document.getElementById("only-incorrect").checked;
-    const isBeginner = document.getElementById("beginner-quiz").checked; // 初級選択ボタンがチェックされているか確認
+    const isBeginner = document.getElementById("quiz-level-select").value === "beginner"; // 初級選択ボタンがチェックされているか確認
 
-    // 選択された単語リストを設定
-    setWordList(isBeginner ? 'beginner' : 'intermediate'); // 初級か中級のリストを選択
+	const selectedLevel = document.getElementById("quiz-level-select").value;
+	setWordList(selectedLevel);
 
     if (startPage > endPage) {
         alert("開始ページは終了ページ以下にしてください。");
@@ -4757,7 +6604,10 @@ function startQuiz() {
 
     // クイズ進行状況を復元するか、新しく開始するか確認
     const savedQuizState = localStorage.getItem("quizProgress");
-    if (savedQuizState) {
+    if (completed) {
+    // 終了フラグが立っている場合は、確認せずに強制的に新しいクイズを開始
+    startNewQuiz();
+    } else if (savedQuizState) {
         showQuizModal(
             "前回途中で終了したクイズがあります。再開しますか？",
             () => {
@@ -4769,37 +6619,39 @@ function startQuiz() {
             },
             () => {
                 // 新しいクイズを開始
-                quizWords = getWordsInRange(startPage, endPage, onlyIncorrect);
-
-                if (quizWords.length === 0) {
-                    alert("選択範囲内に単語がありません。");
-                    return;
-                }
-
-                quizWords = shuffleArray(quizWords);
-                currentQuizIndex = 0;
-                isQuizInProgress = true;
-
-                showQuizSection();
-                nextQuestion();
+                startNewQuiz();
             }
         );
     } else {
-        // 新しいクイズを開始する場合
-        quizWords = getWordsInRange(startPage, endPage, onlyIncorrect);
-
-        if (quizWords.length === 0) {
-            alert("選択範囲内に単語がありません。");
-            return;
-        }
-
-        quizWords = shuffleArray(quizWords);
-        currentQuizIndex = 0;
-        isQuizInProgress = true;
-
-        showQuizSection();
-        nextQuestion();
+        // 新しいクイズを開始
+        startNewQuiz();
     }
+}
+// 新しいクイズを開始する関数
+function startNewQuiz() {
+    completed = false; // 終了フラグをリセット
+    const startPage = parseInt(document.getElementById("start-page").value);
+    const endPage = parseInt(document.getElementById("end-page").value);
+    const onlyIncorrect = document.getElementById("only-incorrect").checked;
+    const isBeginner = document.getElementById("quiz-level-select").value === "beginner"; // 初級選択ボタンがチェックされているか確認
+    
+    loadAnswersFromStorage();
+    quizWords = getWordsInRange(startPage, endPage, onlyIncorrect);
+
+    if (quizWords.length === 0) {
+        alert("選択範囲内に単語がありません。");
+        return;
+    }
+
+    quizWords = shuffleArray(quizWords);
+    currentQuizIndex = 0;
+    isQuizInProgress = true;
+
+    // 進行状況を初期化
+    updateProgress();
+
+    showQuizSection();
+    nextQuestion();
 }
 	function shuffleArray(array) {
     	    for (let i = array.length - 1; i > 0; i--) {
@@ -4854,49 +6706,114 @@ function loadAnswersFromStorage() {
 function toggleAutoSpeak() {
     return document.getElementById("auto-speak").checked;
 }
+function markAnswer(isCorrect) {
+    const word = quizWords[currentQuizIndex]; // 現在の単語
+    const resultElement = document.getElementById("result");
 
-// 次の問題を設定
+    // 意味を表示する
+    document.getElementById('meaning').style.display = 'inline';
+
+    // 「次へ」ボタンを表示する
+    document.getElementById('next-btn').style.display = 'block';
+    // 〇×ボタンを非表示
+    document.getElementById('incorrect-btn').style.display = "none";
+    document.getElementById('correct-btn').style.display = "none";
+
+    // 正解・不正解の判定処理
+    if (isCorrect) {
+        resultElement.style.color = "green";
+        word.status = "暗記済"; 
+    } else {
+        resultElement.style.color = "red";
+        word.status = "未暗記"; 
+    }
+    // **ここで currentQuizIndex を更新**
+    currentQuizIndex++; // 次の問題へ進む
+
+    saveAnswer(word, word.status); // ステータスを保存
+
+    // 進行状況の更新
+    updateProgress();
+
+    // 1秒後に次の問題へ移動する処理をセット（〇ボタンが押された場合は自動で移動）
+    if (isCorrect) {
+        autoNextTimeout = setTimeout(() => {
+            nextQuestion(); // ここを showNextWord() ではなく nextQuestion() にする
+        }, 1000);
+    }
+}
+// 一つ前の問題に移動
+function moveToPrevious() {
+    if (currentQuizIndex > 0) {
+        currentQuizIndex--;
+        nextQuestion();  // 次の問題に進む処理を呼び出す
+    }
+}
+
+// 一つ次の問題に移動
+function moveToNext() {
+    if (currentQuizIndex < quizWords.length - 1) {
+        currentQuizIndex++;
+        nextQuestion();  // 次の問題に進む処理を呼び出す
+    }
+}
+
+let currentWord = 0; // フラッシュカードの現在の単語インデックスを初期化
+let autoNextTimeout;  // 1秒後の自動移動処理を管理する変数
+
+// 次の問題に進む
 function nextQuestion() {
-    // 前の音声再生とタイマーを停止
+    clearTimeout(autoNextTimeout);  // 1秒後の自動移動をキャンセル
+
+    // クイズが終了した場合、最後の問題の処理を行う
+    if (currentQuizIndex >= quizWords.length) {
+        alert("フラッシュカード終了！");
+        completed = true;  // 終了状態を示すフラグを立てる
+        showRangeSelection(); // 範囲選択画面に戻る
+        return;
+    }
+
     speechSynthesis.cancel();
     if (speechTimeoutId) {
         clearTimeout(speechTimeoutId);
         speechTimeoutId = null;
     }
-    if (currentQuizIndex >= quizWords.length) {
-        endQuiz(); // クイズが終了した場合に終了処理を呼び出す
-        return;
-    }
 
-    const word = quizWords[currentQuizIndex];
-    document.getElementById("word").textContent = word.word;
-    document.getElementById("answer").value = "";
-    document.getElementById("result").textContent = "";
-    document.getElementById("submit-answer").classList.remove("hidden");
-    document.getElementById("submit-answer").disabled = false;
-    document.getElementById("memorized-check-container").classList.add("hidden");
-    document.getElementById("next-question").classList.add("hidden");
+    // 現在の単語を設定
+    const word = quizWords[currentQuizIndex]; 
+    document.getElementById("word").innerHTML = word.word;
+    document.getElementById("meaning").innerHTML = word.meaning;
+    document.getElementById('meaning').style.display = "none"; 
+    document.getElementById("result").innerHTML = "";
 
-    document.getElementById("answer").focus();
-    document.getElementById("memorized-check").checked = false; // チェックボックスをリセット
+    // 「〇×」ボタンを表示
+    document.getElementById("incorrect-btn").style.display = "inline-block";
+    document.getElementById("correct-btn").style.display = "inline-block";
+    document.getElementById("next-btn").style.display = "none"; // 次へボタン非表示
 
-    // 現在の進行状況を保存
     saveQuizProgress();
+    updateProgress();  // 進行状況を更新
 
     // 自動読み上げ機能がオンなら単語を2回読み上げ
     if (toggleAutoSpeak()) {
-        playWord(word.word); // 1回目
+        playWord(word.word);
 
         // 2回目の再生タイマーを設定
-        speechTimeoutId = setTimeout(() => {
-            // 現在の問題であれば再生
-            if (currentQuizIndex === quizWords.indexOf(word) + 1) {
-                playWord(word.word); // 2回目
-            }
-        }, 2000); // 2秒後に再生
+//        speechTimeoutId = setTimeout(() => {
+//            if (currentQuizIndex === quizWords.indexOf(word)) {
+//                playWord(word.word);
+//            }
+//        }, 2500);
     }
-    // 現在のインデックスを増加させる
-    currentQuizIndex++;
+}
+
+// 進行状況の更新
+function updateProgress() {
+    const totalQuestions = quizWords.length;
+    const answeredQuestions = currentQuizIndex + 1; // 進行状況の表示は1からカウント
+    const progressText = `${answeredQuestions}/${totalQuestions}`;
+    
+    document.getElementById('progress').textContent = progressText; // 進行状況を表示
 }
 
 // 「戻る」ボタンを押した際の処理
@@ -4906,78 +6823,6 @@ function showRangeSelection() {
 
     // クイズ進行中でも単語リストや進捗はリセットしない
 }
-
-// ひらがなに変換
-function toHiragana(input) {
-    return input.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
-        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
-    }).replace(/[A-Z]/g, function(s) {
-        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0); // 半角英数字を変換
-    });
-}
-
-// カタカナに変換
-function toKatakana(input) {
-    return input.replace(/[ぁ-ん]/g, function(s) {
-        return String.fromCharCode(s.charCodeAt(0) + 0x60);
-    });
-}
-
-// 回答をチェック
-function checkAnswer() {
-    const answer = document.getElementById("answer").value.trim();
-    const word = quizWords[currentQuizIndex - 1]; // 現在の単語
-    const resultElement = document.getElementById("result");
-
-
-    // 正解の意味を分割
-    const correctMeanings = word.meaning.split("、");
-
-    // 入力された解答のひらがなとカタカナ候補を生成
-    const hiraganaAnswer = toHiragana(answer);
-    const katakanaAnswer = toKatakana(answer);
-    // 解答候補をコンソールに表示
-
-    // 正誤判定
-    const isExactMatch = correctMeanings.includes(answer);
-    const isHiraganaMatch = correctMeanings.some(meaning => meaning === hiraganaAnswer);
-    const isKatakanaMatch = correctMeanings.some(meaning => meaning === katakanaAnswer);
-    const isPartialMatch = correctMeanings.some(meaning => answer.includes(meaning));
-
-    // 判定
-    if (isExactMatch || isHiraganaMatch || isKatakanaMatch || isPartialMatch) {
-        resultElement.textContent = `正解！「${word.meaning}」です。`;
-        resultElement.style.color = "green";
-
-//        console.log("word配列の中身:", word);
-
-        // 解答者が正解した場合のみ、「覚えましたか？」チェックボックスを表示
-        if (word.status === "不正解"){
-            document.getElementById("memorized-check-container").classList.remove("hidden");
-	}
-
-        // チェックボックスが入っていない場合は「不正解」から「正解」に更新
-        if (word.status === "不正解" && !document.getElementById("memorized-check").checked) {
-            word.status = "不正解"; // チェックが入っていれば「不正解」
-        } else {
-            word.status = "正解"; // チェックが入っていなければ「正解」
-        }
-//	console.log("word配列の中身:", word);
-        saveAnswer(word, word.status);  // 結果を保存
-    } else {
-//	console.log("word配列の中身:", word);
-        resultElement.textContent = `不正解！正解は「${word.meaning}」です。`;
-        resultElement.style.color = "red";
-        word.status = "不正解"; // 不正解の場合は状態を不正解に更新
-//console.log("word配列の中身:", word);
-        saveAnswer(word, word.status);  // 結果を保存
-    }
-
-    // 次の問題に進むボタンを表示
-    document.getElementById("submit-answer").classList.add("hidden");
-    document.getElementById("next-question").classList.remove("hidden");
-}
-
 function saveQuizProgress() {
     const quizState = {
         currentQuizIndex: currentQuizIndex,
@@ -4996,76 +6841,40 @@ function loadQuizProgress() {
         currentQuizIndex = 0;
     }
 }
-
-
-window.addEventListener('load', function() {
-    document.getElementById("answer").focus();
-});
-
-document.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        // 現在のセクションがクイズの場合
-        if (!document.getElementById("quiz-section").classList.contains("hidden")) {
-            // 解答ボタンが表示されている場合
-            if (!document.getElementById("submit-answer").classList.contains("hidden")) {
-                checkAnswer();
-            }
-            // 次の問題ボタンが表示されている場合
-            else if (!document.getElementById("next-question").classList.contains("hidden")) {
-                nextQuestion();
-            }
-        }
-    }
-});
-
-document.getElementById("memorized-check").addEventListener("change", function() {
-    const word = quizWords[currentQuizIndex - 1]; // 現在の単語を取得
-    if (this.checked) {
-        word.status = "正解";  // チェックされた場合は「正解」に設定
-    } else {
-        word.status = "不正解";  // チェック外れた場合は「不正解」に設定
-    }
-    saveAnswer(word, word.status);  // 状態を保存
-});
-
+document.body.addEventListener("click", () => {
+    const dummy = new Audio();
+    dummy.play().catch(() => {});
+}, { once: true });
+// グローバル変数：最後に再生された単語
+let lastPlayedWord = "";
 let speechTimeoutId; // 音声再生タイマーのID  
 let currentWordIndex = 0; // 現在の再生対象単語のインデックス  
 let isAudioUnlocked = false; // ブラウザの音声再生が許可されたかどうか
 let isPlaying = false; // 現在の音声再生状態
+let currentAudio = null;
 
-// ページロード時に無音を再生（iOSの制限を回避）
-window.addEventListener("load", () => {
-    let silentAudio = new Audio();
-    silentAudio.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
-    silentAudio.play().catch(() => {});
-});
 function playWord(word) {
-    if (!word) {
-        alert("単語が指定されていません。");
-        return;
+    if (!word) return;
+	
+	    // 既存の再生があれば止める
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
     }
 
-if (!'speechSynthesis' in window) {
-        alert("このブラウザは音声合成をサポートしていません。");
-        return;
-    }
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ko&client=tw-ob&q=${encodeURIComponent(word)}`;
+    const audio = new Audio(url);
 
-    // 既存の音声再生を停止
-    speechSynthesis.cancel();
-
-    // スピーカーマークなどの不要な文字を除去
-    const cleanWord = word.replace(/🔊/, "").trim();
-
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = "ko-KR"; // 韓国語を指定
-    utterance.pitch = 0.5;
-    utterance.rate = 0.7;
-    speechSynthesis.speak(utterance);
-    lastPlayedWord = word; // 最後に再生された単語を記録
+	  audio.play().then(() => {
+	    lastPlayedWord = word;
+	}).catch((err) => {
+	    console.error("音声再生エラー:", err);
+	    showToast("⚠️ 音声の再生に失敗しました。もう一度お試しください。");
+	});
 }
 
-// グローバル変数：最後に再生された単語
-let lastPlayedWord = "";
+
 document.addEventListener("keydown", function(event) {
     if (event.shiftKey) {
         if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -5113,7 +6922,10 @@ document.addEventListener("keydown", function (event) {
 
     if (event.key === "ArrowDown") {
         // →キーで次の単語を再生
-        if (currentWordIndex < wordListRows.length - 1) {
+        if (currentWordIndex === -1 || currentWordIndex <= 0) {
+            // まだ再生していない場合 or 一番下にいる場合 → 一番上の単語を再生
+            currentWordIndex = 0;
+        } else if (currentWordIndex < wordListRows.length - 1) {
             currentWordIndex++;
         }
         const nextWord = wordListRows[currentWordIndex]
@@ -5135,6 +6947,76 @@ document.addEventListener("keydown", function (event) {
         lastPlayedWord = prevWord; // 最後に再生された単語を更新
     }
 });
+function playPreviousWord() {
+    const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
+    if (wordListRows.length === 0) return; // 単語リストが空なら何もしない
+
+    if (currentWordIndex > 0) {
+        currentWordIndex--;
+    }
+    const prevWord = wordListRows[currentWordIndex]
+    playWordAtIndex(currentWordIndex, wordListRows);
+    scrollTable("up");
+}
+function playNextWord() {
+    const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
+    if (currentWordIndex < wordListRows.length - 1) {
+        currentWordIndex++;
+    }
+    playWordAtIndex(currentWordIndex, wordListRows);
+    scrollTable("down");
+}
+
+// スクロール量（ピクセル単位）
+const scrollStep = 42;
+
+// 表のスクロールを行う関数
+function scrollTable(direction) {
+    const scrollableTable = document.getElementById("scrollable-table");
+    if (direction === "down") {
+        scrollableTable.scrollTop += scrollStep;
+    } else if (direction === "up") {
+        scrollableTable.scrollTop -= scrollStep;
+    }
+}
+
+// 単語を再生（`currentWordIndex` の変更はここでは行わない）
+function playWordAtIndex(index, wordListRows) {
+    if (!wordListRows || wordListRows.length === 0 || index < 0 || index >= wordListRows.length) return;
+
+    const word = wordListRows[index]
+        .querySelector("td:first-child")
+        .textContent.trim()
+        .replace(/🔊/, ""); // スピーカーマークを除去
+
+    playWord(word);
+    lastPlayedWord = word;
+    currentWordIndex = index;
+}
+
+// ボタンのクリックイベント
+// document.getElementById("up-button").addEventListener("click", () => {
+//     const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
+//     if (currentWordIndex > 0) {
+//         currentWordIndex--;
+//     }
+//     playWordAtIndex(currentWordIndex, wordListRows);
+//     scrollTable("up");
+// });
+// document.getElementById("down-button").addEventListener("click", () => {
+//     const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
+//     if (currentWordIndex < wordListRows.length - 1) {
+//         currentWordIndex++;
+//     }
+//     playWordAtIndex(currentWordIndex, wordListRows);
+//     scrollTable("down");
+// });
+
+function repeatLastWord() {
+    if (lastPlayedWord) {
+        playWord(lastPlayedWord);
+    }
+}
 ////////////////////// 単語一覧の表示関数/////////////////////////////////////////////
     // 韓国語の表示/非表示を切り替える関数
     function toggleKorean() {
@@ -5150,21 +7032,29 @@ document.addEventListener("keydown", function (event) {
             td.classList.toggle("hidden-meaning", isChecked);
         });
     }
-document.getElementById("beginner-word-list-btn").addEventListener("click", function () {
-    let shuffle = document.getElementById("shuffle-beginner-words").checked;
-    displayWordList("beginner", shuffle);
-});
 
-document.getElementById("intermediate-word-list-btn").addEventListener("click", function () {
-    let shuffle = document.getElementById("shuffle-intermediate-words").checked;
-    displayWordList("intermediate", shuffle);
-});
-// 「中級単語一覧を見る」ボタン
-function showIntermediateWordList() {
-    setWordList('intermediate');
+function playWordFromSpeaker(word) {
+    playWord(word);
 
-    const startPage = parseInt(document.getElementById("intermediate-start-page").value);
-    const endPage = parseInt(document.getElementById("intermediate-end-page").value);
+    const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
+    for (let i = 0; i < wordListRows.length; i++) {
+        const rowWord = wordListRows[i].querySelector("td:first-child").textContent
+            .replace(/🔊/, "")
+            .trim();
+        if (rowWord === word) {
+            currentWordIndex = i;
+            break;
+        }
+    }
+}
+
+function showSelectedWordList() {
+    const level = document.getElementById("wordlist-level-select").value;
+    setWordList(level);
+
+    const startPage = parseInt(document.getElementById("wordlist-start-page").value);
+    const endPage = parseInt(document.getElementById("wordlist-end-page").value);
+    const shuffle = document.getElementById("wordlist-shuffle").checked;
 
     if (startPage > endPage) {
         alert("開始ページは終了ページ以下にしてください。");
@@ -5172,101 +7062,130 @@ function showIntermediateWordList() {
     }
 
     const filteredWords = selectedList.filter(word => word.page >= startPage && word.page <= endPage);
-    if (filteredWords.length === 0) {
-        alert("選択範囲内に単語がありません。");
-        return;
-    }
-
-    showWordList(filteredWords, "intermediate"); // 中級レベルを指定
-}
-// 「初級単語一覧を見る」ボタン
-function showBeginnerWordList() {
-    setWordList('beginner');
-
-    const startPage = parseInt(document.getElementById("beginner-start-page").value);
-    const endPage = parseInt(document.getElementById("beginner-end-page").value);
-
-    if (startPage > endPage) {
-        alert("開始ページは終了ページ以下にしてください。");
-        return;
-    }
-
-    const filteredWords = selectedList.filter(word => word.page >= startPage && word.page <= endPage);
-    if (filteredWords.length === 0) {
-        alert("選択範囲内に単語がありません。");
-        return;
-    }
-
-    showWordList(filteredWords, "beginner"); // 初級レベルを指定
-}
-
-function displayWordList(level, shuffle) {
-    let wordList = level === "beginner" ? beginnerWords : intermediateWords;
-
     if (shuffle) {
-        wordList = [...wordList].sort(() => Math.random() - 0.5);
+        filteredWords.sort(() => Math.random() - 0.5);
     }
 
-    showWordList(wordList, level); // ここで level を渡す
+    showWordList(filteredWords, level);
 }
+
 // 単語一覧表示関数（ローカルストレージのデータを適用）
 function showWordList(filteredWords, level) {
-    // 現在のインデックスをリセット
     currentWordIndex = 0;
-    // ローカルストレージからのデータを最新にする
-    loadAnswersFromStorage(); 
+    loadAnswersFromStorage();
     hideAllSections();
-    // 初級か中級かを判定して対応するチェックボックスを取得
-    let shuffleCheckboxId = level === "beginner" ? "shuffle-beginner-words" : "shuffle-intermediate-words";
-    let shuffleCheckbox = document.getElementById(shuffleCheckboxId);
 
-    if (!shuffleCheckbox) {
-        console.error("エラー: シャッフルチェックボックスが見つかりません:", shuffleCheckboxId);
-        return;
-    }
+    let shuffleCheckbox = document.getElementById("wordlist-shuffle");
+    if (!shuffleCheckbox) return;
 
-    let shuffleWords = shuffleCheckbox.checked;
-
-    if (shuffleWords) {
+    if (shuffleCheckbox.checked) {
         filteredWords = [...filteredWords].sort(() => Math.random() - 0.5);
     }
+
     const wordListBody = document.getElementById("word-list-body");
     wordListBody.innerHTML = "";
+
     filteredWords.forEach(word => {
         let statusClass = "";
         let statusText = "";
-        // 解答状況に応じて表示内容を設定
-        if (word.status === "正解") {
+        if (word.status === "暗記済") {
             statusClass = "green";
             statusText = "〇";
-        } else if (word.status === "不正解") {
+        } else if (word.status === "未暗記") {
             statusClass = "red";
             statusText = "×";
         }
+
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${word.word} <span onclick="playWord('${word.word}')" style="font-size: 12px; cursor: pointer;">🔊</span></td>
+            <td>${word.word}  <span onclick="playWordFromSpeaker('${word.word}')" style="font-size: 12px; cursor: pointer;">🔊</span></td>
             <td>${word.meaning}</td>
-            <td class="${statusClass}">${statusText}</td>
+            <td class="${statusClass}" onclick="toggleWordStatus(this, '${word.word}')">${statusText}</td>
         `;
         wordListBody.appendChild(row);
     });
-    // チェックボックスフィルタを適用
+
     filterWordList();
     document.getElementById("word-list").classList.remove("hidden");
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // ボタンのクリックイベントリスナーをここで追加
-    document.getElementById("intermediate-word-list-btn").addEventListener("click", showIntermediateWordList);
-    document.getElementById("beginner-word-list-btn").addEventListener("click", showBeginnerWordList);
-    document.getElementById("start-page").focus();
+function toggleWordStatus(cell, wordText) {
+    let currentStatus = cell.textContent.trim();
+    let newStatus = "";
+    let newClass = "";
+
+    if (currentStatus === "〇") {
+        newStatus = "×";
+        newClass = "red";
+    } else if (currentStatus === "×") {
+        newStatus = "";
+        newClass = "";
+    } else {
+        newStatus = "〇";
+        newClass = "green";
+    }
+
+    // セルの見た目を更新
+    cell.textContent = newStatus;
+    cell.className = newClass;
+
+    // データ構造を更新
+    const wordObj = selectedList.find(w => w.word === wordText);
+    if (wordObj) {
+        if (newStatus === "〇") {
+            wordObj.status = "暗記済";
+        } else if (newStatus === "×") {
+            wordObj.status = "未暗記";
+        } else {
+            delete wordObj.status;
+        }
+    }
+
+    // localStorageに保存
+    let storedAnswers = JSON.parse(localStorage.getItem('quizAnswers')) || [];
+    const existing = storedAnswers.find(a => a.word === wordText);
+    if (existing) {
+        if (newStatus === "") {
+            storedAnswers = storedAnswers.filter(a => a.word !== wordText);
+        } else {
+            existing.status = newStatus === "〇" ? "暗記済" : "未暗記";
+        }
+    } else if (newStatus !== "") {
+        storedAnswers.push({
+            word: wordText,
+            status: newStatus === "〇" ? "暗記済" : "未暗記"
+        });
+    }
+    localStorage.setItem("quizAnswers", JSON.stringify(storedAnswers));
+
+    // フィルターが有効な場合は再適用
+    // filterWordList();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const btn = document.getElementById("word-list-show-btn");
+  if (btn) {
+    btn.addEventListener("click", showSelectedWordList); 
+  }
 });
-// 初期ロード時にローカルストレージからデータを適用
-window.addEventListener('load', function () {
-    loadAnswersFromStorage(); // ローカルストレージのデータを反映
-    document.getElementById("answer").focus();
+
+document.addEventListener("DOMContentLoaded", function () {
+    const scrollableTable = document.getElementById("scrollable-table");
+
+    // iPadでもフォーカスを当てられるようにする
+    scrollableTable.addEventListener("click", () => {
+        scrollableTable.focus();
+    });
+
 });
+
+// document.addEventListener('DOMContentLoaded', function() {
+//     // ボタンのクリックイベントリスナーをここで追加
+//     document.getElementById("intermediate-word-list-btn").addEventListener("click", showIntermediateWordList);
+//     document.getElementById("beginner-word-list-btn").addEventListener("click", showBeginnerWordList);
+//     document.getElementById("start-page").focus();
+// });
+
 // 範囲を基に単語一覧を表示する関数
 function showFilteredWordList() {
     const startPage = parseInt(wordListStartPageSelect.value);
@@ -5322,7 +7241,62 @@ function filterWordList() {
             });
         }
         showRangeSelection();
-    </script>
-</body>
-</html>
+////ファイル進捗出力///////////////////////////////////////////////////////////////////////////
+function exportProgress() {
+    const answers = JSON.parse(localStorage.getItem("quizAnswers")) || [];
+    const jsonString = JSON.stringify(answers, null, 2);
 
+    const outputArea = document.getElementById("json-output");
+    const textArea = document.getElementById("json-text");
+
+    textArea.value = jsonString;
+    outputArea.classList.remove("hidden");
+    textArea.scrollTop = 0;
+    textArea.select(); // 自動で全選択
+
+    showToast("コピーして保存してください！");
+}
+
+function importProgress(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (Array.isArray(data)) {
+                localStorage.setItem("quizAnswers", JSON.stringify(data));
+                showToast("暗記状況を読み込みました！");
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                alert("ファイルの形式が正しくありません。");
+            }
+        } catch (error) {
+            alert("読み込みに失敗しました。JSON形式のファイルを選んでください。");
+        }
+    };
+    reader.readAsText(file);
+}
+
+function copyToClipboard() {
+    const textArea = document.getElementById("json-text");
+    textArea.select();
+    document.execCommand("copy");
+    showToast("コピーしました！");
+}
+
+function showToast(message, duration = 3000) {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, duration);
+}
+</script>
+</div></body>
+</html>
