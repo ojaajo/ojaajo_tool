@@ -6854,8 +6854,8 @@ let isPlaying = false; // 現在の音声再生状態
 let currentAudio = null;
 
 function playWord(word) {
-    if (!word) return;
-	
+ 
+	if (!audioAllowed || !word) return;
 	    // 既存の再生があれば止める
     if (currentAudio) {
         currentAudio.pause();
@@ -6863,8 +6863,8 @@ function playWord(word) {
         currentAudio = null;
     }
 
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=ko&client=tw-ob&q=${encodeURIComponent(word)}`;
-    const audio = new Audio(url);
+  const url = `https://ojaajo-sound.vercel.app/api/tts?text=${encodeURIComponent(word)}`;
+  const audio = new Audio(url);
 
 	  audio.play().then(() => {
 	    lastPlayedWord = word;
@@ -6873,7 +6873,6 @@ function playWord(word) {
 	    showToast("⚠️ 音声の再生に失敗しました。もう一度お試しください。");
 	});
 }
-
 
 document.addEventListener("keydown", function(event) {
     if (event.shiftKey) {
