@@ -7274,7 +7274,7 @@ function setWordList(listType) {
     selectedList = advancedWords;
   } else if (listType === 'expressionup') {
     selectedList = expressionUpWords;
-  } else if (listType === 'Level4l') {
+  } else if (listType === 'Level4') {
     selectedList = Level4ofkoreanschool;
   } 
 
@@ -7290,6 +7290,8 @@ function setWordList(listType) {
     selectedList = intermediateWords;
   } else if (listType === 'advanced') {
     selectedList = advancedWords;
+  }  else if (level === "Level4") {
+  words = Level4ofkoreanschool;
   } else {
     selectedList = expressionUpWords;
   }
