@@ -9288,6 +9288,7 @@ function playWord(word) {
 
   const url = `https://ojaajo-sound.vercel.app/api/tts?text=${encodeURIComponent(word)}`;
   const audio = new Audio(url);
+  currentAudio = audio;
 
 	  audio.play().then(() => {
 	    lastPlayedWord = word;
@@ -9359,24 +9360,20 @@ document.addEventListener("keydown", function (event) {
   if (isQuizActive) return;
 
   // --- 矢印↑↓：画面ボタンと同じ処理に統一 ---
-  if (!event.altKey && !event.ctrlKey && !event.metaKey) {
-    if (event.key === "ArrowDown") {
-      event.preventDefault();      // スクロール抑止
-      event.stopPropagation();
-      if (typeof playNextWord === "function") {
-        playNextWord();            // 画面下ボタンと同処理
-      }
-      return;
-    }
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      event.stopPropagation();
-      if (typeof playPreviousWord === "function") {
-        playPreviousWord();        // 画面上ボタンと同処理
-      }
-      return;
-    }
+if (!event.altKey && !event.ctrlKey && !event.metaKey) {
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    event.stopPropagation();
+    if (typeof playNextWord === "function") playNextWord();
+    return;
   }
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    event.stopPropagation();
+    if (typeof playPreviousWord === "function") playPreviousWord();
+    return;
+  }
+}
 
   // --- （必要なら）Shift+矢印の個別処理も可能 ---
   // if (event.shiftKey && (event.key === "ArrowUp" || event.key === "ArrowDown")) { ... }
