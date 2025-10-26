@@ -377,9 +377,9 @@ body {
 
 #word-wrapper {
     display: flex;
-    align-items: center;  /* 単語と🔊を縦中央揃え */
-    justify-content: center;  /* 🔊マークを単語の右に配置 */
-    gap: 8px;  /* 単語と🔊マークの間隔 */
+    align-items: center;  /* 単語と📢を縦中央揃え */
+    justify-content: center;  /* 📢マークを単語の右に配置 */
+    gap: 8px;  /* 単語と📢マークの間隔 */
     min-width: 200px;  /* 単語の幅を一定にし、意味と揃えやすくする */
 }
 
@@ -554,6 +554,44 @@ select {
   overflow-y: auto;
   display: block;
 }
+
+/* 単語セル：左に単語、右にアイコン */
+.word-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  white-space: nowrap;        /* 折り返し防止（必要なら） */
+}
+
+/* テキスト側（抽出用のフックにも使う） */
+.word-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* アイコンボタンを控えめに（キーボード操作にも配慮してbutton化） */
+.icon-btn {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 0.9em;           /* 📢を少し小さめ */
+  opacity: 0.45;              /* 目立ちすぎない */
+  cursor: pointer;
+  border-radius: 4px;
+  transition: opacity 0.15s, transform 0.05s;
+}
+.word-cell:hover .icon-btn,
+.icon-btn:focus-visible {
+  opacity: 1;                 /* ホバー/フォーカス時だけクッキリ */
+}
+.icon-btn:active {
+  transform: translateY(1px);
+}
+
 /* 表現力UPモード時に単語一覧の文字を小さくする */
 #scrollable-table.small-text-mode table {
   font-size: 12px;
@@ -644,7 +682,7 @@ select {
 <div id="word-container">
 <div id="word-wrapper">
 <span id="word">ここに単語が表示されます</span>
-<span id="speaker-icon" onclick="playWord(document.getElementById('word').textContent)">🔊</span>
+<span id="speaker-icon" onclick="playWord(document.getElementById('word').textContent)">📢</span>
 </div>
 </div>
 <div id="meaning">（意味が表示されます）</div>
@@ -5412,7 +5450,7 @@ const advancedWords = [
 {"word": "낮추다", "meaning": "下げる", "page": 5},
 {"word": "내놓다", "meaning": "出す", "page": 5},
 {"word": "내두르다", "meaning": "振り回す", "page": 5},
-{"word": "내물다", "meaning": "押し出す、追い立てる", "page": 5},
+{"word": "내몰다", "meaning": "押し出す、追い立てる", "page": 5},
 {"word": "내뱉다", "meaning": "吐き出す", "page": 5},
 {"word": "내뿜다", "meaning": "吹き出す", "page": 5},
 {"word": "내색하다", "meaning": "顔に出す、そぶりを見せる", "page": 5},
@@ -6543,7 +6581,7 @@ const advancedWords = [
 {"word": "진열하다", "meaning": "陳列する", "page": 19},
 {"word": "진영", "meaning": "陣営", "page": 19},
 {"word": "진입", "meaning": "進入", "page": 19},
-{"word": "진작", "meaning": "とっくに", "page": 19},
+{"word": "진작", "meaning": "とっくに、ずっと前に", "page": 19},
 {"word": "진정으로", "meaning": "心から、本気で", "page": 19},
 {"word": "진정하다", "meaning": "落ち着く", "page": 19},
 {"word": "진지하다", "meaning": "真剣だ", "page": 19},
@@ -9296,41 +9334,52 @@ document.addEventListener("keydown", function (event) {
 });
 // 矢印キーの処理
 document.addEventListener("keydown", function (event) {
-    // クイズ中の場合は矢印キーの処理を無効化
-    if (!document.getElementById("quiz-section").classList.contains("hidden")) {
-        return;
+  // 入力中（INPUT/TEXTAREA/contenteditable）は奪わない
+  const t = event.target;
+  const typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+  if (typing) return;
+
+  const isQuizActive = !document.getElementById("quiz-section").classList.contains("hidden");
+
+  // --- Shift単独：最後の単語 or クイズ中は現在の単語を再生 ---
+  if (event.key === "Shift") {
+    if (isQuizActive) {
+      // クイズ中：現在の問題の単語を再生
+      if (typeof quizWords !== "undefined" && quizWords[currentQuizIndex - 1]) {
+        playWord(quizWords[currentQuizIndex - 1].word);
+      }
+    } else if (lastPlayedWord) {
+      // 単語一覧表示中：最後に再生された単語を再生
+      playWord(lastPlayedWord);
     }
+    return;
+  }
 
-    const wordListRows = document.querySelectorAll("#word-list-body tr");
-    if (wordListRows.length === 0) return; // 単語リストが空の場合は何もしない
+  // --- クイズ中は矢印キー無効 ---
+  if (isQuizActive) return;
 
+  // --- 矢印↑↓：画面ボタンと同じ処理に統一 ---
+  if (!event.altKey && !event.ctrlKey && !event.metaKey) {
     if (event.key === "ArrowDown") {
-        // →キーで次の単語を再生
-        if (currentWordIndex === -1 || currentWordIndex <= 0) {
-            // まだ再生していない場合 or 一番下にいる場合 → 一番上の単語を再生
-            currentWordIndex = 0;
-        } else if (currentWordIndex < wordListRows.length - 1) {
-            currentWordIndex++;
-        }
-        const nextWord = wordListRows[currentWordIndex]
-            .querySelector("td:first-child")
-            .textContent.trim()
-            .replace(/🔊/, ""); // スピーカーマークを除去
-        playWord(nextWord);
-        lastPlayedWord = nextWord; // 最後に再生された単語を更新
-    } else if (event.key === "ArrowUp") {
-        // ←キーで前の単語を再生
-        if (currentWordIndex > 0) {
-            currentWordIndex--;
-        }
-        const prevWord = wordListRows[currentWordIndex]
-            .querySelector("td:first-child")
-            .textContent.trim()
-            .replace(/🔊/, ""); // スピーカーマークを除去
-        playWord(prevWord);
-        lastPlayedWord = prevWord; // 最後に再生された単語を更新
+      event.preventDefault();      // スクロール抑止
+      if (typeof playNextWord === "function") {
+        playNextWord();            // 画面下ボタンと同処理
+      }
+      return;
     }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      if (typeof playPreviousWord === "function") {
+        playPreviousWord();        // 画面上ボタンと同処理
+      }
+      return;
+    }
+  }
+
+  // --- （必要なら）Shift+矢印の個別処理も可能 ---
+  // if (event.shiftKey && (event.key === "ArrowUp" || event.key === "ArrowDown")) { ... }
 });
+
 function playPreviousWord() {
     const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
     if (wordListRows.length === 0) return; // 単語リストが空なら何もしない
@@ -9371,7 +9420,7 @@ function playWordAtIndex(index, wordListRows) {
     const word = wordListRows[index]
         .querySelector("td:first-child")
         .textContent.trim()
-        .replace(/🔊/, ""); // スピーカーマークを除去
+        .replace(/📢/, ""); // スピーカーマークを除去
 
     playWord(word);
     lastPlayedWord = word;
@@ -9423,7 +9472,7 @@ function playWordFromSpeaker(word) {
     const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
     for (let i = 0; i < wordListRows.length; i++) {
         const rowWord = wordListRows[i].querySelector("td:first-child").textContent
-            .replace(/🔊/, "")
+            .replace(/📢/, "")
             .trim();
         if (rowWord === word) {
             currentWordIndex = i;
@@ -9482,7 +9531,7 @@ function showWordList(filteredWords, level) {
 
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${word.word}  <span onclick="playWordFromSpeaker('${word.word}')" style="font-size: 12px; cursor: pointer;">🔊</span></td>
+            <td>${word.word}  <span onclick="playWordFromSpeaker('${word.word}')" style="font-size: 12px; cursor: pointer;">📢</span></td>
             <td>${word.meaning}</td>
             <td class="${statusClass}" onclick="toggleWordStatus(this, '${word.word}')">${statusText}</td>
         `;
