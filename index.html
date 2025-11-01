@@ -596,6 +596,102 @@ select {
 #scrollable-table.small-text-mode table {
   font-size: 12px;
 }
+/* サマリーの1行目（左：チェック群／右：合計）を同じ高さに */
+#word-summary{
+  display: grid;
+  grid-template-columns: 1fr auto;  /* 左は可変、右は内容幅 */
+  align-items: center;               /* 縦位置を中央揃え */
+  row-gap: 6px;                      /* 1行目とバーの間 */
+  column-gap: 12px;
+  margin-bottom: 0;
+}
+
+/* 左側（チェック＋ラベル） */
+#word-summary .status-group{
+  grid-column: 1 / 2;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;                   /* 横が足りなければ折り返し */
+  align-items: center;
+  margin: 0;
+}
+
+/* 右側（/ 合計 XX） */
+#word-summary .summary-total{
+  grid-column: 2 / 3;
+  white-space: nowrap;               /* 折り返さないで右に寄せる */
+  margin: 0;
+}
+
+/* 進捗バーは2列ぶち抜きで2段目に */
+#word-summary .progress-bar{
+  grid-column: 1 / 3;
+  margin: 2px 0 0 0;
+}
+
+.status-item.green { color: #6dbd61; }   /* 黄緑 */
+.status-item.red   { color: #e07c7c; }   /* 淡い赤 */
+.status-item.gray  { color: #888; }      /* 薄灰 */
+.summary-total     { color: #666; margin-left: auto; }
+
+.progress-bar {
+  display: flex;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #e6e6e6;
+}
+/* ====== ① 上部の白余白を小さくする ====== */
+
+/* 「単語一覧」タイトルとサマリーの間 */
+#word-list h2 {
+  margin-top: 6px !important;  /* 上の空きを減らす */
+  margin-bottom: 6px !important;
+}
+
+/* サマリー全体の外側マージンも最小化 */
+#word-summary {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* ページ全体にパディングが効いている場合に備えて軽く上を詰める */
+#word-list,
+#word-list .card,
+#word-list .content {
+  padding-top: 8px !important;
+}
+/* サマリー1段目（チェック群と合計）→バー→表、の縦ギャップ最小化 */
+#word-summary { margin-bottom: 0 !important; }
+#word-summary .status-group { margin: 0 !important; line-height: 1.2; }
+#word-summary .summary-total { margin: 0 !important; }
+#word-summary .progress-bar { margin: 4px 0 6px 0 !important; }
+
+/* バーの角丸を綺麗に出す */
+#word-summary .progress-bar {
+  height: 8px;
+  border-radius: 6px;
+  overflow: hidden;                /* 角丸を子要素に適用 */
+  background: #e6e6e6;
+}
+#word-summary .progress-bar .bar { border-radius: 0; }
+
+/* バー直後の要素（区切り線やテーブルラッパ）の上余白を潰す */
+#word-summary + * { margin-top: 0 !important; }
+
+/* 表コンテナ側の余白をゼロに */
+#scrollable-table { margin-top: 0 !important; }
+
+/* ヘッダとの隙間をなくす（tableの仕様で生まれる隙間対策） */
+#scrollable-table table {
+  border-collapse: collapse;       /* これで境界のスキマが消える */
+  border-spacing: 0;
+}
+.bar { height: 100%; transition: width 0.3s; }
+.bar.green { background: #9ed993; }  /* 明るい黄緑 */
+.bar.red   { background: #f1b0b0; }  /* 淡い赤 */
+.bar.gray  { background: #cfcfcf; }  /* 薄灰 */
 
 </style>
 </head>
@@ -705,16 +801,30 @@ select {
 <!-- 単語一覧表示 -->
 <div class="table-container hidden" id="word-list">
 <h2>単語一覧</h2>
-<div>
-<label>
-<input id="hide-correct" onchange="filterWordList()" type="checkbox"/> 暗記済非表示
-                </label>
-<label>
-<input id="hide-incorrect" onchange="filterWordList()" type="checkbox"/> 未暗記非表示
-                </label>
-<label>
-<input id="hide-unattempted" onchange="filterWordList()" type="checkbox"/> 未解答非表示
-                </label>
+<!-- 単語進捗サマリー -->
+<div id="word-summary" class="word-summary">
+  <div class="status-group">
+    <label class="status-item green">
+      <input type="checkbox" id="hide-correct" >
+      暗記済 <b>0</b>
+    </label>
+    <label class="status-item red">
+      <input type="checkbox" id="hide-incorrect" >
+      未暗記 <b>0</b>
+    </label>
+    <label class="status-item gray">
+      <input type="checkbox" id="hide-unattempted" >
+      未解答 <b>0</b>
+    </label>
+  </div>
+  <div class="summary-total">
+    / 合計 <b>0</b>
+  </div>
+  <div class="progress-bar">
+    <div id="bar-done" class="bar green"></div>
+    <div id="bar-not" class="bar red"></div>
+    <div id="bar-none" class="bar gray"></div>
+  </div>
 </div>
 <div class="scrollable-table" id="scrollable-table" tabindex="0">
 <table>
@@ -723,13 +833,13 @@ select {
 <th>
                                 単語
                                 <label>
-<input id="toggle-korean" onchange="toggleKorean()" type="checkbox"/> 非表示
+<input id="toggle-korean" onchange="toggleKorean()" type="checkbox"/> 
                                 </label>
 </th>
 <th>
                                 意味
                                 <label>
-<input id="toggle-meaning" onchange="toggleMeaning()" type="checkbox"/> 非表示
+<input id="toggle-meaning" onchange="toggleMeaning()" type="checkbox"/> 
                                 </label>
 </th>
 <th>暗記状況</th>
@@ -9609,8 +9719,8 @@ document.addEventListener("DOMContentLoaded", function () {
 //     // ボタンのクリックイベントリスナーをここで追加
 //     document.getElementById("intermediate-word-list-btn").addEventListener("click", showIntermediateWordList);
 //     document.getElementById("beginner-word-list-btn").addEventListener("click", showBeginnerWordList);
-//     document.getElementById("start-page").focus();
-// });
+//     document.getElementById("start
+        
 
 // 範囲を基に単語一覧を表示する関数
 function showFilteredWordList() {
@@ -9667,6 +9777,65 @@ function filterWordList() {
             });
         }
         showRangeSelection();
+        
+		function updateWordSummary(){
+		  const tbody = document.getElementById('word-list-body');
+		  if(!tbody) return;
+
+		  const rowsAll = [...tbody.querySelectorAll('tr')];
+
+		  const countBy = (rows) => {
+		    let done=0, not=0, none=0;
+		    rows.forEach(tr=>{
+		      const td = tr.querySelector('td:nth-child(3)');
+		      if(!td) return;
+		      const txt = td.textContent.trim();
+		      if (txt === '〇' || td.classList.contains('green')) done++;
+		      else if (txt === '×' || td.classList.contains('red')) not++;
+		      else none++;
+		    });
+		    return {done, not, none, total: done+not+none};
+		  };
+
+		  // ✅ 表示/非表示に関係なく全体をカウント
+		  const c = countBy(rowsAll);
+
+		  // 更新
+		  document.querySelector('.status-item.green b').textContent = c.done;
+		  document.querySelector('.status-item.red b').textContent   = c.not;
+		  document.querySelector('.status-item.gray b').textContent  = c.none;
+		  document.querySelector('.summary-total b').textContent     = c.total;
+
+		  const total = c.total || 1; // 0除算防止
+		  document.getElementById('bar-done').style.width = (c.done/total*100)+'%';
+		  document.getElementById('bar-not').style.width  = (c.not/total*100)+'%';
+		  document.getElementById('bar-none').style.width = (c.none/total*100)+'%';
+		}
+				// --- 自動更新フック ---
+			['showWordList','toggleWordStatus','filterWordList'].forEach(fn=>{
+			  const orig = window[fn];
+			  if(typeof orig==='function'){
+			    window[fn] = function(){
+			      const r = orig.apply(this, arguments);
+			      requestAnimationFrame(updateWordSummary);
+			      return r;
+			    };
+			  }
+			});
+
+// ✅ チェックボックスのON/OFFで即反映（構造に依存しない）
+document.addEventListener("DOMContentLoaded", () => {
+  const ids = ["hide-correct", "hide-incorrect", "hide-unattempted"];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("change", () => {
+      if (typeof filterWordList === "function") filterWordList();
+      requestAnimationFrame(updateWordSummary);
+    });
+  });
+});
+
 ////ファイル進捗出力///////////////////////////////////////////////////////////////////////////
 function exportProgress() {
     const answers = JSON.parse(localStorage.getItem("quizAnswers")) || [];
