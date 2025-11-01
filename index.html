@@ -693,6 +693,20 @@ select {
 .bar.red   { background: #f1b0b0; }  /* 淡い赤 */
 .bar.gray  { background: #cfcfcf; }  /* 薄灰 */
 
+.hidden-peek{
+  display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 4px;
+}
+.hidden-peek .chip{
+  padding:4px 8px; border-radius:12px; font-size:12px;
+  background:#f0f0f0; cursor:pointer; user-select:none;
+  border:1px solid #ddd;
+}
+.hidden-peek .chip .x{ margin-left:6px; opacity:.6 }
+
+#word-list-body tr.hidden-row{ display:none; }        /* 従来通り */
+#word-list-body tr.peek{ display:table-row !important; }
+#word-list-body tr.peek td{ background:#fffdf2; }     /* うっすら強調 */
+
 </style>
 </head>
 <body>
@@ -826,6 +840,7 @@ select {
     <div id="bar-none" class="bar gray"></div>
   </div>
 </div>
+<div id="hidden-peek" class="hidden-peek"></div>
 <div class="scrollable-table" id="scrollable-table" tabindex="0">
 <table>
 <thead>
@@ -9603,6 +9618,9 @@ function showSelectedWordList() {
     }
 
     showWordList(filteredWords, level);
+    
+    rebuildHiddenChips();                 // ← チップを再生成
+    requestAnimationFrame(updateWordSummary); // ← 集計も更新
 }
 
 // 単語一覧表示関数（ローカルストレージのデータを適用）
@@ -9759,8 +9777,11 @@ function filterWordList() {
             hideRow = true;
         }
         // 行を非表示にする
-        row.style.display = hideRow ? "none" : "";
+        row.classList.toggle("hidden-row", hideRow);
     });
+    rebuildHiddenChips();                 // 非表示チップの更新
+requestAnimationFrame(updateWordSummary);
+rebuildHiddenChips();
 }
         // セクションの表示切り替え
         function showRangeSelection() {
@@ -9832,6 +9853,77 @@ document.addEventListener("DOMContentLoaded", () => {
     el.addEventListener("change", () => {
       if (typeof filterWordList === "function") filterWordList();
       requestAnimationFrame(updateWordSummary);
+    });
+  });
+});
+
+// 隠れている行からチップを作る
+function rebuildHiddenChips(){
+  const box = document.getElementById('hidden-peek');
+  if (!box) return;
+  box.innerHTML = '';
+  const hiddenRows = [...document.querySelectorAll('#word-list-body tr.hidden-row')];
+  hiddenRows.slice(0, 50).forEach(tr=>{
+    const wordCell = tr.querySelector('.word-text') || tr.querySelector('td:first-child');
+    const word = (wordCell?.textContent || '').replace('🔊','').trim();
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.textContent = word;
+    chip.title = 'この単語だけ表示（フィルタは維持）';
+    chip.addEventListener('click', ()=> peekRowByWord(word)); // ← ①で定義
+    box.appendChild(chip);
+  });
+  box.style.display = hiddenRows.length ? 'flex' : 'none';
+}
+
+// ① チップクリック：一時表示トグル
+function peekRowByWord(word){
+  const norm = s => (s||'').normalize('NFC').trim();
+  document.querySelectorAll('#word-list-body tr').forEach(tr=>{
+    const cell = tr.querySelector('.word-text') || tr.querySelector('td:first-child');
+    const w = norm((cell?.textContent || '').replace('🔊',''));
+    if (w !== norm(word)) return;
+
+    if (tr.classList.contains('peek')) {
+      tr.classList.remove('peek');
+      if (typeof filterWordList === 'function') filterWordList(); // 元の非表示に戻す
+    } else {
+      tr.classList.add('peek');
+      tr.classList.remove('hidden-row');
+      tr.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+}
+
+// ② 行タップで戻す（3列目=状態列は除外）
+(function enableRowTapToggle(){
+  const tbody = document.getElementById('word-list-body');
+  if (!tbody || tbody.__tapBound) return;
+  tbody.__tapBound = true;
+  tbody.addEventListener('click', (e)=>{
+    const td = e.target.closest('td');
+    if (!td || td.cellIndex === 2) return;
+    const tr = td.parentNode;
+    if (tr.classList.contains('peek')) {
+      tr.classList.remove('peek');
+      if (typeof filterWordList === 'function') filterWordList();
+      e.stopPropagation();
+    }
+  }, true);
+})();
+
+// ③ チェックボックス変更で一時表示をリセット
+function clearAllPeek(){
+  document.querySelectorAll('#word-list-body tr.peek').forEach(tr=> tr.classList.remove('peek'));
+}
+document.addEventListener('DOMContentLoaded', () => {
+  ['hide-correct','hide-incorrect','hide-unattempted'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', ()=>{
+      clearAllPeek();                                       // ← リセット
+      if (typeof filterWordList === 'function') filterWordList(); // 通常フィルタ再適用
+      requestAnimationFrame(updateWordSummary);             // 集計はそのまま
     });
   });
 });
