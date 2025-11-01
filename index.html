@@ -767,8 +767,8 @@ td.peek-cell {
 </div>
 </div>
 <div class="checkbox-group">
-<label><input id="only-incorrect" type="checkbox"/> 未暗記の単語一覧からのみ出題する</label>
-<label><input id="auto-speak" onchange="toggleAutoSpeak()" type="checkbox"/> 自動読み上げ機能をONにする</label>
+<label><input id="only-incorrect" type="checkbox"/> 未暗記のみ出題</label>
+<label><input id="auto-speak" onchange="toggleAutoSpeak()" type="checkbox"/> 音声再生ON</label>
 </div>
 <div>
 <button onclick="exportProgress()">暗記状況を保存</button>
@@ -5361,7 +5361,7 @@ const advancedWords = [
 {"word": "결재", "meaning": "決裁", "page": 2},
 {"word": "결정적", "meaning": "決定的", "page": 2},
 {"word": "결제", "meaning": "決済", "page": 2},
-{"word": "졀합", "meaning": "結合、連結", "page": 2},
+{"word": "결합", "meaning": "結合、連結", "page": 2},
 {"word": "겸비하다", "meaning": "兼ね備える、兼備する", "page": 2},
 {"word": "경각심", "meaning": "警戒心", "page": 2},
 {"word": "경건하다", "meaning": "敬虔だ", "page": 2},
@@ -5729,7 +5729,7 @@ const advancedWords = [
 {"word": "떠올리다", "meaning": "思い浮かべる", "page": 6},
 {"word": "떨림", "meaning": "震え", "page": 7},
 {"word": "떨치다", "meaning": "振り払う", "page": 7},
-{"word": "떳떳하다", "meaning": "堂々としている", "page": 7},
+{"word": "떳떳하다", "meaning": "潔い、堂々としている", "page": 7},
 {"word": "또래", "meaning": "同年代", "page": 7},
 {"word": "또렷하다", "meaning": "はっきりしている", "page": 7},
 {"word": "뚝뚝", "meaning": "ぽたぽた", "page": 7},
@@ -6189,7 +6189,7 @@ const advancedWords = [
 {"word": "시달리다", "meaning": "悩まされる", "page": 12},
 {"word": "시들다", "meaning": "しおれる", "page": 12},
 {"word": "시범", "meaning": "お手本", "page": 12},
-{"word": "시사", "meaning": "時事", "page": 12},
+{"word": "시사", "meaning": "示唆", "page": 12},
 {"word": "시상식", "meaning": "授賞式", "page": 12},
 {"word": "시선", "meaning": "視線", "page": 12},
 {"word": "시야", "meaning": "視野", "page": 12},
@@ -6212,7 +6212,7 @@ const advancedWords = [
 {"word": "신하", "meaning": "家臣", "page": 13},
 {"word": "신화", "meaning": "神話", "page": 13},
 {"word": "실로", "meaning": "まさに", "page": 13},
-{"word": "실마리", "meaning": "手がかり", "page": 13},
+{"word": "실마리", "meaning": "糸口、手がかり", "page": 13},
 {"word": "실상", "meaning": "実状", "page": 13},
 {"word": "실속", "meaning": "中身、実利", "page": 13},
 {"word": "실습", "meaning": "実習", "page": 13},
@@ -9616,11 +9616,6 @@ function showSelectedWordList() {
     const endPage = parseInt(document.getElementById("wordlist-end-page").value);
     const shuffle = document.getElementById("wordlist-shuffle").checked;
 
-    if (startPage > endPage) {
-        alert("開始ページは終了ページ以下にしてください。");
-        return;
-    }
-
     const filteredWords = selectedList.filter(word => word.page >= startPage && word.page <= endPage);
     if (shuffle) {
         filteredWords.sort(() => Math.random() - 0.5);
@@ -9630,6 +9625,74 @@ function showSelectedWordList() {
     
     rebuildHiddenChips();                 // ← チップを再生成
     requestAnimationFrame(updateWordSummary); // ← 集計も更新
+}
+// ✅ 開始を変えたら終了も同じページに自動同期（右を左に揃える）
+function syncEndToStart(startId, endId) {
+  const s = document.getElementById(startId);
+  const e = document.getElementById(endId);
+  if (!s || !e) return;
+  e.value = s.value;                       // 右を左に揃える
+  e.dispatchEvent(new Event("change"));    // 依存処理があれば発火
+}
+
+// ✅ 左(開始)と右(終了)の連動セットアップ
+function setupLinkedPageSelectors(startId, endId) {
+  const startSel = document.getElementById(startId);
+  const endSel   = document.getElementById(endId);
+  if (!startSel || !endSel) return;
+
+  // 左を変えたら右を同期＆範囲制限
+  startSel.addEventListener("change", () => {
+    const startVal = parseInt(startSel.value, 10);
+    const options  = [...endSel.querySelectorAll("option")];
+
+    // ① 右の選択肢から、左より小さいページを非表示（消す）
+    options.forEach(opt => {
+      const v = parseInt(opt.value, 10);
+      if (isNaN(v)) return;
+      opt.hidden = v < startVal;
+    });
+
+    // ② 現在の右の値が左より小さい場合は自動で揃える
+    const endVal = parseInt(endSel.value, 10);
+    if (isNaN(endVal) || endVal < startVal) {
+      endSel.value = startSel.value;
+    }
+  });
+}
+
+// ✅ ページロード時に一度だけ初期化
+document.addEventListener('DOMContentLoaded', () => {
+  setupLinkedPageSelectors('wordlist-start-page', 'wordlist-end-page');
+  setupLinkedPageSelectors('start-page', 'end-page');
+});
+
+function setupLinkedPageSelectors(startId, endId) {
+  const startSel = document.getElementById(startId);
+  const endSel   = document.getElementById(endId);
+  if (!startSel || !endSel) return;
+
+  // 左を変えたら右を再構築
+  startSel.addEventListener('change', () => {
+    const startVal = parseInt(startSel.value, 10);
+    if (isNaN(startVal)) return;
+
+    // 現在の右の全 option を取得
+    const allOptions = [...endSel.querySelectorAll('option')];
+
+    // 🔹 左の値以上のものだけ残す
+    const visibleOpts = allOptions.filter(opt => parseInt(opt.value, 10) >= startVal || isNaN(opt.value));
+
+    // 🔹 右のセレクトを再生成
+    const currentEnd = parseInt(endSel.value, 10);
+    endSel.innerHTML = ''; // 一旦中身を空に
+    visibleOpts.forEach(opt => endSel.appendChild(opt));
+
+    // 🔹 右の値が左より小さい or 無効なら左に合わせる
+    if (isNaN(currentEnd) || currentEnd < startVal) {
+      endSel.value = startSel.value;
+    }
+  });
 }
 
 // 単語一覧表示関数（ローカルストレージのデータを適用）
