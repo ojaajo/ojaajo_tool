@@ -6109,7 +6109,7 @@ const advancedWords = [
 {"word": "성과", "meaning": "成果", "page": 11},
 {"word": "성급하다", "meaning": "性急だ", "page": 11},
 {"word": "성급히", "meaning": "せっかちに", "page": 11},
-{"word": "성대", "meaning": "声帯", "page": 11},
+{"word": "성대", "meaning": "盛大、声帯", "page": 11},
 {"word": "성분", "meaning": "成分", "page": 11},
 {"word": "성사되다", "meaning": "成立する", "page": 11},
 {"word": "성장", "meaning": "成長", "page": 11},
@@ -9667,32 +9667,51 @@ document.addEventListener('DOMContentLoaded', () => {
   setupLinkedPageSelectors('start-page', 'end-page');
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  setupLinkedPageSelectors('wordlist-start-page', 'wordlist-end-page');
+  setupLinkedPageSelectors('start-page', 'end-page');
+});
+
 function setupLinkedPageSelectors(startId, endId) {
   const startSel = document.getElementById(startId);
   const endSel   = document.getElementById(endId);
   if (!startSel || !endSel) return;
 
-  // 左を変えたら右を再構築
-  startSel.addEventListener('change', () => {
+  // ✅ 初回に右側の全<option>を丸ごと退避（クローンして保持）
+  if (!endSel._allOptions) {
+    endSel._allOptions = Array.from(endSel.options).map(o => o.cloneNode(true));
+  }
+
+  const rebuild = () => {
     const startVal = parseInt(startSel.value, 10);
     if (isNaN(startVal)) return;
 
-    // 現在の右の全 option を取得
-    const allOptions = [...endSel.querySelectorAll('option')];
-
-    // 🔹 左の値以上のものだけ残す
-    const visibleOpts = allOptions.filter(opt => parseInt(opt.value, 10) >= startVal || isNaN(opt.value));
-
-    // 🔹 右のセレクトを再生成
-    const currentEnd = parseInt(endSel.value, 10);
-    endSel.innerHTML = ''; // 一旦中身を空に
-    visibleOpts.forEach(opt => endSel.appendChild(opt));
-
-    // 🔹 右の値が左より小さい or 無効なら左に合わせる
-    if (isNaN(currentEnd) || currentEnd < startVal) {
-      endSel.value = startSel.value;
+    // ✅ 退避しておいた全候補から、左以上のものだけで右<select>を再生成
+    endSel.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    for (const opt of endSel._allOptions) {
+      const v = parseInt(opt.value, 10);
+      if (isNaN(v) || v >= startVal) {
+        frag.appendChild(opt.cloneNode(true)); // クローンで挿入
+      }
     }
-  });
+    endSel.appendChild(frag);
+
+    // 右の現在値が小さすぎる/未設定なら、左に揃える
+    const endVal = parseInt(endSel.value, 10);
+    if (isNaN(endVal) || endVal < startVal) {
+      endSel.value = String(startVal);
+    }
+
+    // 必要なら依存処理を発火
+    endSel.dispatchEvent(new Event('change'));
+  };
+
+  // 左変更時に右を再構築
+  startSel.addEventListener('change', rebuild);
+
+  // 初期表示でも一度同期（任意だがオススメ）
+  rebuild();
 }
 
 // 単語一覧表示関数（ローカルストレージのデータを適用）
