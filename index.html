@@ -9762,180 +9762,156 @@ const expressionUpWords = [
     "page": 10
   }
 ];
+// ---------------------- 基本状態 ----------------------
 let completed = false;
-// どの単語リストを使うか選択するオプション（例: 変数selectedListを使用）
-let selectedList = intermediateWords; // 初期状態は中級単語を使う
+let selectedList = []; // ← 初期選択は後でDOM読み込み後に決める
 
-// 出題範囲に基づく単語リストを取得
+// 単語配列マップ（存在する配列名に合わせてここだけ整備）
+const WORD_MAP = {
+  beginner:      beginnerWords,
+  intermediate:  intermediateWords,
+  advanced:      advancedWords,
+  expressionup:  expressionUpWords,
+  Level4:        Level4ofkoreanschool,
+  Level5:        Level5ofkoreanschool,
+};
+
+// 出題用：現在の selectedList から範囲抽出
 function getWordsInRange(start, end, onlyIncorrect) {
-    // 現在選択されている単語リスト（selectedList）を使ってフィルタリング
-    return selectedList.filter(word => word.page >= start && word.page <= end && (!onlyIncorrect || word.status === "未暗記"));
+  return selectedList.filter(w =>
+    w.page >= start && w.page <= end &&
+    (!onlyIncorrect || w.status === "未暗記")
+  );
 }
 
-// 出題範囲選択に応じてリストを切り替える処理を追加
-
-
+// ---------------------- レベル選択とリスト決定 ----------------------
 function setWordList(listType) {
-  if (listType === 'beginner') {
-    selectedList = beginnerWords;
-  } else if (listType === 'intermediate') {
-    selectedList = intermediateWords;
-  } else if (listType === 'advanced') {
-    selectedList = advancedWords;
-  } else if (listType === 'expressionup') {
-    selectedList = expressionUpWords;
-  } else if (listType === 'Level4') {
-    selectedList = Level4ofkoreanschool;
-  } else if (listType === 'Level5') {
-    selectedList = Level5ofkoreanschool;
-  } 
+  // 安全に現在のレベル配列を取得
+  const base = WORD_MAP[listType] || [];
+  // 直接書き換え防止のためコピー
+  selectedList = base.map(w => ({ ...w }));
+
+  // 表現力UPだけフォント小さめ
   const tableContainer = document.getElementById('scrollable-table');
   if (tableContainer) {
-    if (listType === 'expressionup') {
-      tableContainer.classList.add('small-text-mode');
-    } else {
-      tableContainer.classList.remove('small-text-mode');
-    }
+    tableContainer.classList.toggle('small-text-mode', listType === 'expressionup');
   }
-  else if (listType === 'intermediate') {
-    selectedList = intermediateWords;
-  } else if (listType === 'advanced') {
-    selectedList = advancedWords;
-  }  else if (level === "Level4") {
-  words = Level4ofkoreanschool;
-  }  else if (level === "Level5") {
-  words = Level5ofkoreanschool;
-  } else {
-    selectedList = expressionUpWords;
-  }
+
+  // （単語一覧やクイズ開始の時点でこの selectedList が使われます）
 }
 
-
-// 出題範囲選択に基づくページ範囲の変更
-
-function updatePageRange() {
-  const level = document.getElementById("quiz-level-select").value;
-  let maxPage = 1;
-  if (level === "beginner") {
-    maxPage = 21;
-  } else if (level === "intermediate") {
-    maxPage = 34;
-  } else if (level === "advanced") {
-    maxPage = 23;
-  } else if (level === "expressionup") {
-    maxPage = 10;
-  } else if (level === "Level4") {
-    maxPage = 6;
-  } else if (level === "Level5") {
-    maxPage = 8;
-  }
-
-  const startPageSelect = document.getElementById("start-page");
-  const endPageSelect = document.getElementById("end-page");
-
-  startPageSelect.innerHTML = "";
-  endPageSelect.innerHTML = "";
-
-  for (let i = 1; i <= maxPage; i++) {
-    const opt1 = document.createElement("option");
-    opt1.value = i;
-    opt1.textContent = i;
-    startPageSelect.appendChild(opt1);
-
-    const opt2 = document.createElement("option");
-    opt2.value = i;
-    opt2.textContent = i;
-    endPageSelect.appendChild(opt2);
-  }
+// ---------------------- ページセレクトの生成 ----------------------
+function maxPageOf(list) {
+  return list.reduce((m, w) => Math.max(m, Number(w.page) || 1), 1);
 }
 
-
-
-function updateWordlistPageRange() {
-  const level = document.getElementById("wordlist-level-select").value;
-  let maxPage = 1;
-  if (level === "beginner") {
-    maxPage = 21;
-  } else if (level === "intermediate") {
-    maxPage = 34;
-  } else if (level === "advanced") {
-    maxPage = 23;
-  } else if (level === "expressionup") {
-    maxPage = 10;
-  } else if (level === "Level4") {
-    maxPage = 6;
-  } else if (level === "Level5") {
-    maxPage = 8;
+// あるレベルの最大ページ数から、指定の select を 1..max で作り直す
+function rebuildSelectOptions(selectId, max) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  sel.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  for (let p = 1; p <= max; p++) {
+    const opt = document.createElement('option');
+    opt.value = String(p);
+    opt.textContent = String(p);
+    frag.appendChild(opt);
   }
-
-  const startSelect = document.getElementById("wordlist-start-page");
-  const endSelect = document.getElementById("wordlist-end-page");
-
-  startSelect.innerHTML = "";
-  endSelect.innerHTML = "";
-
-  for (let i = 1; i <= maxPage; i++) {
-    const opt1 = document.createElement("option");
-    opt1.value = i;
-    opt1.textContent = i;
-    startSelect.appendChild(opt1);
-
-    const opt2 = document.createElement("option");
-    opt2.value = i;
-    opt2.textContent = i;
-    endSelect.appendChild(opt2);
-  }
+  sel.appendChild(frag);
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  updatePageRange();
-  updateWordlistPageRange();
+// 左右リンク：左を変えたら右の候補を“左以上のみ”に再構築し、値も同期
+function linkStartEnd(startId, endId) {
+  const s = document.getElementById(startId);
+  const e = document.getElementById(endId);
+  if (!s || !e) return;
 
-  const quizLevel = document.getElementById("quiz-level-select");
-  const wordlistLevel = document.getElementById("wordlist-level-select");
-
-  if (quizLevel) {
-    quizLevel.addEventListener("change", updatePageRange);
+  // すでにリンク済みなら、右候補の更新だけして終了
+  if (s._linkedTo === endId && e._linkedFrom === startId) {
+    // 最新の全候補を撮り直し
+    e._allOptions = Array.from(e.options).map(o => o.cloneNode(true));
+    // 左以上に絞って値も揃える
+    const startVal = parseInt(s.value, 10);
+    e.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    e._allOptions.forEach(opt => {
+      const v = parseInt(opt.value, 10);
+      if (isNaN(v) || v >= startVal) frag.appendChild(opt.cloneNode(true));
+    });
+    e.appendChild(frag);
+    if (parseInt(e.value, 10) < startVal) e.value = String(startVal);
+    return;
   }
 
-  if (wordlistLevel) {
-    wordlistLevel.addEventListener("change", updateWordlistPageRange);
-  }
+  // 初回リンク
+  s._linkedTo = endId;
+  e._linkedFrom = startId;
+
+  // 右の全<option>スナップショット
+  e._allOptions = Array.from(e.options).map(o => o.cloneNode(true));
+
+  const rebuildRight = () => {
+    const startVal = parseInt(s.value, 10);
+    if (isNaN(startVal)) return;
+    e.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    e._allOptions.forEach(opt => {
+      const v = parseInt(opt.value, 10);
+      if (isNaN(v) || v >= startVal) frag.appendChild(opt.cloneNode(true));
+    });
+    e.appendChild(frag);
+    const endVal = parseInt(e.value, 10);
+    if (isNaN(endVal) || endVal < startVal) e.value = String(startVal);
+  };
+
+  s.addEventListener('change', () => {
+    if (document.activeElement === e) return; // 右を開いている最中は閉じさせない
+    rebuildRight();
+  });
+
+  // 初期同期
+  rebuildRight();
+}
+
+// レベルセレクタの値から、そのペア（開始/終了）を作り直す
+function populatePageSelectorsFor(levelSelectId, startId, endId) {
+  const lvSel = document.getElementById(levelSelectId);
+  if (!lvSel) return;
+  const level = lvSel.value;
+  const list = WORD_MAP[level] || [];
+  const max = maxPageOf(list);
+
+  rebuildSelectOptions(startId, max);
+  rebuildSelectOptions(endId,   max);
+
+  // 左右リンク（左以上のみ表示＋値同期）
+  linkStartEnd(startId, endId);
+}
+
+// ---------------------- 起動時セットアップ ----------------------
+document.addEventListener('DOMContentLoaded', () => {
+  // それぞれのレベルセレクトでページ選択肢を生成
+  populatePageSelectorsFor('wordlist-level-select', 'wordlist-start-page', 'wordlist-end-page');
+  populatePageSelectorsFor('quiz-level-select',     'start-page',           'end-page');
+
+  // レベル変更時にページ選択肢を作り直す（級ごとの最大ページ数に合わせる）
+  const wlLevel = document.getElementById('wordlist-level-select');
+  wlLevel && wlLevel.addEventListener('change', () => {
+    populatePageSelectorsFor('wordlist-level-select', 'wordlist-start-page', 'wordlist-end-page');
+    // 単語一覧用として selectedList も更新
+    setWordList(wlLevel.value);
+  });
+
+  const qLevel = document.getElementById('quiz-level-select');
+  qLevel && qLevel.addEventListener('change', () => {
+    populatePageSelectorsFor('quiz-level-select', 'start-page', 'end-page');
+    // クイズ用にも selectedList をこのタイミングで切り替えたいなら↓を有効化
+    // setWordList(qLevel.value);
+  });
+
+  // 初期 selectedList（単語一覧の方のレベルに合わせる）
+  if (wlLevel) setWordList(wlLevel.value);
 });
-
-// 初級/中級の選択が変更された際にページ範囲を更新
-document.getElementById("quiz-level-select").addEventListener("change", updatePageRange);
-
-// 最初にページ範囲を更新（ページロード時や初期状態で呼び出す）
-updatePageRange();
-
-	const intermediateStartPageSelect = document.getElementById("intermediate-start-page");
-	const intermediateEndPageSelect = document.getElementById("intermediate-end-page");
-	// 中級単語のページ範囲 (1~34)
-        for (let i = 1; i <= 34; i++) { // 最大ページ数を直接設定
-            const startOption = document.createElement("option");
-            startOption.value = i;
-            startOption.textContent = i;
-            // document.getElementById("intermediate-start-page").appendChild(startOption);
-            const endOption = document.createElement("option");
-            endOption.value = i;
-            endOption.textContent = i;
-            // document.getElementById("intermediate-end-page").appendChild(endOption);
-        }
-	const beginnerStartPageSelect = document.getElementById("beginner-start-page");
-	const beginnerEndPageSelect = document.getElementById("beginner-end-page");
-	// 初級単語のページ範囲 (1~21)
-        for (let i = 1; i <= 21; i++) { // 最大ページ数を直接設定
-
-            const startOption = document.createElement("option");
-            startOption.value = i;
-            startOption.textContent = i;
-            // document.getElementById("beginner-start-page").appendChild(startOption);
-            const endOption = document.createElement("option");
-            endOption.value = i;
-            endOption.textContent = i;
-            // document.getElementById("beginner-end-page").appendChild(endOption);
-        }
 
 
         // 出題範囲に基づく単語リストを取得
