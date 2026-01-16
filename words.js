@@ -1,5 +1,4 @@
-export const WORDS = {
-beginner:[
+const beginnerWords = [
 {"word": "가게", "meaning": "店", "page": 1},
 {"word": "가격", "meaning": "価格", "page": 1},
 {"word": "가구", "meaning": "家具", "page": 1},
@@ -1670,8 +1669,8 @@ beginner:[
 {"word": "흐리다", "meaning": "曇る", "page": 21},
 {"word": "흰색", "meaning": "白色、白", "page": 21},
 {"word": "힘", "meaning": "力", "page": 21}
-],
-intermediate:[
+];
+const intermediateWords = [
 {"word": "가계부", "meaning": "家計簿", "page": 1},
 {"word": "가구점", "meaning": "家具店", "page": 1},
 {"word": "가까이", "meaning": "近く", "page": 1},
@@ -4334,9 +4333,9 @@ intermediate:[
 {"word": "희망자", "meaning": "希望者", "page": 34},
 {"word": "희생자", "meaning": "犠牲者", "page": 34},
 {"word": "힘껏", "meaning": "力の限り、精一杯", "page": 34}
-],
+];
 
-advanced:[
+const advancedWords = [
 {"word": "가공", "meaning": "架空、加工", "page": 1},
 {"word": "가까스로", "meaning": "やっとのことで、ようやく", "page": 1},
 {"word": "가꾸기", "meaning": "育てること、手入れ", "page": 1},
@@ -6176,8 +6175,9 @@ advanced:[
 {"word": "희박하다", "meaning": "希薄だ", "page": 23},
 {"word": "힘겹다", "meaning": "手強い、苦しい", "page": 23},
 {"word": "힘차다", "meaning": "力が強い", "page": 23}
-],
-Level4:[
+];
+
+const Level4ofkoreanschool = [
 { word: "여가 시간", meaning: "余暇時間", page: 1 },
 { word: "여가 산업", meaning: "余暇産業", page: 1 },
 { word: "피로를 회복하다", meaning: "疲労を回復する", page: 1 },
@@ -7029,9 +7029,9 @@ Level4:[
 { word: "호랑이는 평소에 발톱을 감춘다", meaning: "虎は普段爪を隠す", page: 6 },
 { word: "호랑이를 잡으려면 호랑이 굴에 가야 한다", meaning: "虎を捕まえるには虎の巣へ行け", page: 6 },
 { word: "호랑이에게 물려 가도 정신만 차리면 산다", meaning: "虎に噛まれても正気を保てば助かる", page: 6 },
-],
+];
 
-Level5:[
+const Level5ofkoreanschool = [
 { word: "저고리", meaning: "チョゴリ（韓服の上衣）", page: 1 },
 { word: "상하의가 구분되다", meaning: "上下が分かれている", page: 1 },
 { word: "곱다", meaning: "美しい", page: 1 },
@@ -8161,8 +8161,8 @@ Level5:[
 { word: "대리 만족", meaning: "代理満足", page: 8 },
 { word: "불효자", meaning: "親不孝者", page: 8 },
 { word: "변형되다", meaning: "変形する、変化する", page: 8 }
-],
-expressionup:[
+];
+const expressionUpWords = [
   {
     "word": "입이 가볍다",
     "meaning": "口が軽い → 秘密を守れない <br>例）그 사람한테 말하면 안 돼. 입이 가벼운 사람이야.",
@@ -9163,5 +9163,4 @@ expressionup:[
     "meaning": "中をのぞく → 本音を見抜く <br>例）그 사람은 남의 속을 들여다보는 데 능해.",
     "page": 10
   }
-]
-};
+];
