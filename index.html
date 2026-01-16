@@ -909,13 +909,10 @@ if ('serviceWorker' in navigator) {
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#4CAF50">
-<script type="module" src="main.js">
+<script>
  import { WORDS } from "./words.js";
-
-// 既存コード
 const words = WORDS;
 
-// 今まで words を使ってた処理はそのまま
 // ---------------------- 基本状態 ----------------------
 let completed = false;
 let selectedList = []; // ← 初期選択は後でDOM読み込み後に決める

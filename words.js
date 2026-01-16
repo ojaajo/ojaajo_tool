@@ -1,5 +1,5 @@
 export const WORDS = {
-beginnerWords:[
+beginner:[
 {"word": "가게", "meaning": "店", "page": 1},
 {"word": "가격", "meaning": "価格", "page": 1},
 {"word": "가구", "meaning": "家具", "page": 1},
@@ -1671,7 +1671,7 @@ beginnerWords:[
 {"word": "흰색", "meaning": "白色、白", "page": 21},
 {"word": "힘", "meaning": "力", "page": 21}
 ],
-intermediateWords:[
+intermediate:[
 {"word": "가계부", "meaning": "家計簿", "page": 1},
 {"word": "가구점", "meaning": "家具店", "page": 1},
 {"word": "가까이", "meaning": "近く", "page": 1},
@@ -4336,7 +4336,7 @@ intermediateWords:[
 {"word": "힘껏", "meaning": "力の限り、精一杯", "page": 34}
 ],
 
-advancedWords:[
+advanced:[
 {"word": "가공", "meaning": "架空、加工", "page": 1},
 {"word": "가까스로", "meaning": "やっとのことで、ようやく", "page": 1},
 {"word": "가꾸기", "meaning": "育てること、手入れ", "page": 1},
@@ -6177,7 +6177,7 @@ advancedWords:[
 {"word": "힘겹다", "meaning": "手強い、苦しい", "page": 23},
 {"word": "힘차다", "meaning": "力が強い", "page": 23}
 ],
-Level4ofkoreanschool:[
+Level4:[
 { word: "여가 시간", meaning: "余暇時間", page: 1 },
 { word: "여가 산업", meaning: "余暇産業", page: 1 },
 { word: "피로를 회복하다", meaning: "疲労を回復する", page: 1 },
@@ -7031,7 +7031,7 @@ Level4ofkoreanschool:[
 { word: "호랑이에게 물려 가도 정신만 차리면 산다", meaning: "虎に噛まれても正気を保てば助かる", page: 6 },
 ],
 
-Level5ofkoreanschool:[
+Level5:[
 { word: "저고리", meaning: "チョゴリ（韓服の上衣）", page: 1 },
 { word: "상하의가 구분되다", meaning: "上下が分かれている", page: 1 },
 { word: "곱다", meaning: "美しい", page: 1 },
@@ -8162,7 +8162,7 @@ Level5ofkoreanschool:[
 { word: "불효자", meaning: "親不孝者", page: 8 },
 { word: "변형되다", meaning: "変形する、変化する", page: 8 }
 ],
-expressionUpWords:[
+expressionup:[
   {
     "word": "입이 가볍다",
     "meaning": "口が軽い → 秘密を守れない <br>例）그 사람한테 말하면 안 돼. 입이 가벼운 사람이야.",
