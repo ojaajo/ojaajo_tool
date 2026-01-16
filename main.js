@@ -1,16 +1,3 @@
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js').then(() => {
-      console.log("Service Worker registered");
-    });
-  });
-}
-</script>
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4CAF50">
-<script>
 import { WORDS } from "./words.js";
 const words = WORDS;
 // ---------------------- 基本状態 ----------------------
@@ -19,12 +6,12 @@ let selectedList = []; // ← 初期選択は後でDOM読み込み後に決め�
 
 // 単語配列マップ（存在する配列名に合わせてここだけ整備）
 const WORD_MAP = {
-  beginner:      beginnerWords,
-  intermediate:  intermediateWords,
-  advanced:      advancedWords,
-  expressionup:  expressionUpWords,
-  Level4:        Level4ofkoreanschool,
-  Level5:        Level5ofkoreanschool,
+  beginner:      WORDS.beginnerWords,
+  intermediate:  WORDS.intermediateWords,
+  advanced:      WORDS.advancedWords,
+  expressionup:  WORDS.expressionUpWords,
+  Level4:        WORDS.Level4ofkoreanschool,
+  Level5:        WORDS.Level5ofkoreanschool,
 };
 
 // 出題用：現在の selectedList から範囲抽出
@@ -164,12 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (wlLevel) setWordList(wlLevel.value);
 });
 
-
-        // 出題範囲に基づく単語リストを取得
-function getWordsInRange(start, end, onlyIncorrect) {
-    return selectedList.filter(word => word.page >= start && word.page <= end && (!onlyIncorrect || word.status === "未暗記"));
-}
-
 // クイズ進行状態のフラグを追加
 let isQuizInProgress = false;
 
@@ -195,7 +176,7 @@ function showQuizModal(message, onConfirm, onCancel) {
     };
 }
 
-window.startQuiz() {
+function startQuiz() {
     const startPage = parseInt(document.getElementById("start-page").value);
     const endPage = parseInt(document.getElementById("end-page").value);
     const onlyIncorrect = document.getElementById("only-incorrect").checked;
@@ -234,6 +215,7 @@ window.startQuiz() {
         startNewQuiz();
     }
 }
+window.startQuiz = startQuiz;
 // 新しいクイズを開始する関数
 function startNewQuiz() {
     completed = false; // 終了フラグをリセット
@@ -310,10 +292,11 @@ function loadAnswersFromStorage() {
 }
 
 // 自動読み上げ機能の状態をトグルする関数
-window.toggleAutoSpeak() {
+function toggleAutoSpeak() {
     return document.getElementById("auto-speak").checked;
 }
-window.markAnswer(isCorrect) {
+window.toggleAutoSpeak = toggleAutoSpeak;
+function markAnswer(isCorrect) {
     const word = quizWords[currentQuizIndex]; // 現在の単語
     const resultElement = document.getElementById("result");
 
@@ -349,27 +332,29 @@ window.markAnswer(isCorrect) {
         }, 1000);
     }
 }
+window.markAnswer = markAnswer;
 // 一つ前の問題に移動
-window.moveToPrevious() {
+function moveToPrevious() {
     if (currentQuizIndex > 0) {
         currentQuizIndex--;
         nextQuestion();  // 次の問題に進む処理を呼び出す
     }
 }
-
+window.moveToPrevious = moveToPrevious;
 // 一つ次の問題に移動
-window.moveToNext() {
+function moveToNext() {
     if (currentQuizIndex < quizWords.length - 1) {
         currentQuizIndex++;
         nextQuestion();  // 次の問題に進む処理を呼び出す
     }
 }
+window.moveToNext = moveToNext;
 
 let currentWord = 0; // フラッシュカードの現在の単語インデックスを初期化
 let autoNextTimeout;  // 1秒後の自動移動処理を管理する変数
 
 // 次の問題に進む
-window.nextQuestion() {
+function nextQuestion() {
     clearTimeout(autoNextTimeout);  // 1秒後の自動移動をキャンセル
 
     // クイズが終了した場合、最後の問題の処理を行う
@@ -413,7 +398,7 @@ window.nextQuestion() {
 //        }, 2500);
     }
 }
-
+window.nextQuestion = nextQuestion;
 // 進行状況の更新
 function updateProgress() {
     const totalQuestions = quizWords.length;
@@ -424,12 +409,13 @@ function updateProgress() {
 }
 
 // 「戻る」ボタンを押した際の処理
-window.showRangeSelection() {
+function showRangeSelection() {
     hideAllSections();
     document.getElementById("range-selection").classList.remove("hidden");
 
     // クイズ進行中でも単語リストや進捗はリセットしない
 }
+window.showRangeSelection = showRangeSelection;
 function saveQuizProgress() {
     const quizState = {
         currentQuizIndex: currentQuizIndex,
@@ -460,7 +446,7 @@ let isAudioUnlocked = false; // ブラウザの音声再生が許可されたか
 let isPlaying = false; // 現在の音声再生状態
 let currentAudio = null;
 
-window.playWord(word) {
+function playWord(word) {
 	if (!word) {
         alert("単語が指定されていません。");
         return;
@@ -482,7 +468,7 @@ window.playWord(word) {
 	    showToast("⚠️ 音声の再生に失敗しました。もう一度お試しください。");
 	});
 }
-
+window.playWord = playWord;
 document.addEventListener("keydown", function(event) {
     if (event.shiftKey) {
         if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -559,7 +545,7 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
-window.playPreviousWord() {
+function playPreviousWord() {
     const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
     if (wordListRows.length === 0) return; // 単語リストが空なら何もしない
 
@@ -570,7 +556,8 @@ window.playPreviousWord() {
     playWordAtIndex(currentWordIndex, wordListRows);
     scrollTable("up");
 }
-window.playNextWord() {
+window.playPreviousWord = playPreviousWord;
+function playNextWord() {
     const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
     if (currentWordIndex < wordListRows.length - 1) {
         currentWordIndex++;
@@ -578,7 +565,7 @@ window.playNextWord() {
     playWordAtIndex(currentWordIndex, wordListRows);
     scrollTable("down");
 }
-
+window.playNextWord = playNextWord;
 // スクロール量（ピクセル単位）
 const scrollStep = 42;
 
@@ -624,27 +611,29 @@ function playWordAtIndex(index, wordListRows) {
 //     scrollTable("down");
 // });
 
-window.repeatLastWord() {
+function repeatLastWord() {
     if (lastPlayedWord) {
         playWord(lastPlayedWord);
     }
 }
+window.repeatLastWord = repeatLastWord;
 ////////////////////// 単語一覧の表示関数/////////////////////////////////////////////
     // 韓国語の表示/非表示を切り替える関数
-    window.toggleKorean() {
+    function toggleKorean() {
         const isChecked = document.getElementById("toggle-korean").checked;
         document.querySelectorAll("#word-list-body tr td:first-child").forEach(td => {
             td.classList.toggle("hidden-korean", isChecked);
         });
     }
+    window.toggleKorean = toggleKorean;
     // 意味の表示/非表示を切り替える関数
-    window.toggleMeaning() {
+    function toggleMeaning() {
         const isChecked = document.getElementById("toggle-meaning").checked;
         document.querySelectorAll("#word-list-body tr td:nth-child(2)").forEach(td => {
             td.classList.toggle("hidden-meaning", isChecked);
         });
     }
-
+	window.toggleMeaning = toggleMeaning;
 function playWordFromSpeaker(word) {
     playWord(word);
 
@@ -712,17 +701,6 @@ function setupLinkedPageSelectors(startId, endId) {
     }
   });
 }
-
-// ✅ ページロード時に一度だけ初期化
-document.addEventListener('DOMContentLoaded', () => {
-  setupLinkedPageSelectors('wordlist-start-page', 'wordlist-end-page');
-  setupLinkedPageSelectors('start-page', 'end-page');
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  setupLinkedPageSelectors('wordlist-start-page', 'wordlist-end-page');
-  setupLinkedPageSelectors('start-page', 'end-page');
-});
 
 function setupLinkedPageSelectors(startId, endId) {
   const startSel = document.getElementById(startId);
@@ -866,16 +844,6 @@ document.addEventListener("DOMContentLoaded", function () {
   if (btn) {
     btn.addEventListener("click", showSelectedWordList); 
   }
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const scrollableTable = document.getElementById("scrollable-table");
-
-    // iPadでもフォーカスを当てられるようにする
-    scrollableTable.addEventListener("click", () => {
-        scrollableTable.focus();
-    });
-
 });
 
 // document.addEventListener('DOMContentLoaded', function() {
@@ -1043,7 +1011,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 ////ファイル進捗出力///////////////////////////////////////////////////////////////////////////
-window.exportProgress() {
+function exportProgress() {
     const answers = JSON.parse(localStorage.getItem("quizAnswers")) || [];
     const jsonString = JSON.stringify(answers, null, 2);
 
@@ -1057,8 +1025,8 @@ window.exportProgress() {
 
     showToast("コピーして保存してください！");
 }
-
-window.importProgress(event) {
+window.exportProgress = exportProgress;
+function importProgress(event) {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -1079,14 +1047,14 @@ window.importProgress(event) {
     };
     reader.readAsText(file);
 }
-
-window.copyToClipboard() {
+window.importProgress = importProgress;
+function copyToClipboard() {
     const textArea = document.getElementById("json-text");
     textArea.select();
     document.execCommand("copy");
     showToast("コピーしました！");
 }
-
+window.copyToClipboard = copyToClipboard;
 function showToast(message, duration = 3000) {
     const toast = document.getElementById("toast");
     if (!toast) return;
@@ -1098,4 +1066,3 @@ function showToast(message, duration = 3000) {
         toast.classList.remove("show");
     }, duration);
 }
-</script>
