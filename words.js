@@ -1706,7 +1706,7 @@ const intermediateWords = [
 {"word": "간접적", "meaning": "間接的", "page": 1},
 {"word": "간판", "meaning": "看板", "page": 1},
 {"word": "간호", "meaning": "看護", "page": 1},
-{"word": "갈다", "meaning": "替える", "page": 1},
+{"word": "갈다", "meaning": "替える、研ぐ、磨く、すりおろす", "page": 1},
 {"word": "갈등", "meaning": "葛藤", "page": 1},
 {"word": "갈수록", "meaning": "ますます", "page": 1},
 {"word": "갈아입다", "meaning": "着替える", "page": 1},
