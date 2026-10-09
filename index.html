@@ -764,6 +764,68 @@ td.peek-cell {
 
   testSupabaseConnection();
 
+  document.addEventListener("DOMContentLoaded", async () => {
+
+  const panel = document.createElement("div");
+
+  panel.style.cssText = `
+
+    margin: 10px auto;
+
+    padding: 12px;
+
+    max-width: 600px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    background: #f5f5f5;
+
+    color: #222;
+
+  `;
+
+  panel.textContent = "Supabase接続を確認しています…";
+
+  document.body.prepend(panel);
+
+  try {
+
+    const { data, error } =
+
+      await supabaseClient.auth.getSession();
+
+    if (error) throw error;
+
+    panel.textContent =
+
+      "✅ Supabase接続OK（" +
+
+      (data.session ? "ログイン中" : "未ログイン") +
+
+      "）";
+
+    panel.style.borderColor = "#26934a";
+
+  } catch (error) {
+
+    console.error("Supabase接続エラー:", error);
+
+    panel.textContent =
+
+      "❌ Supabase接続エラー: " +
+
+      (error.message || String(error));
+
+    panel.style.borderColor = "#d33";
+
+  }
+
+});
+
 </script>
 </head>
 <body>
