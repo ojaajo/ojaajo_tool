@@ -25,9 +25,9 @@ function getWordsInRange(start, end, onlyIncorrect) {
 
 // ---------------------- レベル選択とリスト決定 ----------------------
 function setWordList(listType) {
+  currentListKey = listType;
   // 安全に現在のレベル配列を取得
   const base = WORD_MAP[listType] || [];
-  currentListKey = listType;
   // 直接書き換え防止のためコピー
   selectedList = base.map(w => ({ ...w }));
 
