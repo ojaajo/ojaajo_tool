@@ -3,6 +3,7 @@ const words = WORDS;
 // ---------------------- 基本状態 ----------------------
 let completed = false;
 let selectedList = []; // ← 初期選択は後でDOM読み込み後に決める
+let currentListKey = "beginner";
 
 // 単語配列マップ（存在する配列名に合わせてここだけ整備）
 const WORD_MAP = {
