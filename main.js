@@ -280,6 +280,15 @@ function saveAnswer(word, status) {
         storedAnswers.push({ word: word.word, status: status });
     }
     localStorage.setItem('quizAnswers', JSON.stringify(storedAnswers));
+    if (["beginner", "intermediate", "advanced", "expressionup"].includes(currentListKey)) {
+        window.dispatchEvent(new CustomEvent("word-progress-changed", {
+            detail: {
+                listKey: currentListKey,
+                word: word.word,
+                status: status
+            }
+        }));
+    }
 }
 
 // ローカルストレージから解答データを復元し、words配列に反映
