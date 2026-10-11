@@ -1089,7 +1089,73 @@ td.peek-cell {
   supabaseClient.auth.onAuthStateChange((_event, session) => {
 
     updateUI(session?.user || null);
-
+  
+      // 単語の進捗をクラウドに保存する
+    window.addEventListener("word-progress-changed", async (event) => {
+      const { listKey, word, status } = event.detail || {};
+  
+      // 同期対象は4つのリストだけ
+      if (!["beginner", "intermediate", "advanced", "expressionup"].includes(listKey)) {
+        return;
+      }
+  
+      const { data: { user }, error: userError } =
+        await supabaseClient.auth.getUser();
+  
+      if (userError || !user) return;
+  
+      // 暗記状況を未設定に戻した場合はクラウドから削除
+      if (status === null) {
+        const { error } = await supabaseClient
+          .from("word_progress")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("list_key", listKey)
+          .eq("word", word);
+  
+        if (error) console.error("クラウド削除エラー:", error);
+        return;
+      }
+  
+      // すでに保存されている単語か確認
+      const { data: existingRows, error: selectError } =
+        await supabaseClient
+          .from("word_progress")
+          .select("word")
+          .eq("user_id", user.id)
+          .eq("list_key", listKey)
+          .eq("word", word)
+          .limit(1);
+  
+      if (selectError) {
+        console.error("クラウド確認エラー:", selectError);
+        return;
+      }
+  
+      if (existingRows && existingRows.length > 0) {
+        // 既存データを更新
+        const { error } = await supabaseClient
+          .from("word_progress")
+          .update({ status })
+          .eq("user_id", user.id)
+          .eq("list_key", listKey)
+          .eq("word", word);
+  
+        if (error) console.error("クラウド更新エラー:", error);
+      } else {
+        // 新しい単語を保存
+        const { error } = await supabaseClient
+          .from("word_progress")
+          .insert({
+            user_id: user.id,
+            list_key: listKey,
+            word: word,
+            status: status
+          });
+  
+        if (error) console.error("クラウド保存エラー:", error);
+      }
+    });
   });
 
 });
