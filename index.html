@@ -1089,7 +1089,7 @@ td.peek-cell {
   supabaseClient.auth.onAuthStateChange((_event, session) => {
 
     updateUI(session?.user || null);
-  
+  });
       // 単語の進捗をクラウドに保存する
     window.addEventListener("word-progress-changed", async (event) => {
       const { listKey, word, status } = event.detail || {};
