@@ -2472,6 +2472,133 @@ function showToast(message, duration = 3000) {
         toast.classList.remove("show");
     }, duration);
 }
+
+document.getElementById("custom-list-import-btn")?.addEventListener("click", async () => {
+  const fileInput = document.getElementById("custom-list-file");
+  const message = document.getElementById("custom-list-import-message");
+  const button = document.getElementById("custom-list-import-btn");
+  const file = fileInput?.files?.[0];
+
+  if (!file) {
+    message.textContent = "先に .txt ファイルを選択してください。";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "読み込み中です…";
+
+  let createdListKey = null;
+
+  try {
+    const { data: { user }, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError) throw userError;
+
+    if (!user) {
+      throw new Error("先にSupabaseへログインしてください。");
+    }
+
+    const text = await file.text();
+    const lines = text.split(/\r?\n/);
+    const words = [];
+    const seen = new Set();
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      const colonIndex = line.indexOf(":");
+
+      if (colonIndex < 1) {
+        throw new Error(
+          `${i + 1}行目に「:」がありません。形式を確認してください。`
+        );
+      }
+
+      const word = line.slice(0, colonIndex).trim();
+      const meaning = line.slice(colonIndex + 1).trim();
+
+      if (!word || !meaning) {
+        throw new Error(
+          `${i + 1}行目の単語または意味が空です。`
+        );
+      }
+
+      if (seen.has(word)) continue;
+      seen.add(word);
+
+      words.push({
+        user_id: user.id,
+        word,
+        meaning,
+        page: 1,
+        example: null
+      });
+    }
+
+    if (words.length === 0) {
+      throw new Error("登録できる単語がありません。");
+    }
+
+    const listName = file.name.replace(/\.txt$/i, "").trim();
+    if (!listName) {
+      throw new Error("ファイル名からリスト名を取得できません。");
+    }
+
+    createdListKey = `custom_${crypto.randomUUID()}`;
+
+    const { error: listError } = await supabaseClient
+      .from("vocab_lists")
+      .insert({
+        user_id: user.id,
+        list_key: createdListKey,
+        name: listName
+      });
+
+    if (listError) throw listError;
+
+    const rows = words.map(word => ({
+      ...word,
+      list_key: createdListKey
+    }));
+
+    for (let i = 0; i < rows.length; i += 100) {
+      const { error: wordsError } = await supabaseClient
+        .from("vocab_words")
+        .insert(rows.slice(i, i + 100));
+
+      if (wordsError) throw wordsError;
+    }
+
+    message.textContent =
+      `保存しました！「${listName}」に${words.length}語を登録しました。`;
+
+    fileInput.value = "";
+
+  } catch (error) {
+    console.error("単語リストの読み込みエラー:", error);
+
+    if (createdListKey) {
+      const { error: cleanupError } = await supabaseClient
+        .from("vocab_lists")
+        .delete()
+        .eq("list_key", createdListKey);
+
+      if (cleanupError) {
+        console.error("作成したリストの後片付けに失敗:", cleanupError);
+      }
+    }
+
+    message.textContent =
+      "読み込みに失敗しました: " +
+      (error.message || "原因を確認できませんでした。");
+
+  } finally {
+    button.disabled = false;
+  }
+});
+
 </script>
 </div></body>
 </html>
