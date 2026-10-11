@@ -2196,6 +2196,20 @@ function toggleWordStatus(cell, wordText) {
         });
     }
     localStorage.setItem("quizAnswers", JSON.stringify(storedAnswers));
+    
+    // クラウド保存処理に変更を通知
+    const listKey = document.getElementById("wordlist-level-select").value;
+    const status = newStatus === ""
+        ? null
+        : newStatus === "〇" ? "暗記済" : "未暗記";
+
+    window.dispatchEvent(new CustomEvent("word-progress-changed", {
+        detail: {
+            listKey: listKey,
+            word: wordText,
+            status: status
+        }
+    }));
 
     // フィルターが有効な場合は再適用
     // filterWordList();
