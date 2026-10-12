@@ -2558,10 +2558,26 @@ document.getElementById("custom-list-import-btn")?.addEventListener("click", asy
   const fileInput = document.getElementById("custom-list-file");
   const message = document.getElementById("custom-list-import-message");
   const button = document.getElementById("custom-list-import-btn");
+  const destination = document.getElementById("custom-list-destination");
+  const nameInput = document.getElementById("custom-list-name");
+
   const file = fileInput?.files?.[0];
+  const selectedDestination = destination?.value;
+  const newListName = nameInput?.value.trim();
+
+  if (selectedDestination === "new" && !newListName) {
+    message.textContent = "新しいリストの名前を入力してください。";
+    nameInput?.focus();
+    return;
+  }
+
+  if (!selectedDestination) {
+    message.textContent = "登録先のリストを選択してください。";
+    return;
+  }
 
   if (!file) {
-    message.textContent = "先に .txt ファイルを選択してください。";
+    message.textContent = ".txtファイルを選択してください。";
     return;
   }
 
@@ -2575,14 +2591,13 @@ document.getElementById("custom-list-import-btn")?.addEventListener("click", asy
       await supabaseClient.auth.getUser();
 
     if (userError) throw userError;
-
     if (!user) {
       throw new Error("先にSupabaseへログインしてください。");
     }
 
-    const text = await file.text();
-    const lines = text.split(/\r?\n/);
-    const words = [];
+    const fileText = await file.text();
+    const lines = fileText.split(/\r?\n/);
+    const importedWords = [];
     const seen = new Set();
 
     for (let i = 0; i < lines.length; i++) {
@@ -2609,66 +2624,138 @@ document.getElementById("custom-list-import-btn")?.addEventListener("click", asy
       if (seen.has(word)) continue;
       seen.add(word);
 
-      words.push({
-        user_id: user.id,
-        word,
-        meaning,
-        page: 1,
-        example: null
-      });
+      importedWords.push({ word, meaning });
     }
 
-    if (words.length === 0) {
+    if (importedWords.length === 0) {
       throw new Error("登録できる単語がありません。");
     }
 
-    const listName = file.name.replace(/\.txt$/i, "").trim();
-    if (!listName) {
-      throw new Error("ファイル名からリスト名を取得できません。");
+    let listKey;
+    let listName;
+
+    if (selectedDestination === "new") {
+      const { data: sameNameLists, error: nameError } =
+        await supabaseClient
+          .from("vocab_lists")
+          .select("list_key")
+          .eq("user_id", user.id)
+          .eq("name", newListName);
+
+      if (nameError) throw nameError;
+
+      if (sameNameLists && sameNameLists.length > 0) {
+        throw new Error(
+          "同じ名前のリストがすでにあります。既存リストを選ぶか、別の名前を入力してください。"
+        );
+      }
+
+      listKey = `custom_${crypto.randomUUID()}`;
+      listName = newListName;
+      createdListKey = listKey;
+
+      const { error: listError } = await supabaseClient
+        .from("vocab_lists")
+        .insert({
+          user_id: user.id,
+          list_key: listKey,
+          name: listName
+        });
+
+      if (listError) throw listError;
+    } else {
+      listKey = selectedDestination;
+
+      const { data: existingList, error: listError } =
+        await supabaseClient
+          .from("vocab_lists")
+          .select("list_key, name")
+          .eq("list_key", listKey)
+          .eq("user_id", user.id)
+          .single();
+
+      if (listError) throw listError;
+      if (!existingList) {
+        throw new Error("選択したリストが見つかりません。");
+      }
+
+      listName = existingList.name;
     }
 
-    createdListKey = `custom_${crypto.randomUUID()}`;
+    const { data: existingWords, error: wordsReadError } =
+      await supabaseClient
+        .from("vocab_words")
+        .select("word")
+        .eq("list_key", listKey)
+        .eq("user_id", user.id);
 
-    const { error: listError } = await supabaseClient
-      .from("vocab_lists")
-      .insert({
-        user_id: user.id,
-        list_key: createdListKey,
-        name: listName
-      });
+    if (wordsReadError) throw wordsReadError;
 
-    if (listError) throw listError;
+    const existingWordSet = new Set(
+      (existingWords || []).map(item => item.word)
+    );
 
-    const rows = words.map(word => ({
-      ...word,
-      list_key: createdListKey
+    const newWords = importedWords.filter(
+      item => !existingWordSet.has(item.word)
+    );
+
+    if (newWords.length === 0) {
+      message.textContent =
+        "追加できる新しい単語はありませんでした。";
+
+      if (createdListKey) {
+        await supabaseClient
+          .from("vocab_lists")
+          .delete()
+          .eq("list_key", createdListKey)
+          .eq("user_id", user.id);
+
+        createdListKey = null;
+      }
+
+      await refreshCustomListOptions();
+      return;
+    }
+
+    const existingCount = existingWordSet.size;
+
+    const rows = newWords.map((item, index) => ({
+      user_id: user.id,
+      list_key: listKey,
+      word: item.word,
+      meaning: item.meaning,
+      page: Math.floor((existingCount + index) / 80) + 1,
+      example: null
     }));
 
     for (let i = 0; i < rows.length; i += 100) {
-      const { error: wordsError } = await supabaseClient
+      const { error: insertError } = await supabaseClient
         .from("vocab_words")
         .insert(rows.slice(i, i + 100));
 
-      if (wordsError) throw wordsError;
+      if (insertError) throw insertError;
     }
 
     message.textContent =
-      `保存しました！「${listName}」に${words.length}語を登録しました。`;
+      `保存しました！「${listName}」に${newWords.length}語を追加しました。`;
 
     fileInput.value = "";
+    await refreshCustomListOptions();
 
   } catch (error) {
     console.error("単語リストの読み込みエラー:", error);
 
     if (createdListKey) {
-      const { error: cleanupError } = await supabaseClient
+      await supabaseClient
+        .from("vocab_words")
+        .delete()
+        .eq("list_key", createdListKey)
+        .eq("user_id", (await supabaseClient.auth.getUser()).data.user?.id);
+
+      await supabaseClient
         .from("vocab_lists")
         .delete()
         .eq("list_key", createdListKey);
-
-      if (cleanupError) {
-        console.error("作成したリストの後片付けに失敗:", cleanupError);
-      }
     }
 
     message.textContent =
