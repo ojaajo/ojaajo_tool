@@ -2495,6 +2495,65 @@ function showToast(message, duration = 3000) {
     }, duration);
 }
 
+
+async function refreshCustomListOptions() {
+  const select = document.getElementById("custom-list-destination");
+  if (!select) return;
+
+  const previousValue = select.value;
+
+  select.innerHTML = `
+    <option value="new">新しいリストを作成</option>
+  `;
+
+  try {
+    const { data: { user }, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError) throw userError;
+    if (!user) return;
+
+    const { data: lists, error } = await supabaseClient
+      .from("vocab_lists")
+      .select("list_key, name")
+      .eq("user_id", user.id)
+      .order("name");
+
+    if (error) throw error;
+
+    (lists || []).forEach(list => {
+      const option = document.createElement("option");
+      option.value = list.list_key;
+      option.textContent = list.name;
+      select.appendChild(option);
+    });
+
+    if ([...select.options].some(option => option.value === previousValue)) {
+      select.value = previousValue;
+    }
+  } catch (error) {
+    console.error("単語リスト取得エラー:", error);
+  }
+}
+
+document.getElementById("custom-list-destination")
+  ?.addEventListener("change", () => {
+    const select = document.getElementById("custom-list-destination");
+    const nameArea = document.getElementById("custom-list-name-area");
+
+    if (nameArea) {
+      nameArea.style.display =
+        select.value === "new" ? "block" : "none";
+    }
+  });
+
+refreshCustomListOptions();
+
+supabaseClient.auth.onAuthStateChange(() => {
+  setTimeout(refreshCustomListOptions, 0);
+});
+
+
 document.getElementById("custom-list-import-btn")?.addEventListener("click", async () => {
   const fileInput = document.getElementById("custom-list-file");
   const message = document.getElementById("custom-list-import-message");
