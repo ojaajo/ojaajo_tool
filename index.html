@@ -1216,23 +1216,45 @@ td.peek-cell {
 <label><input id="auto-speak" onchange="toggleAutoSpeak()" type="checkbox"/> 音声再生ON</label>
 </div>
 
+
 <div id="custom-list-import" style="margin: 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
   <h3>📥 自分の単語リスト</h3>
-  <label for="custom-list-file">単語リスト（.txt）:</label>
+
+  <label for="custom-list-destination">登録先：</label>
+  <select id="custom-list-destination" style="display: block; width: 100%; margin: 8px 0 12px; padding: 8px;">
+    <option value="new">新しいリストを作成</option>
+  </select>
+
+  <div id="custom-list-name-area">
+    <label for="custom-list-name">新しいリストの名前：</label>
+    <input
+      id="custom-list-name"
+      type="text"
+      placeholder="例：韓国語表現・第1回"
+      style="display: block; box-sizing: border-box; width: 100%; margin: 8px 0 12px; padding: 8px;"
+    />
+  </div>
+
+  <label for="custom-list-file">単語リスト（.txt）：</label>
   <input
     id="custom-list-file"
     type="file"
     accept=".txt,text/plain"
     style="display: block; margin: 10px 0;"
   />
+
   <p style="font-size: 13px; color: #666;">
-    1行に1単語ずつ「韓国語:日本語の意味」の形式で記載してください。
+    1行に1単語ずつ「韓国語:日本語の意味」の形式で記載してください。<br>
+    1ページ80語で自動的にページ分けします。
   </p>
+
   <button id="custom-list-import-btn" type="button">
     単語リストを読み込む
   </button>
+
   <p id="custom-list-import-message" role="status"></p>
 </div>
+
 
 <div>
 <button onclick="exportProgress()">暗記状況を保存</button>
