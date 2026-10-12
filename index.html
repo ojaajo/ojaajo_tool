@@ -1094,6 +1094,9 @@ td.peek-cell {
   window.addEventListener("word-progress-changed", async (event) => {
     alert("クラウド保存処理に通知が届きました");
     const { listKey, word, status } = event.detail || {};
+    const dbListKey = listKey.startsWith("custom:")
+  ? listKey.slice("custom:".length)
+  : listKey;
 
     // 同期対象は4つのリストだけ
 if (
@@ -1114,7 +1117,7 @@ if (
         .from("word_progress")
         .delete()
         .eq("user_id", user.id)
-        .eq("list_key", listKey)
+        .eq("list_key", dbListKey)
         .eq("word", word);
 
       if (error) console.error("クラウド削除エラー:", error);
@@ -1127,7 +1130,7 @@ if (
         .from("word_progress")
         .select("word")
         .eq("user_id", user.id)
-        .eq("list_key", listKey)
+        .eq("list_key", dbListKey)
         .eq("word", word)
         .limit(1);
 
@@ -1142,7 +1145,7 @@ if (
         .from("word_progress")
         .update({ status })
         .eq("user_id", user.id)
-        .eq("list_key", listKey)
+        .eq("list_key", dbListKey)
         .eq("word", word);
 
       if (error) console.error("クラウド更新エラー:", error);
@@ -1152,7 +1155,7 @@ if (
         .from("word_progress")
         .insert({
           user_id: user.id,
-          list_key: listKey,
+          list_key: dbListKey,
           word: word,
           status: status
         });
