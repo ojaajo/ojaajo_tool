@@ -1343,6 +1343,26 @@ td.peek-cell {
   </div>
 </div>
 
+<!-- 単語リスト管理メニュー -->
+<div id="word-list-menu" hidden
+  style="position: absolute; right: 24px; z-index: 1000; background: white; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); min-width: 180px; padding: 6px;">
+
+  <button type="button" class="word-list-menu-item" data-action="edit-list"
+    style="display: block; width: 100%; text-align: left; background: transparent; color: inherit; box-shadow: none; border-radius: 6px; margin: 0; padding: 12px;">
+    リスト名を編集
+  </button>
+
+  <button type="button" class="word-list-menu-item" data-action="delete-list"
+    style="display: block; width: 100%; text-align: left; background: transparent; color: inherit; box-shadow: none; border-radius: 6px; margin: 0; padding: 12px;">
+    リストを削除
+  </button>
+
+  <button type="button" class="word-list-menu-item" data-action="add-word"
+    style="display: block; width: 100%; text-align: left; background: transparent; color: inherit; box-shadow: none; border-radius: 6px; margin: 0; padding: 12px;">
+    単語を追加
+  </button>
+</div>
+
 <!-- 単語進捗サマリー -->
 <div id="word-summary" class="word-summary">
   <div class="status-group">
