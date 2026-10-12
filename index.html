@@ -2432,23 +2432,6 @@ function toggleWordStatus(cell, wordText) {
         }
     }
 
-    // localStorageに保存
-    let storedAnswers = JSON.parse(localStorage.getItem('quizAnswers')) || [];
-    const existing = storedAnswers.find(a => a.word === wordText);
-    if (existing) {
-        if (newStatus === "") {
-            storedAnswers = storedAnswers.filter(a => a.word !== wordText);
-        } else {
-            existing.status = newStatus === "〇" ? "暗記済" : "未暗記";
-        }
-    } else if (newStatus !== "") {
-        storedAnswers.push({
-            word: wordText,
-            status: newStatus === "〇" ? "暗記済" : "未暗記"
-        });
-    }
-    localStorage.setItem("quizAnswers", JSON.stringify(storedAnswers));
-    
     // クラウド保存処理に変更を通知
     const listKey = document.getElementById("wordlist-level-select").value;
     const status = newStatus === ""
