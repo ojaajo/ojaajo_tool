@@ -1092,7 +1092,6 @@ td.peek-cell {
   });
     // 単語の進捗をクラウドに保存する
   window.addEventListener("word-progress-changed", async (event) => {
-    alert("クラウド保存処理に通知が届きました");
     const { listKey, word, status } = event.detail || {};
     const dbListKey = listKey.startsWith("custom:")
   ? listKey.slice("custom:".length)
