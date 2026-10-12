@@ -2539,6 +2539,138 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+/* ===== 単語リスト全体の検索機能 ===== */
+document.addEventListener("DOMContentLoaded", () => {
+  const searchButton = document.getElementById("word-list-search-btn");
+  const searchArea = document.getElementById("word-search-area");
+  const searchInput = document.getElementById("word-search-input");
+  const clearButton = document.getElementById("word-search-clear-btn");
+  const searchCount = document.getElementById("word-search-count");
+  const wordListBody = document.getElementById("word-list-body");
+
+  if (
+    !searchButton ||
+    !searchArea ||
+    !searchInput ||
+    !clearButton ||
+    !searchCount ||
+    !wordListBody
+  ) {
+    console.error("単語検索に必要なHTMLが見つかりません。");
+    return;
+  }
+
+  let searchActive = false;
+
+  // 選択中のリスト全体から検索して結果を表示
+  function renderWordSearchResults() {
+    const query = searchInput.value.trim().toLocaleLowerCase();
+
+    if (!query) {
+      searchCount.textContent = "韓国語・日本語を入力して検索";
+      return;
+    }
+
+    loadAnswersFromStorage();
+
+    const results = selectedList.filter(word => {
+      const korean = String(word.word || "").toLocaleLowerCase();
+      const meaning = String(word.meaning || "").toLocaleLowerCase();
+
+      return korean.includes(query) || meaning.includes(query);
+    });
+
+    wordListBody.innerHTML = "";
+
+    results.forEach(word => {
+      const row = document.createElement("tr");
+
+      const wordCell = document.createElement("td");
+      wordCell.className = "col-word";
+      wordCell.appendChild(document.createTextNode(word.word + " "));
+
+      const speaker = document.createElement("span");
+      speaker.textContent = "📢";
+      speaker.style.fontSize = "12px";
+      speaker.style.cursor = "pointer";
+      speaker.addEventListener("click", () => {
+        playWordFromSpeaker(word.word);
+      });
+      wordCell.appendChild(speaker);
+
+      const meaningCell = document.createElement("td");
+      meaningCell.className = "col-meaning";
+      meaningCell.textContent = word.meaning || "";
+
+      const statusCell = document.createElement("td");
+      let statusText = "";
+
+      if (word.status === "暗記済") {
+        statusText = "〇";
+        statusCell.className = "green";
+      } else if (word.status === "未暗記") {
+        statusText = "×";
+        statusCell.className = "red";
+      }
+
+      statusCell.textContent = statusText;
+      statusCell.addEventListener("click", () => {
+        toggleWordStatus(statusCell, word.word);
+      });
+
+      row.append(wordCell, meaningCell, statusCell);
+      wordListBody.appendChild(row);
+    });
+
+    searchCount.textContent = results.length + "件見つかりました";
+
+    filterWordList();
+
+    if (typeof updateWordSummary === "function") {
+      updateWordSummary();
+    }
+  }
+
+  // 虫眼鏡を押して検索欄を開く
+  searchButton.addEventListener("click", () => {
+    searchActive = true;
+    searchArea.hidden = false;
+    searchArea.style.display = "block";
+    searchInput.value = "";
+    searchCount.textContent = "韓国語・日本語を入力して検索";
+    searchInput.focus();
+  });
+
+  // 入力するたびにリスト全体を検索
+  searchInput.addEventListener("input", () => {
+    if (searchActive) {
+      renderWordSearchResults();
+    }
+  });
+
+  // ×を押して検索を終了し、通常表示に戻す
+  function closeWordSearch() {
+    searchActive = false;
+    searchInput.value = "";
+    searchArea.hidden = true;
+    searchArea.style.display = "none";
+    searchCount.textContent = "";
+
+    showFilteredWordList();
+  }
+
+  clearButton.addEventListener("click", closeWordSearch);
+
+  // Escキーでも検索を終了
+  searchInput.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      closeWordSearch();
+    }
+  });
+});
+/* ===== 単語リスト全体の検索機能ここまで ===== */
+
+
 ////ファイル進捗出力///////////////////////////////////////////////////////////////////////////
 function exportProgress() {
     const answers = JSON.parse(localStorage.getItem("quizAnswers")) || [];
