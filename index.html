@@ -2818,7 +2818,41 @@ async function refreshCustomListOptions() {
     console.error("単語リスト取得エラー:", error);
   }
 }
+// 通常の単語一覧の選択欄に、自作リストを追加する
+async function refreshCustomWordListOptions() {
+  const select = document.getElementById("wordlist-level-select");
+  if (!select) return;
 
+  // 以前追加した自作リストの選択肢だけを削除
+  select.querySelectorAll('option[data-custom-list="true"]')
+    .forEach(option => option.remove());
+
+  try {
+    const { data: { user }, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError) throw userError;
+    if (!user) return;
+
+    const { data: lists, error } = await supabaseClient
+      .from("vocab_lists")
+      .select("list_key, name")
+      .eq("user_id", user.id)
+      .order("name");
+
+    if (error) throw error;
+
+    (lists || []).forEach(list => {
+      const option = document.createElement("option");
+      option.value = `custom:${list.list_key}`;
+      option.textContent = list.name;
+      option.dataset.customList = "true";
+      select.appendChild(option);
+    });
+  } catch (error) {
+    console.error("自作リストの選択肢取得エラー:", error);
+  }
+}
 document.getElementById("custom-list-destination")
   ?.addEventListener("change", () => {
     const select = document.getElementById("custom-list-destination");
@@ -2831,6 +2865,7 @@ document.getElementById("custom-list-destination")
   });
 
 refreshCustomListOptions();
+refreshCustomWordListOptions();
 
 supabaseClient.auth.onAuthStateChange(() => {
   setTimeout(refreshCustomListOptions, 0);
