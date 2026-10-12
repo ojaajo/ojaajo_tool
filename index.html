@@ -1651,10 +1651,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // レベル変更時にページ選択肢を作り直す（級ごとの最大ページ数に合わせる）
   const wlLevel = document.getElementById('wordlist-level-select');
-  wlLevel && wlLevel.addEventListener('change', () => {
-    populatePageSelectorsFor('wordlist-level-select', 'wordlist-start-page', 'wordlist-end-page');
-    // 単語一覧用として selectedList も更新
-    setWordList(wlLevel.value);
+  // リスト変更時の処理
+  wlLevel && wlLevel.addEventListener('change', async () => {
+    const level = wlLevel.value;
+
+    try {
+      if (level.startsWith('custom:')) {
+        // 自作リストをSupabaseから読み込む
+        await loadCustomWordList(level.slice('custom:'.length));
+
+        // 読み込んだ単語に合わせてページ選択肢を作る
+        const max = maxPageOf(selectedList);
+        rebuildSelectOptions('wordlist-start-page', max);
+        rebuildSelectOptions('wordlist-end-page', max);
+        linkStartEnd('wordlist-start-page', 'wordlist-end-page');
+      } else {
+        // 通常のリスト
+        populatePageSelectorsFor(
+          'wordlist-level-select',
+          'wordlist-start-page',
+          'wordlist-end-page'
+        );
+        setWordList(level);
+      }
+    } catch (error) {
+      console.error('単語リストの読み込みに失敗しました:', error);
+      alert('単語リストの読み込みに失敗しました。ログイン状態や通信を確認してください。');
+    }
   });
 
   const qLevel = document.getElementById('quiz-level-select');
