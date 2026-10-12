@@ -1310,7 +1310,25 @@ td.peek-cell {
 </div>
 <!-- 単語一覧表示 -->
 <div class="table-container hidden" id="word-list">
-<h2>単語一覧</h2>
+<div class="word-list-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+  <h2 style="margin: 0;">単語一覧</h2>
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <button
+      id="word-list-menu-btn"
+      type="button"
+      aria-label="単語リストの管理"
+      title="単語リストの管理"
+      style="font-size: 24px; padding: 4px 10px; background: transparent; color: inherit; border: none;"
+    >…</button>
+    <button
+      id="word-list-search-btn"
+      type="button"
+      aria-label="単語を検索"
+      title="単語を検索"
+      style="font-size: 22px; padding: 4px 10px; background: transparent; color: inherit; border: none;"
+    >⌕</button>
+  </div>
+</div>
 <!-- 単語進捗サマリー -->
 <div id="word-summary" class="word-summary">
   <div class="status-group">
