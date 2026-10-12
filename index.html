@@ -2623,9 +2623,20 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       wordCell.appendChild(speaker);
 
+
       const meaningCell = document.createElement("td");
       meaningCell.className = "col-meaning";
-      meaningCell.textContent = word.meaning || "";
+      
+      const meaningParts = String(word.meaning || "").split(/(<br\s*\/?>|&lt;br\s*\/?&gt;)/gi);
+      
+      meaningParts.forEach(part => {
+        if (/^(<br\s*\/?>|&lt;br\s*\/?&gt;)$/i.test(part)) {
+          meaningCell.appendChild(document.createElement("br"));
+        } else {
+          meaningCell.appendChild(document.createTextNode(part));
+        }
+      });
+
 
       const statusCell = document.createElement("td");
       let statusText = "";
