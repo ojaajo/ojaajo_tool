@@ -2187,23 +2187,45 @@ function playWordFromSpeaker(word) {
     }
 }
 
-function showSelectedWordList() {
+async function showSelectedWordList() {
     const level = document.getElementById("wordlist-level-select").value;
-    setWordList(level);
 
-    const startPage = parseInt(document.getElementById("wordlist-start-page").value);
-    const endPage = parseInt(document.getElementById("wordlist-end-page").value);
-    const shuffle = document.getElementById("wordlist-shuffle").checked;
+    try {
+        if (level.startsWith("custom:")) {
+            // 自作リストをSupabaseから読み込む
+            await loadCustomWordList(level.slice("custom:".length));
+        } else {
+            // 通常のリストを読み込む
+            setWordList(level);
+        }
 
-    const filteredWords = selectedList.filter(word => word.page >= startPage && word.page <= endPage);
-    if (shuffle) {
-        filteredWords.sort(() => Math.random() - 0.5);
+        const startPage = parseInt(
+            document.getElementById("wordlist-start-page").value,
+            10
+        );
+        const endPage = parseInt(
+            document.getElementById("wordlist-end-page").value,
+            10
+        );
+        const shuffle = document.getElementById("wordlist-shuffle").checked;
+
+        const filteredWords = selectedList.filter(word =>
+            (Number(word.page) || 1) >= startPage &&
+            (Number(word.page) || 1) <= endPage
+        );
+
+        if (shuffle) {
+            filteredWords.sort(() => Math.random() - 0.5);
+        }
+
+        showWordList(filteredWords, level);
+
+        rebuildHiddenChips();
+        requestAnimationFrame(updateWordSummary);
+    } catch (error) {
+        console.error("単語リストの表示に失敗しました:", error);
+        alert("単語リストの表示に失敗しました。ログイン状態や通信を確認してください。");
     }
-
-    showWordList(filteredWords, level);
-    
-    rebuildHiddenChips();                 // ← チップを再生成
-    requestAnimationFrame(updateWordSummary); // ← 集計も更新
 }
 // ✅ 開始を変えたら終了も同じページに自動同期（右を左に揃える）
 function syncEndToStart(startId, endId) {
