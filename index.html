@@ -2220,7 +2220,6 @@ async function showSelectedWordList() {
 
         showWordList(filteredWords, level);
 
-        rebuildHiddenChips();
         requestAnimationFrame(updateWordSummary);
 } catch (error) {
     const detail = error?.message || String(error);
