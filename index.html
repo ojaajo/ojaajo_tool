@@ -1363,6 +1363,29 @@ td.peek-cell {
   </button>
 </div>
 
+<!-- 単語検索欄 -->
+<div id="word-search-area" hidden
+  style="display: none; margin: 0 0 12px 0;">
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <input
+      id="word-search-input"
+      type="search"
+      placeholder="韓国語・日本語で検索"
+      autocomplete="off"
+      style="flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px;"
+    >
+    <button
+      id="word-search-clear-btn"
+      type="button"
+      aria-label="検索を閉じる"
+      title="検索を閉じる"
+      style="background: transparent; color: inherit; border: none; box-shadow: none; padding: 8px; font-size: 20px; cursor: pointer;"
+    >×</button>
+  </div>
+  <div id="word-search-count"
+    style="font-size: 13px; margin-top: 6px; color: #666;"></div>
+</div>
+
 <!-- 単語進捗サマリー -->
 <div id="word-summary" class="word-summary">
   <div class="status-group">
