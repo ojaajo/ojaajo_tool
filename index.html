@@ -2562,12 +2562,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let searchActive = false;
 
+  function restoreNormalWordList() {
+    const startSelect = document.getElementById("wordlist-start-page");
+    const endSelect = document.getElementById("wordlist-end-page");
+  
+    const startPage = Number(startSelect?.value);
+    const endPage = Number(endSelect?.value);
+  
+    if (
+      !Number.isFinite(startPage) ||
+      !Number.isFinite(endPage) ||
+      startPage > endPage
+    ) {
+      return;
+    }
+  
+    const normalWords = selectedList.filter(word => {
+      const page = Number(word.page);
+      return page >= startPage && page <= endPage;
+    });
+  
+    if (normalWords.length > 0) {
+      showWordList(normalWords);
+    }
+  }
   // 選択中のリスト全体から検索して結果を表示
   function renderWordSearchResults() {
     const query = searchInput.value.trim().toLocaleLowerCase();
 
     if (!query) {
-      showFilteredWordList();
+      restoreNormalWordList();
       searchCount.textContent = "韓国語・日本語を入力して検索";
       return;
     }
@@ -2657,7 +2681,7 @@ document.addEventListener("DOMContentLoaded", () => {
     searchArea.style.display = "none";
     searchCount.textContent = "";
   
-    showFilteredWordList();
+   restoreNormalWordList();
   }
 
   clearButton.addEventListener("click", closeWordSearch);
