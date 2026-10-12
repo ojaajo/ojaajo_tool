@@ -1309,26 +1309,39 @@ td.peek-cell {
 <p id="result"></p>
 </div>
 <!-- 単語一覧表示 -->
-<div class="table-container hidden" id="word-list">
 <div class="word-list-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
   <h2 style="margin: 0;">単語一覧</h2>
-  <div style="display: flex; align-items: center; gap: 8px;">
+
+  <div style="display: flex; align-items: center; gap: 4px;">
     <button
       id="word-list-menu-btn"
       type="button"
       aria-label="単語リストの管理"
       title="単語リストの管理"
-      style="font-size: 24px; padding: 4px 10px; background: transparent; color: inherit; border: none;"
-    >…</button>
+      style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; color: inherit; border: none; box-shadow: none; cursor: pointer;"
+    >
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+        <circle cx="5" cy="12" r="1.7"></circle>
+        <circle cx="12" cy="12" r="1.7"></circle>
+        <circle cx="19" cy="12" r="1.7"></circle>
+      </svg>
+    </button>
+
     <button
       id="word-list-search-btn"
       type="button"
       aria-label="単語を検索"
       title="単語を検索"
-      style="font-size: 22px; padding: 4px 10px; background: transparent; color: inherit; border: none;"
-    >⌕</button>
+      style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; color: inherit; border: none; box-shadow: none; cursor: pointer;"
+    >
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="10.8" cy="10.8" r="6.5"></circle>
+        <path d="m16 16 4.2 4.2"></path>
+      </svg>
+    </button>
   </div>
 </div>
+
 <!-- 単語進捗サマリー -->
 <div id="word-summary" class="word-summary">
   <div class="status-group">
