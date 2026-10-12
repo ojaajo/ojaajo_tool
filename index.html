@@ -1505,7 +1505,40 @@ function getWordsInRange(start, end, onlyIncorrect) {
     (!onlyIncorrect || w.status === "未暗記")
   );
 }
+// Supabaseの自作リストから単語を読み込む
+async function loadCustomWordList(listKey) {
+  const { data: { user }, error: userError } =
+    await supabaseClient.auth.getUser();
 
+  if (userError) throw userError;
+  if (!user) {
+    throw new Error("Supabaseにログインしてください。");
+  }
+
+  const { data: words, error } = await supabaseClient
+    .from("vocab_words")
+    .select("word, meaning, page, example")
+    .eq("user_id", user.id)
+    .eq("list_key", listKey)
+    .order("page")
+    .order("word");
+
+  if (error) throw error;
+
+  selectedList = (words || []).map(item => ({
+    word: item.word,
+    meaning: item.meaning,
+    page: Number(item.page) || 1,
+    example: item.example,
+  }));
+
+  const tableContainer = document.getElementById("scrollable-table");
+  if (tableContainer) {
+    tableContainer.classList.remove("small-text-mode");
+  }
+
+  return selectedList;
+}
 // ---------------------- レベル選択とリスト決定 ----------------------
 function setWordList(listType) {
   // 安全に現在のレベル配列を取得
