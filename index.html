@@ -2362,7 +2362,6 @@ function setupLinkedPageSelectors(startId, endId) {
 // 単語一覧表示関数（ローカルストレージのデータを適用）
 function showWordList(filteredWords, level) {
     currentWordIndex = 0;
-    loadAnswersFromStorage();
     hideAllSections();
 
     let shuffleCheckbox = document.getElementById("wordlist-shuffle");
