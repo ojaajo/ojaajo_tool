@@ -2490,6 +2490,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const menuButton = document.getElementById("word-list-menu-btn");
+  const menu = document.getElementById("word-list-menu");
+
+  if (!menuButton || !menu) return;
+
+  menuButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    menu.hidden = !menu.hidden;
+  });
+
+  menu.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+
+  document.addEventListener("click", () => {
+    menu.hidden = true;
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      menu.hidden = true;
+    }
+  });
+});
+
 ////ファイル進捗出力///////////////////////////////////////////////////////////////////////////
 function exportProgress() {
     const answers = JSON.parse(localStorage.getItem("quizAnswers")) || [];
