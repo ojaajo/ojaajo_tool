@@ -832,23 +832,23 @@ td.peek-cell {
 
   panel.style.cssText = `
 
-    max-width: 600px;
-
-    margin: 16px auto;
-
-    padding: 18px;
-
-    box-sizing: border-box;
-
-    background: white;
-
-    border: 1px solid #ddd;
-
-    border-radius: 12px;
-
-    color: #222;
-
-    font-family: sans-serif;
+display: none;
+position: fixed;
+right: 16px;
+bottom: 76px;
+z-index: 10000;
+width: min(420px, calc(100vw - 32px));
+max-height: min(70vh, 620px);
+overflow-y: auto;
+margin: 0;
+padding: 18px;
+box-sizing: border-box;
+background: white;
+border: 1px solid #ddd;
+border-radius: 16px;
+color: #222;
+font-family: sans-serif;
+box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
 
   `;
 
