@@ -2193,6 +2193,42 @@ function playWordFromSpeaker(word) {
     }
 }
 
+async function loadProgressFromSupabase(level) {
+    const { data: { user }, error: userError } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !user) return;
+
+    const dbListKey = level.startsWith("custom:")
+        ? level.slice("custom:".length)
+        : level;
+
+    const { data, error } = await supabaseClient
+        .from("word_progress")
+        .select("word, status")
+        .eq("user_id", user.id)
+        .eq("list_key", dbListKey);
+
+    if (error) {
+        console.error("暗記状況の読み込みエラー:", error);
+        throw error;
+    }
+
+    selectedList.forEach(word => {
+        delete word.status;
+    });
+
+    (data || []).forEach(row => {
+        const wordObj = selectedList.find(
+            word => word.word === row.word
+        );
+
+        if (wordObj) {
+            wordObj.status = row.status;
+        }
+    });
+}
+
 async function showSelectedWordList() {
     const level = document.getElementById("wordlist-level-select").value;
 
