@@ -2259,9 +2259,11 @@ async function showSelectedWordList() {
         if (shuffle) {
             filteredWords.sort(() => Math.random() - 0.5);
         }
+// Supabaseから暗記状況を読み込む
+await loadProgressFromSupabase(level);
 
-        showWordList(filteredWords, level);
-
+// 単語一覧を表示
+showWordList(filteredWords, level);
         requestAnimationFrame(updateWordSummary);
 } catch (error) {
     const detail = error?.message || String(error);
