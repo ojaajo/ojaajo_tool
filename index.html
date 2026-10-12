@@ -901,22 +901,39 @@ box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
     document.body.prepend(panel);
 
   }
-const cloudButton = document.createElement(“button”);
-cloudButton.type = “button”;
-cloudButton.id = “sb-cloud-toggle”;
-cloudButton.textContent = “☁️”;
-cloudButton.setAttribute(“aria-label”, “クラウド同期の設定を開く”);
-cloudButton.setAttribute(“aria-expanded”, “false”);
+  const cloudButton = document.createElement("button");
+  cloudButton.type = "button";
+  cloudButton.id = "sb-cloud-toggle";
+  cloudButton.textContent = "☁️";
+  cloudButton.setAttribute("aria-label", "クラウド同期の設定を開く");
+  cloudButton.setAttribute("aria-expanded", "false");
 
-cloudButton.style.cssText = position: fixed; right: 16px; bottom: 16px; z-index: 10001; width: 52px; height: 52px; border: none; border-radius: 50%; background: #2563eb; color: white; font-size: 25px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); cursor: pointer; display: flex; align-items: center; justify-content: center;;
+  cloudButton.style.cssText = `
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 10001;
+    width: 52px;
+    height: 52px;
+    border: none;
+    border-radius: 50%;
+    background: #2563eb;
+    color: white;
+    font-size: 25px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
 
-document.body.appendChild(cloudButton);
+  document.body.appendChild(cloudButton);
 
-cloudButton.addEventListener(“click”, () => {
-const isOpen = panel.style.display !== “none”;
-panel.style.display = isOpen ? “none” : “block”;
-cloudButton.setAttribute(“aria-expanded”, String(!isOpen));
-});
+  cloudButton.addEventListener("click", () => {
+    const isOpen = panel.style.display !== "none";
+    panel.style.display = isOpen ? "none" : "block";
+    cloudButton.setAttribute("aria-expanded", String(!isOpen));
+  });
 
   const status = panel.querySelector("#sb-auth-status");
 
