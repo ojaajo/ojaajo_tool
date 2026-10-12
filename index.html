@@ -2222,10 +2222,11 @@ async function showSelectedWordList() {
 
         rebuildHiddenChips();
         requestAnimationFrame(updateWordSummary);
-    } catch (error) {
-        console.error("単語リストの表示に失敗しました:", error);
-        alert("単語リストの表示に失敗しました。ログイン状態や通信を確認してください。");
-    }
+} catch (error) {
+    const detail = error?.message || String(error);
+    alert("エラー詳細:\n" + detail);
+    console.error("単語リストの表示に失敗しました:", error);
+}
 }
 // ✅ 開始を変えたら終了も同じページに自動同期（右を左に揃える）
 function syncEndToStart(startId, endId) {
