@@ -1496,7 +1496,8 @@ const WORD_MAP = {
   Level4:        Level4ofkoreanschool,
   Level5:        Level5ofkoreanschool,
 };
-
+// 自作リストの名前を管理
+const CUSTOM_LIST_NAMES = {};
 // 出題用：現在の selectedList から範囲抽出
 function getWordsInRange(start, end, onlyIncorrect) {
   return selectedList.filter(w =>
