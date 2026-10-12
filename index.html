@@ -2567,6 +2567,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const query = searchInput.value.trim().toLocaleLowerCase();
 
     if (!query) {
+      showFilteredWordList();
       searchCount.textContent = "韓国語・日本語を入力して検索";
       return;
     }
@@ -2655,7 +2656,7 @@ document.addEventListener("DOMContentLoaded", () => {
     searchArea.hidden = true;
     searchArea.style.display = "none";
     searchCount.textContent = "";
-
+  
     showFilteredWordList();
   }
 
