@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#111318">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="manifest" href="./manifest.webmanifest">
 <title>韓国語単語暗記ツール</title>
 <style>
 :root{color-scheme:dark;--bg:#111318;--panel:#1a1d24;--panel2:#222630;--line:#303540;--text:#f4f5f7;--muted:#9ba2b0;--accent:#b7f36b;--accent-ink:#17200c;--red:#ff8585}
@@ -396,9 +399,9 @@ header > button[onclick*="settings"]{display:none!important}
   </div>
  </div>
  <div id="cardQuizView" hidden>
-  <div class="section-head"><div><button class="btn small subtle" onclick="showCardSetup()">← クイズ設定</button><div class="eyebrow" style="margin-top:10px" id="cardListName">初級</div></div><span class="status" id="cardCounter">1 / 4</span></div>
+  <div class="section-head"><div><button class="btn small subtle" onclick="showCardSetup()">← クイズ設定</button><div class="eyebrow" style="margin-top:10px" id="cardQuizListName">初級</div></div><span class="status" id="cardCounter">1 / 4</span></div>
   <div class="panel card-stage">
-    <div class="eyebrow" id="cardListName">初級</div>
+    <div class="eyebrow" id="cardSetupListName">初級</div>
     <div class="card-ko-line"><div class="card-korean" id="cardKorean">가볍다</div><button type="button" class="audio-btn" onclick="playCardVoice(true)" aria-label="韓国語を再生" title="韓国語を再生"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"/></svg></button></div>
     <div class="card-meaning" id="cardMeaning">軽い</div>
     <div class="card-example" id="cardExample" hidden><strong>例文</strong><div id="cardExampleText"></div><div class="muted tiny" id="cardExampleMeaning" style="margin-top:5px"></div></div>
