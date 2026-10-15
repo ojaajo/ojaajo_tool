@@ -255,6 +255,17 @@ section:has(#sb-auth-status) a{color:#b7f36b!important}
 #sb-cloud-popup #sb-logout{display:block;margin-left:auto!important;background:transparent!important;border:0!important;color:#b7f36b!important;font-size:13px!important;padding:7px 3px!important}
 #sb-cloud-popup #sb-auth-message{color:#aab2bf!important}
 #sb-cloud-popup .cloud-popup-close{position:absolute!important;top:12px!important;right:12px!important;float:none!important}
+
+/* Step 33: compact paired Korean/Japanese examples, preserving the green rail. */
+.example.example-line{white-space:normal!important}
+.example-pairs{display:flex;flex-direction:column;gap:5px;min-width:0}
+.example-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:12px;align-items:start;min-width:0}
+.example-ko,.example-ja{min-width:0;overflow-wrap:anywhere;white-space:pre-wrap;line-height:1.55}
+.example-ko{color:#dce2e9}.example-ja{color:#9fa9b7}
+.example-pair.no-translation{grid-template-columns:minmax(0,1fr)}
+#cardExampleText{margin-top:8px;border-left:3px solid #b7f36b;padding-left:12px}
+#cardExampleText .example-pairs{gap:6px}
+@media(max-width:310px){.example-pair{column-gap:7px}}
 </style>
 <style>
 /* Supabase cloud control stays above the new bottom navigation */
@@ -404,7 +415,7 @@ header > button[onclick*="settings"]{display:none!important}
     <div class="eyebrow" id="cardSetupListName">初級</div>
     <div class="card-ko-line"><div class="card-korean" id="cardKorean">가볍다</div><button type="button" class="audio-btn" onclick="playCardVoice(true)" aria-label="韓国語を再生" title="韓国語を再生"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"/></svg></button></div>
     <div class="card-meaning" id="cardMeaning">軽い</div>
-    <div class="card-example" id="cardExample" hidden><strong>例文</strong><div id="cardExampleText"></div><div class="muted tiny" id="cardExampleMeaning" style="margin-top:5px"></div></div>
+    <div class="card-example" id="cardExample" hidden><strong>例文</strong><div id="cardExampleText"></div><div class="muted tiny" id="cardExampleMeaning" hidden></div></div>
     <div class="space"></div>
     <button class="btn full" onclick="revealMeaning()" id="revealBtn">意味を表示する</button>
     <button class="btn subtle full" style="margin-top:8px" onclick="toggleCardExample()">例文を表示／非表示</button>
@@ -472,7 +483,7 @@ header > button[onclick*="settings"]{display:none!important}
     <div class="field"><label for="importMode">登録先</label><select id="importMode"><option value="existing">既存リストに追加</option><option value="new">新しいリストを作成して登録</option></select></div>
     <div class="field" id="existingListField"><label for="importTargetList">追加先リスト</label><select id="importTargetList"></select></div>
     <div class="field" id="newListField"><label for="newListName">新しいリスト名</label><input id="newListName" placeholder="例：語学堂4級"></div>
-    <div class="field"><label for="importFile">テキストファイル（.txt）</label><input type="file" id="importFile" accept=".txt,text/plain"></div><div class="field"><label for="importText">単語データ</label><textarea id="importText" rows="7" placeholder="한적하다:人通りが少なく静かだ&#10;例文:이 동네는 한적하고 조용해요.&#10;例文訳:この町は人通りが少なく静かです。"></textarea></div>
+    <div class="field"><label for="importFile">テキストファイル（.txt）</label><input type="file" id="importFile" accept=".txt,text/plain"></div><div class="field"><label for="importText">単語データ</label><textarea id="importText" rows="7" placeholder="한적하다:人通りが少なく静かだ&#10;例文:이 동네는 한적하고 조용해요.例文訳:この町は人通りが少なく静かです。"></textarea></div>
     <div class="field"><label for="importDuplicatePolicy">登録済み単語の扱い</label><select id="importDuplicatePolicy"><option value="skip">スキップ（変更しない）</option><option value="fill">未登録の例文・例文訳だけ追加</option><option value="overwrite">意味・例文・例文訳を上書き</option></select></div><div class="row"><button class="btn" type="button" onclick="document.getElementById('importDialog').close()">キャンセル</button><button class="btn primary" id="doImport" type="submit">取り込む</button></div>
   </form>
 </dialog>

@@ -129,6 +129,28 @@ function repeatSelectedWord(){
   if(selectedWordIndex<0)selectedWordIndex=0;
   focusSelectedWord(true);
 }
+// Step 33: paired examples are stored as newline-delimited strings in existing DB columns.
+function examplePairs(ex,exja){
+ const korean=String(ex||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ const japanese=String(exja||'').split(/\r?\n/).map(x=>x.trim());
+ return korean.map((ko,i)=>({ko,ja:japanese[i]||''}));
+}
+function buildExampleRows(ex,exja){
+ const wrapper=document.createElement('div');wrapper.className='example-pairs';
+ for(const pair of examplePairs(ex,exja)){
+  const row=document.createElement('div');row.className='example-pair';
+  const ko=document.createElement('div');ko.className='example-ko';ko.textContent=pair.ko;
+  const ja=document.createElement('div');ja.className='example-ja';ja.textContent=pair.ja;
+  if(!pair.ja)row.classList.add('no-translation');
+  row.append(ko,ja);wrapper.append(row);
+ }
+ return wrapper;
+}
+function validateExampleLines(ex,exja){
+ const ko=String(ex||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ const ja=String(exja||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ if(ja.length>ko.length)throw new Error('例文訳の行数が韓国語例文より多くなっています。');
+}
 function renderWords(){
   const root=el('wordList');if(!root)return;
   root.replaceChildren();visibleWordRows=[];selectedWordIndex=-1;
@@ -160,7 +182,7 @@ function renderWords(){
     const status=document.createElement('button');status.type='button';status.className='status status-action '+(w.status==='known'?'known':w.status==='unknown'?'unknown':'');status.textContent=w.status==='known'?'✓ 暗記済み':w.status==='unknown'?'× 未暗記':'○ 未確認';status.title='タップして暗記状況を切り替え';status.setAttribute('aria-label',w.ko+'の暗記状況を切り替え');status.addEventListener('click',()=>cycleWordStatus(w,status));
     const menu=document.createElement('button');menu.type='button';menu.className='word-edit-menu';menu.textContent='⋮';menu.title='単語の編集';menu.setAttribute('aria-label','単語・訳・例文の編集');
     menu.addEventListener('click',()=>openWordEditor(w));right.append(status,menu);top.append(body,right);a.append(top);
-    if(allExamples && String(w.ex||'').trim()){const ex=document.createElement('div');ex.className='example example-line';const ko=document.createElement('div');ko.textContent=w.ex;ex.append(ko);if(String(w.exja||'').trim()){const ja=document.createElement('div');ja.className='example-translation';ja.textContent=w.exja;ex.append(ja)}a.append(ex)}
+    if(allExamples && String(w.ex||'').trim()){const ex=document.createElement('div');ex.className='example example-line';ex.append(buildExampleRows(w.ex,w.exja));a.append(ex)}
     const rowIndex=visibleWordRows.length;visibleWordRows.push({node:a,word:w});
     a.addEventListener('click',e=>{if(e.target.closest('button'))return;selectedWordIndex=rowIndex;focusSelectedWord(false)});
     root.append(a);
@@ -292,7 +314,7 @@ async function openWordEditor(w){
     const button=el('saveWordEdit');if(button.disabled)return;
     const ko=el('editWordKo').value.trim(),ja=el('editWordJa').value.trim(),ex=el('editWordEx').value.trim(),exja=el('editWordExJa').value.trim();
     if(!ko||!ja){alert('韓国語と日本語訳は必須です。');return}
-    if(exja&&!ex){alert('例文の日本語訳を登録する場合は、韓国語の例文も入力してください。');return}
+    try{validateExampleLines(ex,exja)}catch(error){alert(error.message);return}
     if(isBuiltinList(listKey)&&ko!==original){alert('標準リストの単語そのものは変更できません。意味と例文を編集してください。');return}
     // A word is the progress key. Renaming a studied word would orphan its progress;
     // defer that operation until a safe progress migration is implemented.
@@ -436,31 +458,42 @@ async function readImportFile(){
  try{el('importText').value=await file.text()}catch(e){alert('ファイルを読めませんでした: '+e.message)}
 }
 function parseImport(text){
- const result=[],seen=new Set();let current=null;
+ const result=[],seen=new Set();let current=null,pending=null;
  const rows=text.replace(/^\uFEFF/,'').split(/\r?\n/);
+ function finish(){
+  if(!current)return;
+  if(pending&&pending.ko){current.pairs.push(pending);pending=null}
+  current.example=current.pairs.map(p=>p.ko).join('\n');
+  current.example_meaning=current.pairs.map(p=>p.ja).join('\n');
+  delete current.pairs;
+ }
  for(let i=0;i<rows.length;i++){
   const line=rows[i].trim();if(!line)continue;
-  const match=line.match(/^(例文訳|例文)[:：](.*)$/);
-  if(match){
-   if(!current)throw new Error((i+1)+'行目：例文の前に単語を記入してください。');
-   const field=match[1]==='例文'?'example':'example_meaning';
-   if(current[field])throw new Error((i+1)+'行目：同じ項目が重複しています。');
-   current[field]=match[2].trim();continue;
+  if(/^例文[:：]/.test(line)){
+   if(!current)throw new Error((i+1)+'行目：例文の前に単語が必要です。');
+   const payload=line.replace(/^例文[:：]/,'');
+   const m=payload.match(/^(.*?)例文訳[:：](.*)$/);
+   if(pending){current.pairs.push(pending);pending=null}
+   if(m){if(!m[1].trim())throw new Error((i+1)+'行目：韓国語例文が空です。');current.pairs.push({ko:m[1].trim(),ja:m[2].trim()})}
+   else {if(!payload.trim())throw new Error((i+1)+'行目：韓国語例文が空です。');pending={ko:payload.trim(),ja:''}}
+   continue;
   }
-  const pos=line.search(/[:：]/);
-  if(pos<1)throw new Error((i+1)+'行目に「単語:意味」がありません。');
+  if(/^例文訳[:：]/.test(line)){
+   if(!current||!pending)throw new Error((i+1)+'行目：対応する韓国語例文がありません。');
+   pending.ja=line.replace(/^例文訳[:：]/,'').trim();current.pairs.push(pending);pending=null;continue;
+  }
+  const pos=line.search(/[:：]/);if(pos<1)throw new Error((i+1)+'行目に「単語:意味」がありません。');
   const word=line.slice(0,pos).trim(),meaning=line.slice(pos+1).trim();
   if(!word||!meaning)throw new Error((i+1)+'行目の単語または意味が空です。');
-  if(seen.has(word))throw new Error((i+1)+'行目：'+word+' がファイル内で重複しています。');
-  current={word,meaning,example:'',example_meaning:''};result.push(current);seen.add(word);
+  if(seen.has(word))throw new Error((i+1)+'行目：'+word+' が重複しています。');
+  finish();current={word,meaning,pairs:[],example:'',example_meaning:''};result.push(current);seen.add(word);
  }
- for(const w of result)if(w.example_meaning&&!w.example)throw new Error(w.word+'：例文訳には韓国語の例文が必要です。');
- return result;
+ finish();return result;
 }
 function exportWordList(){
  const key=el('exportListSelect')?.value||currentList;
  const rows=lists[key];if(!rows){alert('書き出すリストを選択してください。');return}
- const text=rows.map(w=>[w.ko+':'+w.ja,...(w.ex?['例文:'+w.ex.replace(/\r?\n/g,' ')]:[]),...(w.exja?['例文訳:'+w.exja.replace(/\r?\n/g,' ')]:[])].join('\n')).join('\n\n')+'\n';
+ const text=rows.map(w=>[w.ko+':'+w.ja,...examplePairs(w.ex,w.exja).map(p=>'例文:'+p.ko+(p.ja?'例文訳:'+p.ja:''))].join('\n')).join('\n\n')+'\n';
  const url=URL.createObjectURL(new Blob(['\uFEFF',text],{type:'text/plain;charset=utf-8'}));
  const link=document.createElement('a');link.href=url;link.download=(listNames[key]||key).replace(/[\\/:*?"<>|]/g,'_')+'.txt';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
 }
@@ -529,7 +562,7 @@ async function submitNewWord(event){
   const exja=el('editExJa').value.trim();
   if(!editableListKeys().includes(key)){alert('自作リストを選択してください。');return}
   if(!ko||!ja){alert('韓国語と日本語訳は必須です。');return}
-  if(exja&&!ex){alert('例文の日本語訳を登録する場合は、韓国語の例文も入力してください。');return}
+  try{validateExampleLines(ex,exja)}catch(error){alert(error.message);return}
   if((lists[key]||[]).some(w=>w.ko===ko)){alert('このリストには同じ単語がすでにあります。');return}
   button.disabled=true;
   try{
@@ -601,7 +634,7 @@ function renderCard(){
   safeText('cardKorean',w.ko);safeText('cardMeaning',meaningRevealed?w.ja:'…');
   safeText('revealBtn',meaningRevealed?'意味を隠す':'意味を表示する');
   el('cardExample').hidden=!exampleShown;
-  safeText('cardExampleText',w.ex||'例文は未登録です。');safeText('cardExampleMeaning',w.exja||'');
+  const target=el('cardExampleText');target.replaceChildren();if(w.ex)target.append(buildExampleRows(w.ex,w.exja));else target.textContent='例文は未登録です。';safeText('cardExampleMeaning','');
 }
 function playCardVoice(force=false){
   if(!force&&!el('cardAutoVoice').checked)return;
