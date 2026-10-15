@@ -1,3226 +1,511 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="ja">
-<head><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&amp;display=swap" rel="stylesheet"/>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111318">
 <title>韓国語単語暗記ツール</title>
-<style>body, header, h1, h2, h3, label, select, button {
-  font-family: 'Noto Sans JP', sans-serif;
-}
+<style>
+:root{color-scheme:dark;--bg:#111318;--panel:#1a1d24;--panel2:#222630;--line:#303540;--text:#f4f5f7;--muted:#9ba2b0;--accent:#b7f36b;--accent-ink:#17200c;--red:#ff8585}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans JP","Apple SD Gothic Neo",system-ui,sans-serif;font-size:15px;line-height:1.55}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0}
+.app{max-width:760px;min-height:0;margin:auto;padding:0 18px calc(92px + env(safe-area-inset-bottom))}
+header{padding:26px 0 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:17px;font-weight:800;letter-spacing:-.03em}.brand span{color:var(--accent)}
+.eyebrow{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+h1{font-size:29px;line-height:1.25;letter-spacing:-.05em;margin:8px 0 8px}
+h2{font-size:19px;margin:0 0 14px;letter-spacing:-.03em}
+h3{font-size:15px;margin:0 0 8px}
+p{margin:0;color:var(--muted)}
+.page{display:none}.page.active{display:block}body:has(.page:target) .page.active{display:none}.page:target{display:block}body:has(#list:target) #listIndexView{display:block}a.nav-btn{text-decoration:none}body:has(#list:target) .nav-btn[data-page="list"],body:has(#cards:target) .nav-btn[data-page="cards"],body:has(#settings:target) .nav-btn[data-page="settings"]{color:var(--accent);background:#282e25}
+.hero{padding:23px;border-radius:24px;background:linear-gradient(135deg,#252b34,#1a1d24 72%);border:1px solid #353b46;margin-bottom:22px}
+.hero p{max-width:420px}.tag{display:inline-flex;padding:5px 9px;border-radius:999px;background:#333b2c;color:var(--accent);font-size:11px;font-weight:700;margin-bottom:9px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px}
+.field{display:flex;flex-direction:column;gap:7px;margin:14px 0}
+label{font-size:12px;color:var(--muted);font-weight:700}
+input,select,textarea{width:100%;border:1px solid var(--line);background:#11141a;color:var(--text);border-radius:12px;padding:12px 13px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.row{display:flex;align-items:center;gap:10px}.row>*{flex:1;min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:12px 15px;font-weight:750;background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.subtle{background:transparent}.btn.danger{color:var(--red)}
+.btn:active{transform:scale(.99)}
+.full{width:100%}.small{padding:7px 10px;font-size:12px;border-radius:9px}
+.muted{color:var(--muted)}.tiny{font-size:12px}.space{height:10px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 0 12px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.stat{padding:13px;border-radius:15px;background:#171a20;border:1px solid var(--line)}
+.stat strong{display:block;font-size:22px;letter-spacing:-.04em}.stat span{font-size:11px;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.toolbar .btn{flex:1;min-width:105px}
+/* Keep the selected list's heading and display controls visible while scrolling. */
+.word-list-sticky{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 0 12px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.word-list-sticky .section-head{margin:4px 0 12px}
+.word-list-sticky .toolbar{margin-bottom:0}
+.word-list-sticky .word-detail-controls{margin-bottom:0}
+.word-list{display:flex;flex-direction:column;gap:9px}
+.list-index{display:flex;flex-direction:column;gap:10px}
+.list-index-card{display:flex;align-items:center;gap:13px;width:100%;padding:15px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:16px;color:var(--text)}
+.list-index-card:active{transform:scale(.99)}
+.list-index-icon{width:48px;height:48px;display:grid;place-items:center;flex-shrink:0;border-radius:50%;background:conic-gradient(var(--accent) 0 33%, #404740 33% 66%, #252b28 66% 100%);color:var(--text);font-size:11px;font-weight:700;position:relative}.list-index-icon::before{content:"";position:absolute;inset:6px;background:var(--panel);border-radius:50%}.list-index-icon span{position:relative;z-index:1}
+.list-index-copy{flex:1;min-width:0}
+.list-index-copy strong{display:block;font-size:15px;overflow-wrap:anywhere}
+.list-index-copy small{display:block;margin-top:3px;color:var(--muted);font-size:12px} 
+.list-index-arrow{color:var(--muted);font-size:23px}
+.list-progress{height:6px;background:#30352f;border-radius:999px;overflow:hidden;margin-top:10px;width:100%}.list-progress-fill{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .2s}.list-progress-detail{display:flex;justify-content:space-between;gap:8px;margin-top:6px;color:var(--muted);font-size:11px}.list-index-copy{min-width:0}.detail-status-options{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.detail-status-options label{display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;font-size:12px}.detail-status-options input{accent-color:var(--accent)}.detail-subhead{font-size:12px;color:var(--muted);margin-top:13px;margin-bottom:6px}.detail-panel{background:var(--panel2);border:1px solid var(--line);padding:12px;border-radius:12px;margin-bottom:8px}
+.word{border:1px solid var(--line);border-radius:15px;background:var(--panel);padding:14px}
+.word-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.korean{font-size:19px;font-weight:800;letter-spacing:-.03em;overflow-wrap:anywhere}
+.meaning{margin-top:3px;color:#c2c7d0}.hidden-text{font-size:0!important;user-select:none}.hidden-text::after{content:"…";font-size:18px;color:var(--muted)}
+.status{white-space:nowrap;font-size:11px;border-radius:999px;padding:5px 8px;background:#30343c;color:#c8ced8}
+.status.known{background:#293a22;color:var(--accent)}.status.unknown{background:#3a2929;color:var(--red)}
+.word-actions{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.word-actions .btn{padding:7px 10px;font-size:12px}
+.example{margin-top:12px;padding:11px 12px;border-radius:12px;background:#14171d;border:1px solid #292e37;font-size:13px}
+.example strong{display:block;color:var(--accent);font-size:11px;margin-bottom:4px}
+.card-stage{min-height:340px;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:24px}
+.card-korean{font-size:clamp(28px,7vw,43px);font-weight:850;letter-spacing:-.05em;margin:22px 0 10px;overflow-wrap:anywhere}
+.card-meaning{font-size:19px;min-height:32px;color:#c9ced7}
+.card-example{margin-top:22px;padding:14px;border-radius:14px;background:#15181e;text-align:left}
+.card-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.bottom-nav{position:fixed;z-index:5;bottom:0;left:0;right:0;background:rgba(17,19,24,.94);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:9px 12px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center}
+.nav-inner{display:grid;grid-template-columns:repeat(4,1fr);width:min(760px,100%);gap:5px}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;color:var(--muted);padding:7px 3px;border-radius:12px;font-size:11px;font-weight:700}
+.nav-btn .ico{font-size:18px;line-height:1.2}.nav-btn.active{background:#282e25;color:var(--accent)}
+.notice{padding:12px;border:1px dashed #444b58;border-radius:13px;color:var(--muted);font-size:12px}
+.divider{height:1px;background:var(--line);margin:16px 0}
+.cloud-panel{background:linear-gradient(135deg,#1d2420,#1a1d24 72%)}
+.cloud-head{display:flex;align-items:center;gap:12px;margin-bottom:15px}
+.cloud-icon{width:42px;height:42px;display:grid;place-items:center;flex-shrink:0;border-radius:13px;background:#303b29;color:var(--accent);font-size:23px}
+.cloud-copy{flex:1;min-width:0}.cloud-copy h2{margin:0 0 3px}.cloud-copy p{font-size:12px}
+.action-card{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:16px;margin-bottom:10px;border-radius:17px;border:1px solid var(--line);background:var(--panel);color:var(--text)}
+.action-card:active{transform:scale(.99)}
+.action-icon{width:43px;height:43px;display:grid;place-items:center;flex-shrink:0;border-radius:13px;background:#303b29;color:var(--accent);font-size:24px}
+.action-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.action-copy strong{font-size:14px}.action-copy small{font-size:12px;color:var(--muted)}
+.action-arrow{font-size:25px;color:var(--muted)}
+.choice-list{display:grid;gap:10px;margin-top:18px}
+.choice-btn{display:flex;align-items:center;gap:12px;width:100%;padding:15px;text-align:left;background:#222630;border:1px solid var(--line);border-radius:14px;color:var(--text)}
 
-header h1 {
-  font-size: 24px;
-  margin: 0;
-}
+.word-top{align-items:flex-start}
+.word-menu-wrap{position:relative;flex-shrink:0}
+.word-menu-trigger{width:34px;height:34px;padding:0;border:1px solid var(--line);border-radius:10px;background:#242832;color:var(--text);font-size:22px;line-height:1}
+.word-menu{position:absolute;right:0;top:39px;z-index:10;min-width:145px;padding:6px;background:#252932;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px #0008}
+.word-menu button{display:block;width:100%;padding:10px;text-align:left;border:0;border-radius:8px;background:transparent;color:var(--text);font-size:13px}
+.word-menu button:active{background:#353a45}
+.word-menu button.danger{color:#ff8989}
+.choice-btn .choice-symbol{font-size:21px;color:var(--accent);width:26px;text-align:center}
+.choice-btn strong{display:block;font-size:14px}.choice-btn small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
 
-body {
-  font-family: 'Noto Sans JP', sans-serif;
-  background-color: #f9f9fb;
-  margin: 0;
-  padding: 0;
-}
-header {
-  background-color: #333;
-  color: #fff;
-  padding: 15px 0;
-  text-align: center;
-  font-size: 28px;
-}
-.container {
-  max-width: 600px;
-  background-color: #fff;
-  margin: 40px auto;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-}
-h3 {
-  margin-top: 15px;
-  font-size: 20px;
-  border-left: 6px solid #007BFF;
-  padding-left: 10px;
-}
-button {
-  display: inline-block;
-  margin: 10px 5px 10px 0;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #fff;
-  background-color: #007BFF;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  transition: all 0.2s ease-in-out;
-}
-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-1px);
-}
-.form-group {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  align-items: center;
-  gap: 10px;
-  margin: 10px 0;
-}
-.form-group label {
-  font-size: 14px;
-  margin: 0;
-  white-space: nowrap;
-}
-.form-group select {
-  padding: 4px 8px;
-  font-size: 14px;
-}
-.page-range {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.checkbox-group {
-  margin: 10px 0;
-}
-.checkbox-group label {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  gap: 5px;
-}
-select.level-select {
-  width: 160px;
-}
+@media(min-width:600px){.app{padding-left:26px;padding-right:26px}.hero{padding:30px}.panel{padding:22px}.word{padding:16px}}
+[hidden]{display:none!important}
+.bottom-nav{z-index:100}
 
-body {
-      font-family: 'Noto Sans JP', sans-serif;
-      background-color: #f9f9fb;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #333;
-      color: #fff;
-      padding: 15px 0;
-      text-align: center;
-      font-size: 24px;
-    }
-    .container {
-      max-width: 600px;
-      background-color: #fff;
-      margin: 40px auto;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    }
-    h3 {
-      margin-top: 15px;
-      font-size: 20px;
-      border-left: 6px solid #007BFF;
-      padding-left: 10px;
-    }
-    button {
-      display: inline-block;
-      margin: 10px 5px 10px 0;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #fff;
-      background-color: #007BFF;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      transition: all 0.2s ease-in-out;
-    }
-    button:hover {
-      background-color: #0056b3;
-      transform: translateY(-1px);
-    }
-    .form-group {
-      display: grid;
-      grid-template-columns: 100px 1fr;
-      align-items: center;
-      gap: 10px;
-      margin: 10px 0;
-    }
-    .form-group label {
-      font-size: 14px;
-      margin: 0;
-      white-space: nowrap;
-    }
-    .form-group select {
-      padding: 4px 8px;
-      font-size: 14px;
-    }
-    .page-range {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .checkbox-group {
-      margin: 10px 0;
-    }
-    .checkbox-group label {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      gap: 5px;
-    }
-    select.level-select {
-    width: 160px; /* 表示ページセレクト2個＋～と同じくらいの幅に調整 */
-    }
+/* JavaScriptが無効なプレビューでも単語一覧を開ける */
+[hidden]{display:none!important}
+body:has(#word-detail:target) .page.active,body:has(#word-detail:target) #list{display:none!important}
+body:has(#word-detail:target) #word-detail{display:block!important}
+body:has(#word-detail:target) .nav-btn[data-page="list"]{color:var(--accent);background:#282e25}
+.word-detail-controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.word-detail-controls label{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:9px 12px;color:var(--text);font-size:12px}
+.word-detail-controls input{width:auto;accent-color:var(--accent)}
+#word-detail:has(#hide-ko:checked) .korean{font-size:0;user-select:none}
+#word-detail:has(#hide-ko:checked) .korean::after{content:"…";font-size:18px;color:var(--muted)}
+#word-detail:has(#hide-ja:checked) .meaning{font-size:0;user-select:none}
+#word-detail:has(#hide-ja:checked) .meaning::after{content:"…";font-size:18px;color:var(--muted)}
+.word-detail-static .word{margin:10px 0}
+.word-detail-static details{margin-top:10px}
+.word-detail-static summary{cursor:pointer;color:var(--accent);font-size:13px}
+.word-detail-static .word-top{align-items:flex-start}
+.word-detail-static .example{margin-top:9px}
 
-body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-        header {
-            background: #333;
-            color: #fff;
-            padding: 10px 0;
-            text-align: center;
-        }
-        .container {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        button {
-            display: inline-block;
-            margin: 5px 0;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 3px;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        .hidden {
-            display: none;
-        }
-        .modal-content button {
-            margin: 10px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background: #f4f4f9;
-        }
-        .scrollable-table {
-            max-height: 450px;  /* テーブルの最大高さ */
-            overflow-y: auto;   /* 縦スクロールを許可 */
-            border: 1px solid #ddd;
-            position: relative;
-            padding: 0;
-            margin: 0;
-            -webkit-overflow-scrolling: touch;  /* iOSのスムーズスクロールを有効化 */
-            touch-action: auto;  /* タッチスクロールを有効化 */
-        }
+.shuffle-control{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;background:var(--panel2);font-size:12px;white-space:nowrap}.shuffle-control input{accent-color:var(--accent)}
 
-        .scrollable-table table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
-            padding: 0;
-        }
+.compact-head{padding:9px 0 10px}.compact-top{display:flex;align-items:center;gap:9px;margin-bottom:9px}.compact-top strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px}.compact-top .btn{flex-shrink:0}.range-summary{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:11px;color:var(--text);padding:9px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;text-align:left}.range-summary span:nth-child(2){margin-left:auto;color:var(--muted);font-size:12px}.range-panel{padding:12px 2px 3px}.range-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.range-fields label{display:flex;flex-direction:column;gap:5px}.range-fields select{padding:9px}.setting-choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}.setting-choices label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text)}.setting-choices input{width:auto;accent-color:var(--accent)}[hidden]{display:none!important}
+.detail-toggle{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+#staticRangeDialog{display:none!important}
+#detailSettingsToggle:checked + #staticRangeDialog{display:block!important}
+ .card-settings label{display:flex;align-items:center;gap:9px;min-width:0;white-space:normal} .card-settings input{flex-shrink:0;width:19px;height:19px} #cardListView,#cardSetupView,#cardQuizView{max-width:680px;margin:auto} .list-index-card{text-decoration:none;color:var(--text)}
 
-        .scrollable-table thead th {
-            position: sticky;
-            top: 0;
-            background-color: #f4f4f4;
-            z-index: 2;
-            height: 30px;
-            line-height: 30px;
-        }
-        td.green {
-            color: green;
-            background-color: #d4edda;
-        }
+/* Step 8: fixed search field and compact audio controls */
+.list-search-panel[hidden]{display:none!important}
+.list-search-panel{margin:8px 0 10px!important}
+.list-search-panel input{width:100%;box-sizing:border-box}
+.audio-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;min-width:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--accent);cursor:pointer;padding:7px;vertical-align:middle}
+.audio-btn svg{display:block;width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.audio-btn:active{transform:scale(.95)}
+.word-ko-line{display:flex;align-items:center;gap:8px;min-width:0}
+.word-ko-line .korean{min-width:0}
+.card-ko-line{display:flex;justify-content:center;align-items:center;gap:12px;margin:22px 0 10px}
+.card-ko-line .card-korean{margin:0}
+#listSearchToggle{font-size:23px;line-height:1;min-width:36px}
 
-        td.red {
-            color: red;
-            background-color: #f8d7da;
-        }
-        .hidden-korean {
-            visibility: hidden;
-        }
-
-        .hidden-meaning {
-            visibility: hidden;
-        }
-        #word-container {
-            display: flex;
-            align-items: center;
-        }
-
-        #word {
-            margin-right: 2px; /* スピーカーアイコンとの間に適切なスペースを追加 */
-        }
-        table th, table td {
-            height: 20px;   /* 各行の高さを50pxに設定 */
-        }
-        /* モーダルのスタイル */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal.hidden {
-            display: none;
-        }
-
-        .modal-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            width: 300px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-        }
-
-        .modal-buttons button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #modal-yes {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        #modal-no {
-            background-color: #f44336;
-            color: white;
-        }
-        .button-container {
-            display: flex;
-            justify-content: center;  /* 水平方向に中央揃え */
-            align-items: center;      /* 垂直方向にも中央揃え */
-            gap: 10px;
-            margin-top: 20px;         /* ボタンとカードの間にスペースを追加（必要に応じて調整） */
-        }
+/* Step 10: two independent ellipsis controls and floating navigator */
+.word-reveal{background:transparent;color:#aeb6c4;border:1px dashed #48505b;border-radius:8px;min-width:44px;min-height:32px;padding:2px 10px;font-size:20px;cursor:pointer;text-align:left}
+.word-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.word-edit-menu{background:transparent;color:#aab1bc;border:0;border-radius:9px;min-width:36px;min-height:38px;font-size:23px;cursor:pointer}
+.selected-word{border-color:#b7f36b!important;box-shadow:0 0 0 1px #b7f36b44}
+.word-navigator[hidden]{display:none!important}
+.word-navigator{position:fixed;right:15px;bottom:calc(106px + env(safe-area-inset-bottom));z-index:80;display:flex;flex-direction:column;gap:3px;background:#252a32;border:1px solid #414854;border-radius:17px;padding:5px;box-shadow:0 8px 25px #0008}
+.word-navigator button{width:42px;height:42px;background:transparent;border:0;color:#e8ebef;font-size:27px;border-radius:11px;cursor:pointer}
+.word-navigator button:nth-child(2){color:#b7f36b;font-size:25px}
+.word-navigator button:active{background:#39413a}
+.word-edit-dialog{background:#1a1d24;color:#f4f5f7;border:1px solid #3b414c;border-radius:18px;width:min(440px,90vw);padding:20px}
+.word-edit-dialog::backdrop{background:#000a}
+.edit-dialog-inner{display:grid;gap:12px}.edit-dialog-inner label{display:grid;gap:5px;font-size:13px}.edit-dialog-inner input,.edit-dialog-inner textarea{background:#111318;border:1px solid #3b414c;border-radius:10px;color:white;padding:10px;font:inherit;width:100%;box-sizing:border-box}
+/* Restyle existing Supabase overlay created by supabase.js. Keep login controls. */
+#sb-cloud-toggle{background:#262d29!important;color:#b7f36b!important;border:1px solid #43533a!important;box-shadow:0 5px 18px #0009!important;right:15px!important;bottom:calc(88px + env(safe-area-inset-bottom))!important;width:45px!important;height:45px!important;font-size:20px!important}
+section:has(#sb-auth-status){background:#1a1d24!important;color:#eef0f3!important;border:1px solid #384139!important;border-radius:16px!important;box-shadow:0 15px 40px #000b!important}
+section:has(#sb-auth-status) input{background:#111318!important;color:#f4f5f7!important;border:1px solid #424952!important;border-radius:9px!important}
 
 
-        #correct-btn, #incorrect-btn {
-            font-size: 24px;
-            width: 170px;            /* 幅を適切に設定 */
-            height: 50px;           /* 高さを適切に設定 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            border-radius: 10px;
-            line-height: 1;
-            box-sizing: border-box;
-        }
+/* Step 14: prevent the document itself from scrolling past the bottom navigation.
+   Only the app content scrolls; the navigation stays attached to the viewport. */
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;position:relative}
+body{position:fixed;inset:0;width:100%;touch-action:pan-y}
+.app{
+  height:100vh;
+  height:100dvh;
+  max-height:100%;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(88px + env(safe-area-inset-bottom));
+}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0}
 
-        #card {
-            width: 100%;
-            max-width: 450px;
-            height: auto; /* 高さは内容に応じて可変 */
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #e0e0e0; /* グレーのカード色 */
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column; /* 縦に並べる */
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-        }
+/* Step 19: viewport-safe cloud popup, independent of scrolling content. */
+section:has(#sb-auth-status){
+  position:fixed!important;
+  top:calc(14px + env(safe-area-inset-top))!important;
+  right:calc(14px + env(safe-area-inset-right))!important;
+  left:auto!important;
+  bottom:auto!important;
+  width:min(400px,calc(100vw - 28px))!important;
+  max-width:calc(100vw - 28px)!important;
+  max-height:calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  overflow-y:auto!important;
+  margin:0!important;
+  z-index:10002!important;
+  box-sizing:border-box!important;
+}
+/* The navigation is always above content but below the cloud popup. */
+.word-navigator{z-index:1001!important;right:max(12px,env(safe-area-inset-right))!important;bottom:calc(95px + env(safe-area-inset-bottom))!important}
+.example-translation{margin-top:5px;color:#929aa8;font-size:12px;line-height:1.65;white-space:pre-wrap}
+/* Step 20: compact example layout and viewport-safe cloud dialog. */
+.example.example-line{margin-top:11px;padding:3px 0 3px 12px;border:0;border-left:3px solid #b7f36b;border-radius:0;background:transparent;color:#cdd2d9;font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+/* Keep the iPad document locked, hide only the app scroll indicator. */
+.app{scrollbar-width:none}
+.app::-webkit-scrollbar{display:none;width:0;height:0}
+section:has(#sb-auth-status){
+  position:fixed!important;
+  top:calc(75px + env(safe-area-inset-top))!important;
+  left:auto!important;
+  right:max(12px,env(safe-area-inset-right))!important;
+  bottom:auto!important;
+  width:min(340px,calc(100vw - 24px))!important;
+  max-width:calc(100vw - 24px)!important;
+  max-height:calc(100dvh - 95px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  overflow-y:auto!important;
+  z-index:10010!important;
+  box-sizing:border-box!important;
+  background:#1b1e25!important;
+  color:#eef0f3!important;
+  border:1px solid #343b45!important;
+  border-radius:16px!important;
+  padding:16px!important;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif!important;
+  font-size:13px!important;
+  line-height:1.5!important;
+  box-shadow:0 18px 44px #000b!important;
+  overflow-wrap:anywhere!important;
+}
+section:has(#sb-auth-status) h3{font-size:15px!important;line-height:1.4!important;font-weight:700!important;margin:0 35px 13px 0!important}
+section:has(#sb-auth-status) p{font-size:13px!important;overflow-wrap:anywhere!important}
+section:has(#sb-auth-status) button{font:inherit!important;border-radius:9px!important;padding:8px 11px!important;border:1px solid #414954!important;background:#262b34!important;color:#e9edf2!important;cursor:pointer}
+section:has(#sb-auth-status) #sb-login{background:#b7f36b!important;color:#111318!important;border-color:#b7f36b!important;font-weight:700!important}
+section:has(#sb-auth-status) .cloud-popup-close{position:absolute!important;top:12px!important;right:12px!important;float:none!important;width:31px!important;height:31px!important;padding:0!important;font-size:20px!important;line-height:1!important}
+section:has(#sb-auth-status) a{color:#b7f36b!important}
 
-#word-container {
-    display: flex;
-    justify-content: center;  /* 単語を中央揃え */
-    align-items: center;
-    width: 100%;  /* 親要素の幅を均等に */
+/* Step 22: cloud dialog is portaled to body, outside the app scroll container. */
+#sb-cloud-popup{
+  position:fixed!important;top:calc(16px + env(safe-area-inset-top))!important;
+  right:calc(16px + env(safe-area-inset-right))!important;left:auto!important;bottom:auto!important;
+  width:min(350px,calc(100vw - 32px))!important;max-width:calc(100vw - 32px)!important;
+  max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+  margin:0!important;padding:18px!important;box-sizing:border-box!important;
+  overflow-y:auto!important;overflow-x:hidden!important;z-index:2147483000!important;
+  background:#171a21!important;border:1px solid #353d46!important;border-radius:18px!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.58)!important;color:#f4f5f7!important;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',sans-serif!important;
+  font-size:13px!important;line-height:1.5!important;
 }
-
-#word-wrapper {
-    display: flex;
-    align-items: center;  /* 単語と📢を縦中央揃え */
-    justify-content: center;  /* 📢マークを単語の右に配置 */
-    gap: 8px;  /* 単語と📢マークの間隔 */
-    min-width: 200px;  /* 単語の幅を一定にし、意味と揃えやすくする */
-}
-
-#word {
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    white-space: nowrap;  /* 長い単語でも折り返さない */
-}
-
-#speaker-icon {
-    font-size: 20px;
-    cursor: pointer;
-}
-
-#meaning {
-    display: block;
-    font-size: 18px;
-    color: #555;
-    text-align: center;  /* 単語の意味も中央揃え */
-    margin-top: 10px;
-    min-width: 200px;  /* `#word-wrapper` と同じ幅を設定 */
-}
-.progress-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-/* 〇×ボタンの下に黒線を引いて、矢印ボタンを配置 */
-.button-container {
-    display: flex;
-    justify-content: center;  /* 水平方向に中央揃え */
-    align-items: center;      /* 垂直方向にも中央揃え */
-    gap: 10px;
-    margin-top: 20px;         /* ボタンとカードの間にスペースを追加（必要に応じて調整） */
-}
-
-/* 黒線を引くためのスタイル */
-.line-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    margin-top: 10px; /* ボタンと黒線の間にスペース */
-}
-
-/* 黒線 */
-.black-line {
-    width: 100%;
-    height: 2px;
-    background-color: rgba(0, 0, 0, 0.1);  /* 薄い黒線 */
-    margin-bottom: 10px;  /* 黒線と矢印ボタンの間にスペース */
-}
-
-/* 矢印ボタンのスタイル */
-.arrows-container {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;  /* 親要素いっぱいに広がる */
-    padding: 0 10px;  /* 両端に適切な余白を追加 */
-}
-.word-list-controls {
-    display: flex;
-    justify-content: space-between; /* 左右に配置 */
-    align-items: center; /* 高さを揃える */
-    width: 100%; /* 横幅いっぱいに広げる */
-    margin-top: 10px; /* テーブルとの間隔 */
-}
-
-.word-list-buttons {
-    display: flex;
-    gap: 10px; /* ボタン同士の間隔 */
-}
-
-.word-list-buttons button {
-    padding: 5px 10px;
-    font-size: 20px;
-}
-#toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #ff4d4d;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    font-size: 0.9em;
-    z-index: 9999;
-    display: none;   /* 初期状態は非表示 */
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-#toast.show {
-    display: block;
-    opacity: 1;
-}
-
-    .container {
-      max-width: 600px;
-      background-color: #fff;
-      margin: 40px auto;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    }
-    h3 {
-      margin-top: 15px;
-      font-size: 20px;
-      border-left: 6px solid #007BFF;
-      padding-left: 10px;
-    }
-    .form-group {
-      display: grid;
-      grid-template-columns: 100px 1fr;
-      align-items: center;
-      gap: 10px;
-      margin: 10px 0;
-    }
-    .form-group label {
-      font-size: 14px;
-      margin: 0;
-      white-space: nowrap;
-    }
-    .form-group select {
-      padding: 4px 8px;
-      font-size: 14px;
-    }
-    .page-range {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .page-range select {
-      width: 60px;
-    }
-    .level-select {
-      width: 160px;
-    }
-    .checkbox-group {
-      margin: 10px 0;
-    }
-    .checkbox-group label {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-      gap: 5px;
-    }
- #word-list-body td:nth-child(1),
-#word-list-body td:nth-child(2) {
-  text-align: left;
-  padding-left: 20px;
-}
-#word-list table td:nth-child(1),
-#word-list table th:nth-child(1) {
-  width: 120px;
-}
-
-#word-list table td:nth-child(2),
-#word-list table th:nth-child(2) {
-  width: 270px;
-}
-
-#word-list table td:nth-child(3),
-#word-list table th:nth-child(3) {
-  width: 70px;
-}
-select {
-  max-height: 260px;
-  overflow-y: auto;
-  display: block;
-}
-
-/* 単語セル：左に単語、右にアイコン */
-.word-cell {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  white-space: nowrap;        /* 折り返し防止（必要なら） */
-}
-
-/* テキスト側（抽出用のフックにも使う） */
-.word-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* アイコンボタンを控えめに（キーボード操作にも配慮してbutton化） */
-.icon-btn {
-  all: unset;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  font-size: 0.9em;           /* 📢を少し小さめ */
-  opacity: 0.45;              /* 目立ちすぎない */
-  cursor: pointer;
-  border-radius: 4px;
-  transition: opacity 0.15s, transform 0.05s;
-}
-.word-cell:hover .icon-btn,
-.icon-btn:focus-visible {
-  opacity: 1;                 /* ホバー/フォーカス時だけクッキリ */
-}
-.icon-btn:active {
-  transform: translateY(1px);
-}
-
-/* 表現力UPモード時に単語一覧の文字を小さくする */
-#scrollable-table.small-text-mode table {
-  font-size: 12px;
-}
-/* サマリーの1行目（左：チェック群／右：合計）を同じ高さに */
-#word-summary{
-  display: grid;
-  grid-template-columns: 1fr auto;  /* 左は可変、右は内容幅 */
-  align-items: center;               /* 縦位置を中央揃え */
-  row-gap: 6px;                      /* 1行目とバーの間 */
-  column-gap: 12px;
-  margin-bottom: 0;
-}
-
-/* 左側（チェック＋ラベル） */
-#word-summary .status-group{
-  grid-column: 1 / 2;
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;                   /* 横が足りなければ折り返し */
-  align-items: center;
-  margin: 0;
-}
-
-/* 右側（/ 合計 XX） */
-#word-summary .summary-total{
-  grid-column: 2 / 3;
-  white-space: nowrap;               /* 折り返さないで右に寄せる */
-  margin: 0;
-}
-
-/* 進捗バーは2列ぶち抜きで2段目に */
-#word-summary .progress-bar{
-  grid-column: 1 / 3;
-  margin: 2px 0 0 0;
-}
-
-.status-item.green { color: #6dbd61; }   /* 黄緑 */
-.status-item.red   { color: #e07c7c; }   /* 淡い赤 */
-.status-item.gray  { color: #888; }      /* 薄灰 */
-.summary-total     { color: #666; margin-left: auto; }
-
-.progress-bar {
-  display: flex;
-  width: 100%;
-  height: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-  background: #e6e6e6;
-}
-/* ====== ① 上部の白余白を小さくする ====== */
-
-/* 「単語一覧」タイトルとサマリーの間 */
-#word-list h2 {
-  margin-top: 6px !important;  /* 上の空きを減らす */
-  margin-bottom: 6px !important;
-}
-
-/* サマリー全体の外側マージンも最小化 */
-#word-summary {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-
-/* ページ全体にパディングが効いている場合に備えて軽く上を詰める */
-#word-list,
-#word-list .card,
-#word-list .content {
-  padding-top: 8px !important;
-}
-/* サマリー1段目（チェック群と合計）→バー→表、の縦ギャップ最小化 */
-#word-summary { margin-bottom: 0 !important; }
-#word-summary .status-group { margin: 0 !important; line-height: 1.2; }
-#word-summary .summary-total { margin: 0 !important; }
-#word-summary .progress-bar { margin: 4px 0 6px 0 !important; }
-
-/* バーの角丸を綺麗に出す */
-#word-summary .progress-bar {
-  height: 8px;
-  border-radius: 6px;
-  overflow: hidden;                /* 角丸を子要素に適用 */
-  background: #e6e6e6;
-}
-#word-summary .progress-bar .bar { border-radius: 0; }
-
-/* バー直後の要素（区切り線やテーブルラッパ）の上余白を潰す */
-#word-summary + * { margin-top: 0 !important; }
-
-/* 表コンテナ側の余白をゼロに */
-#scrollable-table { margin-top: 0 !important; }
-
-/* ヘッダとの隙間をなくす（tableの仕様で生まれる隙間対策） */
-#scrollable-table table {
-  border-collapse: collapse;       /* これで境界のスキマが消える */
-  border-spacing: 0;
-}
-.bar { height: 100%; transition: width 0.3s; }
-.bar.green { background: #9ed993; }  /* 明るい黄緑 */
-.bar.red   { background: #f1b0b0; }  /* 淡い赤 */
-.bar.gray  { background: #cfcfcf; }  /* 薄灰 */
-
-
-/* 列の一括非表示（クリック可能にするため display:none は使わない） */
-.hide-col-word    td.col-word,
-.hide-col-meaning td.col-meaning {
-  opacity: 0;                     /* 見えなくする */
-  cursor: pointer;                /* 触れることが分かるように */
-  transition: opacity .12s;
-  position: relative;
-}
-
-/* ヒント（うっすら点線背景）：不要なら消してOK */
-.hide-col-word    td.col-word::after,
-.hide-col-meaning td.col-meaning::after {
-  content: ''; position: absolute; inset: 6px;
-  background-image: radial-gradient(#ddd 1px, transparent 1px);
-  background-size: 6px 6px;
-  opacity: .5; pointer-events: none;
-}
-
-/* セル個別の再表示（peek） */
-td.peek-cell { 
-  opacity: 1 !important;          /* 列が隠れていてもこのセルだけ見える */
-}
-
+#sb-cloud-popup .cloud-popup-heading{display:flex;align-items:center;gap:10px;margin:0 36px 15px 0}
+#sb-cloud-popup .cloud-popup-heading-icon{color:#b7f36b;font-size:19px}
+#sb-cloud-popup .cloud-popup-heading-title{font-size:16px;font-weight:700;letter-spacing:0}
+#sb-cloud-popup #sb-auth-status{font-size:13px!important;line-height:1.6!important;margin:0 0 12px!important;color:#cdd4db!important;overflow-wrap:anywhere!important}
+#sb-cloud-popup #sb-auth-status.cloud-signed-in{background:#222630!important;border-radius:10px!important;padding:11px 12px!important}
+#sb-cloud-popup #sb-auth-form label{display:block;margin:8px 0 4px;color:#aab2bf}
+#sb-cloud-popup #sb-logout{display:block;margin-left:auto!important;background:transparent!important;border:0!important;color:#b7f36b!important;font-size:13px!important;padding:7px 3px!important}
+#sb-cloud-popup #sb-auth-message{color:#aab2bf!important}
+#sb-cloud-popup .cloud-popup-close{position:absolute!important;top:12px!important;right:12px!important;float:none!important}
 </style>
-
-
-<!-- Supabase接続設定 -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-
-  const SUPABASE_URL = "https://ahessrcxqknznyplhnke.supabase.co";
-
-  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_QEUR0G9mbI0i6g3_F3gT_w_kEemLJQU";
-
-  const supabaseClient = window.supabase.createClient(
-
-    SUPABASE_URL,
-
-    SUPABASE_PUBLISHABLE_KEY
-
-  );
-
-  async function testSupabaseConnection() {
-
-    try {
-
-      const { data, error } = await supabaseClient.auth.getSession();
-
-      if (error) throw error;
-
-      console.log(
-
-        "Supabase接続OK",
-
-        data?.session ? "ログイン中" : "未ログイン"
-
-      );
-
-    } catch (error) {
-
-      console.error("Supabase接続エラー:", error);
-
-    }
-
-  }
-
-  testSupabaseConnection();
-
-  document.addEventListener("DOMContentLoaded", async () => {
-
-  const panel = document.createElement("div");
-
-  panel.style.cssText = `
-
-    margin: 10px auto;
-
-    padding: 12px;
-
-    max-width: 600px;
-
-    border: 1px solid #ccc;
-
-    border-radius: 8px;
-
-    font-size: 14px;
-
-    background: #f5f5f5;
-
-    color: #222;
-
-  `;
-
-  panel.textContent = "Supabase接続を確認しています…";
-
-  document.body.prepend(panel);
-
-  try {
-
-    const { data, error } =
-
-      await supabaseClient.auth.getSession();
-
-    if (error) throw error;
-
-    panel.textContent =
-
-      "✅ Supabase接続OK（" +
-
-      (data.session ? "ログイン中" : "未ログイン") +
-
-      "）";
-
-    panel.style.borderColor = "#26934a";
-
-  } catch (error) {
-
-    console.error("Supabase接続エラー:", error);
-
-    panel.textContent =
-
-      "❌ Supabase接続エラー: " +
-
-      (error.message || String(error));
-
-    panel.style.borderColor = "#d33";
-
-  }
-
-});
-
-  document.addEventListener("DOMContentLoaded", async () => {
-
-  const panel = document.createElement("section");
-
-  panel.style.cssText = `
-
-display: none;
-position: fixed;
-right: 16px;
-bottom: 76px;
-z-index: 10000;
-width: min(420px, calc(100vw - 32px));
-max-height: min(70vh, 620px);
-overflow-y: auto;
-margin: 0;
-padding: 18px;
-box-sizing: border-box;
-background: white;
-border: 1px solid #ddd;
-border-radius: 16px;
-color: #222;
-font-family: sans-serif;
-box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
-
-  `;
-
-  panel.innerHTML = `
-
-    <h3 style="margin-top:0">☁️ 暗記状況のクラウド同期</h3>
-
-    <p id="sb-auth-status">ログイン状態を確認しています…</p>
-
-    <div id="sb-auth-form">
-
-      <label for="sb-email">メールアドレス</label>
-
-      <input id="sb-email" type="email" autocomplete="email"
-
-        placeholder="メールアドレス"
-
-        style="display:block;width:100%;box-sizing:border-box;padding:10px;margin:6px 0 14px">
-
-      <label for="sb-password">パスワード（6文字以上）</label>
-
-      <input id="sb-password" type="password"
-
-        autocomplete="current-password"
-
-        placeholder="パスワード"
-
-        style="display:block;width:100%;box-sizing:border-box;padding:10px;margin:6px 0 14px">
-
-      <button id="sb-signup" type="button">新規登録</button>
-
-      <button id="sb-login" type="button">ログイン</button>
-
-    </div>
-
-    <button id="sb-logout" type="button" hidden>ログアウト</button>
-
-    <p id="sb-auth-message" role="status" aria-live="polite"></p>
-
-  `;
-
-  const header = document.querySelector("header");
-
-  if (header) {
-
-    header.before(panel);
-
-  } else {
-
-    document.body.prepend(panel);
-
-  }
-  const cloudButton = document.createElement("button");
-  cloudButton.type = "button";
-  cloudButton.id = "sb-cloud-toggle";
-  cloudButton.textContent = "☁️";
-  cloudButton.setAttribute("aria-label", "クラウド同期の設定を開く");
-  cloudButton.setAttribute("aria-expanded", "false");
-
-  cloudButton.style.cssText = `
-    position: fixed;
-    right: 16px;
-    bottom: 16px;
-    z-index: 10001;
-    width: 52px;
-    height: 52px;
-    border: none;
-    border-radius: 50%;
-    background: #2563eb;
-    color: white;
-    font-size: 25px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  `;
-
-  document.body.appendChild(cloudButton);
-
-  cloudButton.addEventListener("click", () => {
-    const isOpen = panel.style.display !== "none";
-    panel.style.display = isOpen ? "none" : "block";
-    cloudButton.setAttribute("aria-expanded", String(!isOpen));
-  });
-
-  const status = panel.querySelector("#sb-auth-status");
-
-  const message = panel.querySelector("#sb-auth-message");
-
-  const form = panel.querySelector("#sb-auth-form");
-
-  const logoutButton = panel.querySelector("#sb-logout");
-
-  const emailInput = panel.querySelector("#sb-email");
-
-  const passwordInput = panel.querySelector("#sb-password");
-
-  function showMessage(text) {
-
-    message.textContent = text;
-
-  }
-
-  function updateUI(user) {
-
-    if (user) {
-
-      status.textContent = "✅ ログイン中：" + user.email;
-
-      form.hidden = true;
-
-      logoutButton.hidden = false;
-
-    } else {
-
-      status.textContent = "未ログイン";
-
-      form.hidden = false;
-
-      logoutButton.hidden = true;
-
-    }
-
-  }
-
-  async function runAuth(action) {
-
-    const email = emailInput.value.trim();
-
-    const password = passwordInput.value;
-
-    if (!email || !password) {
-
-      showMessage("メールアドレスとパスワードを入力してください。");
-
-      return;
-
-    }
-
-    if (password.length < 6) {
-
-      showMessage("パスワードは6文字以上で入力してください。");
-
-      return;
-
-    }
-
-    const buttons = [
-
-      panel.querySelector("#sb-signup"),
-
-      panel.querySelector("#sb-login"),
-
-      logoutButton
-
-    ];
-
-    buttons.forEach(button => button.disabled = true);
-
-    showMessage("処理しています…");
-
-    try {
-
-      if (action === "signup") {
-
-        const { data, error } = await supabaseClient.auth.signUp({
-
-          email,
-
-          password
-
-        });
-
-        if (error) throw error;
-
-        if (data.session) {
-
-          showMessage("新規登録・ログインが完了しました。");
-
-        } else {
-
-          showMessage(
-
-            "登録を受け付けました。メール確認が必要な場合は、届いたメールの案内に従ってください。"
-
-          );
-
-        }
-
-      } else {
-
-        const { error } =
-
-          await supabaseClient.auth.signInWithPassword({
-
-            email,
-
-            password
-
-          });
-
-        if (error) throw error;
-
-        showMessage("ログインしました。");
-
-      }
-
-    } catch (error) {
-
-      console.error("認証エラー:", error);
-
-      showMessage("エラー：" + (error.message || "認証に失敗しました。"));
-
-    } finally {
-
-      buttons.forEach(button => button.disabled = false);
-
-    }
-
-  }
-
-  panel.querySelector("#sb-signup").addEventListener(
-
-    "click", () => runAuth("signup")
-
-  );
-
-  panel.querySelector("#sb-login").addEventListener(
-
-    "click", () => runAuth("login")
-
-  );
-
-  logoutButton.addEventListener("click", async () => {
-
-    logoutButton.disabled = true;
-
-    showMessage("ログアウトしています…");
-
-    try {
-
-      const { error } = await supabaseClient.auth.signOut();
-
-      if (error) throw error;
-
-      showMessage("ログアウトしました。");
-
-    } catch (error) {
-
-      showMessage("エラー：" + (error.message || "ログアウトに失敗しました。"));
-
-    } finally {
-
-      logoutButton.disabled = false;
-
-    }
-
-  });
-
-  const { data, error } = await supabaseClient.auth.getUser();
-
-  if (error && error.name !== "AuthSessionMissingError") {
-
-    console.error(error);
-
-  }
-
-  updateUI(data?.user || null);
-
-  supabaseClient.auth.onAuthStateChange((_event, session) => {
-
-    updateUI(session?.user || null);
-  });
-    // 単語の進捗をクラウドに保存する
-  window.addEventListener("word-progress-changed", async (event) => {
-    const { listKey, word, status } = event.detail || {};
-    const dbListKey = listKey.startsWith("custom:")
-  ? listKey.slice("custom:".length)
-  : listKey;
-
-    // 同期対象は4つのリストだけ
-if (
-  !["beginner", "intermediate", "advanced", "expressionup"].includes(listKey) &&
-  !listKey.startsWith("custom:")
-) {
-  return;
-}
-
-    const { data: { user }, error: userError } =
-      await supabaseClient.auth.getUser();
-
-    if (userError || !user) return;
-
-    // 暗記状況を未設定に戻した場合はクラウドから削除
-    if (status === null) {
-      const { error } = await supabaseClient
-        .from("word_progress")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("list_key", dbListKey)
-        .eq("word", word);
-
-      if (error) console.error("クラウド削除エラー:", error);
-      return;
-    }
-
-    // すでに保存されている単語か確認
-    const { data: existingRows, error: selectError } =
-      await supabaseClient
-        .from("word_progress")
-        .select("word")
-        .eq("user_id", user.id)
-        .eq("list_key", dbListKey)
-        .eq("word", word)
-        .limit(1);
-
-    if (selectError) {
-      console.error("クラウド確認エラー:", selectError);
-      return;
-    }
-
-    if (existingRows && existingRows.length > 0) {
-      // 既存データを更新
-      const { error } = await supabaseClient
-        .from("word_progress")
-        .update({ status })
-        .eq("user_id", user.id)
-        .eq("list_key", dbListKey)
-        .eq("word", word);
-
-      if (error) console.error("クラウド更新エラー:", error);
-    } else {
-      // 新しい単語を保存
-      const { error } = await supabaseClient
-        .from("word_progress")
-        .insert({
-          user_id: user.id,
-          list_key: dbListKey,
-          word: word,
-          status: status
-        });
-
-      if (error) console.error("クラウド保存エラー:", error);
-    }
-  });
-
-});
-
-</script>
+<style>
+/* Supabase cloud control stays above the new bottom navigation */
+#sb-cloud-toggle{bottom:calc(85px + env(safe-area-inset-bottom))!important;right:14px!important}
+#staticWordRows{display:none}
+#word-detail{display:none!important}
+#word-detail:target{display:none!important}
+#listWordsView .word-list{padding-bottom:20px}
+
+/* Step 11: lighter controls and no duplicate global settings button */
+header > button[onclick*="settings"]{display:none!important}
+.status-action{border:0!important;box-shadow:none!important;background:transparent!important;padding:4px 2px!important;font:inherit;font-size:12px!important;cursor:pointer;color:#aab3c0!important}
+.status-action.known{color:#b7f36b!important}.status-action.unknown{color:#f49b9b!important}
+.status-action:disabled{opacity:.45;cursor:wait}
+.audio-btn{border:0!important;background:transparent!important;width:29px!important;height:29px!important;min-width:29px!important;padding:4px!important}
+.word-reveal{border:0!important;background:transparent!important;padding:2px 4px!important;min-width:30px!important}
+.word-navigator{right:75px!important;bottom:calc(97px + env(safe-area-inset-bottom))!important;padding:3px!important;border-radius:13px!important;gap:0!important;background:#242830e8!important}
+.word-navigator button{width:32px!important;height:33px!important;font-size:22px!important;border-radius:8px!important}
+.word-navigator button:nth-child(2){font-size:21px!important}
+@media(max-width:420px){.word-navigator{right:68px!important}}
+
+/* Step 12: cloud at upper-right, navigation and progress overview */
+.app > header{position:relative;padding-right:60px;min-height:56px}
+#headerCloudSlot{position:absolute;right:0;top:50%;transform:translateY(-50%);width:45px;height:45px;z-index:100}
+#headerCloudSlot #sb-cloud-toggle{position:static!important;inset:auto!important;right:auto!important;bottom:auto!important;top:auto!important;left:auto!important;margin:0!important;transform:none!important;width:45px!important;height:45px!important}
+.word-navigator{right:8px!important;bottom:calc(97px + env(safe-area-inset-bottom))!important}
+@media(max-width:420px){.word-navigator{right:7px!important}}
+.home-progress-panel{background:#1d2129;border:1px solid #353b45;border-radius:19px;padding:18px;margin:20px 0}
+.home-progress-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.home-progress-title strong{font-size:19px}
+.home-progress-title button{border:0;background:none;color:#b7f36b;font:inherit;font-size:13px;cursor:pointer}
+.home-progress-main{display:flex;align-items:center;gap:20px;margin:20px 0}
+.home-progress-ring{--progress:0%;width:130px;height:130px;flex-shrink:0;border-radius:50%;background:conic-gradient(#b7f36b var(--progress),#343a45 var(--progress));display:grid;place-items:center}
+.home-progress-center{width:105px;height:105px;border-radius:50%;background:#1d2129;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.home-progress-center strong{font-size:28px}.home-progress-center small{color:#a4aab5;font-size:12px}
+.home-progress-legend{flex:1;min-width:0;display:grid;gap:12px;font-size:13px;color:#c9ced6}
+.home-progress-legend>div{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.home-progress-legend b{margin-left:auto;color:#f4f5f7}
+.home-progress-legend i{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.legend-known{background:#b7f36b}.legend-unknown{background:#ed9292}.legend-unseen{background:#7c8593}
+#homeProgressDetails{border-top:1px solid #363c46;padding-top:13px}
+#homeProgressDetails summary{color:#b7f36b;cursor:pointer;font-size:14px}
+#homeLevelProgress{display:grid;gap:15px;padding:16px 0 4px}
+.home-level-head{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin-bottom:7px}
+.home-level-head span:last-child{color:#b7f36b}
+.home-level-track{height:7px;background:#363d46;border-radius:8px;overflow:hidden}
+.home-level-fill{height:100%;background:#b7f36b;border-radius:8px}
+@media(max-width:380px){.home-progress-ring{width:108px;height:108px}.home-progress-center{width:87px;height:87px}.home-progress-center strong{font-size:23px}.home-progress-main{gap:12px}}
+</style>
 </head>
 <body>
+<div class="app" id="appRoot">
 <header>
-<h1>韓国語単語暗記ツール</h1>
+  <div><div class="brand">OJAAJO <span>•</span> KOREAN</div><div class="eyebrow">VOCABULARY WORKSPACE</div></div>
+  <div id="headerCloudSlot" aria-label="クラウド同期"></div>
 </header>
-<div class="container">
-<!-- 出題範囲選択 -->
-<div class="section" id="range-selection"><h3>📋 単語一覧表示</h3><button id="word-list-show-btn">単語一覧を見る</button>
-<div class="form-group">
-<label for="wordlist-level-select">難易度:</label>
-<select class="level-select" id="wordlist-level-select">
-<option value="beginner">初級</option>
-<option value="intermediate">中級</option>
-<option value="advanced">上級</option>
-<option value="expressionup">表現力UP</option>
-<option value="Level4">語学堂4級単語</option>
-<option value="Level5">語学堂5級単語</option>
-</select>
-</div>
-<div class="form-group">
-<label>表示ページ:</label>
-<div class="page-range">
-<select id="wordlist-start-page"></select>
-<span>～</span>
-<select id="wordlist-end-page"></select>
-</div>
-</div>
-<div class="checkbox-group">
-<label><input id="wordlist-shuffle" type="checkbox"/> 単語をランダムに並び替えて表示</label>
-</div>
-<h3>🃏 フラッシュカード出題</h3><button onclick="startQuiz()">フラッシュカード開始</button>
-<div class="form-group">
-<label for="quiz-level-select">難易度:</label>
-<select class="level-select" id="quiz-level-select">
-<option value="beginner">初級</option>
-<option value="intermediate">中級</option>
-<option value="advanced">上級</option>
-<option value="expressionup">表現力UP</option>
-<option value="Level4">語学堂4級単語</option>
-<option value="Level5">語学堂5級単語</option>
-</select>
-</div>
-<div class="form-group">
-<label>出題ページ:</label>
-<div class="page-range">
-<select id="start-page"></select>
-<span>～</span>
-<select id="end-page"></select>
-</div>
-</div>
-<div class="checkbox-group">
-<label><input id="only-incorrect" type="checkbox"/> 未暗記のみ出題</label>
-<label><input id="auto-speak" onchange="toggleAutoSpeak()" type="checkbox"/> 音声再生ON</label>
-</div>
 
+<main>
+<section class="page active" id="home">
+  <section class="home-progress-panel" aria-label="学習進捗">
+    <div class="home-progress-title"><strong>学習進捗</strong></div>
+    <div class="home-progress-main">
+      <div class="home-progress-ring" id="homeProgressRing"><div class="home-progress-center"><strong id="homeProgressPercent">0%</strong><small>暗記率</small></div></div>
+      <div class="home-progress-legend"><div><i class="legend-known"></i>暗記済み <b id="homeProgressKnown">0語</b></div><div><i class="legend-unknown"></i>未暗記 <b id="homeProgressUnknown">0語</b></div><div><i class="legend-unseen"></i>未確認 <b id="homeProgressUnseen">0語</b></div></div>
+    </div>
+    <details id="homeProgressDetails"><summary>レベル別の進捗</summary><div id="homeLevelProgress"></div></details>
+  </section>
 
-<div id="custom-list-import" style="margin: 15px 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
-  <h3>📥 自分の単語リスト</h3>
-
-  <label for="custom-list-destination">登録先：</label>
-  <select id="custom-list-destination" style="display: block; width: 100%; margin: 8px 0 12px; padding: 8px;">
-    <option value="new">新しいリストを作成</option>
-  </select>
-
-  <div id="custom-list-name-area">
-    <label for="custom-list-name">新しいリストの名前：</label>
-    <input
-      id="custom-list-name"
-      type="text"
-      placeholder="例：韓国語表現・第1回"
-      style="display: block; box-sizing: border-box; width: 100%; margin: 8px 0 12px; padding: 8px;"
-    />
+  <div class="panel cloud-panel">
+    <div class="cloud-head">
+      <div class="cloud-icon">☁</div>
+      <div class="cloud-copy"><h2>クラウド同期</h2><p id="cloudStatusText">接続を確認しています…</p></div>
+      <span class="status" id="cloudStatusBadge">未接続</span>
+    </div>
+    <p class="tiny" style="margin-top:10px">右上の☁️ボタンからログイン・ログアウトできます。</p>
   </div>
 
-  <label for="custom-list-file">単語リスト（.txt）：</label>
-  <input
-    id="custom-list-file"
-    type="file"
-    accept=".txt,text/plain"
-    style="display: block; margin: 10px 0;"
-  />
-
-  <p style="font-size: 13px; color: #666;">
-    1行に1単語ずつ「韓国語:日本語の意味」の形式で記載してください。<br>
-    1ページ80語で自動的にページ分けします。
-  </p>
-
-  <button id="custom-list-import-btn" type="button">
-    単語リストを読み込む
+  <div class="section-head"><div><div class="eyebrow">WORD MANAGEMENT</div><h2 style="margin:5px 0 0">単語の管理</h2></div></div>
+  <button class="action-card" onclick="openActionChooser()">
+    <span class="action-icon">＋</span>
+    <span class="action-copy"><strong>単語を追加・インポート</strong><small>1語ずつ追加、まとめて登録</small></span>
+    <span class="action-arrow">›</span>
   </button>
+  <button class="action-card" onclick="openCreateList()">
+    <span class="action-icon">▤</span>
+    <span class="action-copy"><strong>新しいリストを作成</strong><small>自分用の単語リストを用意する</small></span>
+    <span class="action-arrow">›</span>
+  </button>
+</section>
 
-  <p id="custom-list-import-message" role="status"></p>
-</div>
-
-
-<div>
-<button onclick="exportProgress()">暗記状況を保存</button>
-<input accept=".json" id="import-file" onchange="importProgress(event)" style="display:none;" type="file"/>
-<button onclick="document.getElementById('import-file').click()">暗記状況を読み込む</button>
-<div id="toast" style="
-  display: none;
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #ff4d4d;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  font-size: 0.9em;
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-"></div>
-</div>
-</div>
-<!-- 出題セクション -->
-<div class="section hidden" id="quiz-section">
-<!-- 進行状況と戻るボタンを横並びにするためのコンテナ -->
-<div class="progress-container">
-<span>進行状況: <span id="progress">0/0</span></span>
-<button onclick="showRangeSelection()">🏠ホーム</button>
-</div>
-<div id="card">
-<div id="word-container">
-<div id="word-wrapper">
-<span id="word">ここに単語が表示されます</span>
-<span id="speaker-icon" onclick="playWord(document.getElementById('word').textContent)">📢</span>
-</div>
-</div>
-<div id="meaning">（意味が表示されます）</div>
-</div>
-<div class="button-container">
-<button id="incorrect-btn" onclick="markAnswer(false)">×</button>
-<button id="correct-btn" onclick="markAnswer(true)">⚪︎</button>
-<button id="next-btn" onclick="nextQuestion()" style="display: none;">次へ</button>
-</div>
-<!-- ここに黒線と矢印ボタンを配置 -->
-<div class="line-container">
-<div class="black-line"></div> <!-- 薄い黒線 -->
-<div class="arrows-container">
-<button id="prev-btn" onclick="moveToPrevious()">←</button>
-<button id="next-btn" onclick="moveToNext()">→</button>
-</div>
-</div>
-<p id="result"></p>
-</div>
-<!-- 単語一覧表示 -->
-<div class="table-container hidden" id="word-list">
-<div class="word-list-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-  <h2 style="margin: 0;">単語一覧</h2>
-
-  <div style="display: flex; align-items: center; gap: 4px;">
-    <button
-      id="word-list-menu-btn"
-      type="button"
-      aria-label="単語リストの管理"
-      title="単語リストの管理"
-      style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; color: inherit; border: none; box-shadow: none; cursor: pointer;"
-    >
-      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
-        <circle cx="5" cy="12" r="1.7"></circle>
-        <circle cx="12" cy="12" r="1.7"></circle>
-        <circle cx="19" cy="12" r="1.7"></circle>
-      </svg>
-    </button>
-
-    <button
-      id="word-list-search-btn"
-      type="button"
-      aria-label="単語を検索"
-      title="単語を検索"
-      style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: transparent; color: inherit; border: none; box-shadow: none; cursor: pointer;"
-    >
-      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-        <circle cx="10.8" cy="10.8" r="6.5"></circle>
-        <path d="m16 16 4.2 4.2"></path>
-      </svg>
-    </button>
+<section class="page" id="list">
+  <div id="listIndexView">
+    <div class="section-head"><div><div class="eyebrow">WORD LIBRARY</div><h1>単語リスト</h1></div><button class="btn small" onclick="openCreateList()">＋ 新規作成</button></div>
+    <p class="tiny" style="margin-bottom:14px">リストを選ぶと、そのリストの単語一覧が開きます。</p>
+    <div class="list-index" id="listIndex">
+      <a class="list-index-card" href="#word-detail"><span class="list-index-icon"><span>33%</span></span><span class="list-index-copy"><strong>初級</strong><small>6語 ・ 暗記済み 2語</small><span class="list-progress"><span class="list-progress-fill" style="width:33.3%"></span></span><span class="list-progress-detail"><span>進捗 33%</span><span>2 / 6語</span></span></span><span class="list-index-arrow">›</span></a>
+      <a class="list-index-card" href="#word-detail"><span class="list-index-icon"><span>33%</span></span><span class="list-index-copy"><strong>中級</strong><small>6語 ・ 暗記済み 2語</small><span class="list-progress"><span class="list-progress-fill" style="width:33.3%"></span></span><span class="list-progress-detail"><span>進捗 33%</span><span>2 / 6語</span></span></span><span class="list-index-arrow">›</span></a>
+      <a class="list-index-card" href="#word-detail"><span class="list-index-icon"><span>33%</span></span><span class="list-index-copy"><strong>上級</strong><small>6語 ・ 暗記済み 2語</small><span class="list-progress"><span class="list-progress-fill" style="width:33.3%"></span></span><span class="list-progress-detail"><span>進捗 33%</span><span>2 / 6語</span></span></span><span class="list-index-arrow">›</span></a>
+      <a class="list-index-card" href="#word-detail"><span class="list-index-icon"><span>33%</span></span><span class="list-index-copy"><strong>表現力</strong><small>6語 ・ 暗記済み 2語</small><span class="list-progress"><span class="list-progress-fill" style="width:33.3%"></span></span><span class="list-progress-detail"><span>進捗 33%</span><span>2 / 6語</span></span></span><span class="list-index-arrow">›</span></a>
+      <a class="list-index-card" href="#word-detail"><span class="list-index-icon"><span>33%</span></span><span class="list-index-copy"><strong>自作リスト（デモ）</strong><small>6語 ・ 暗記済み 2語</small><span class="list-progress"><span class="list-progress-fill" style="width:33.3%"></span></span><span class="list-progress-detail"><span>進捗 33%</span><span>2 / 6語</span></span></span><span class="list-index-arrow">›</span></a>
+    </div>
+    <div class="space"></div>
+    <button class="btn full" onclick="openImport()">⇧ 単語をインポート</button>
   </div>
-</div>
-
-<!-- 単語リスト管理メニュー -->
-<div id="word-list-menu" hidden
-  style="position: absolute; right: 24px; z-index: 1000; background: white; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); min-width: 180px; padding: 6px;">
-
-  <button type="button" class="word-list-menu-item" data-action="add-word"
-    style="display: block; width: 100%; text-align: left; background: transparent; color: inherit; box-shadow: none; border-radius: 6px; margin: 0; padding: 12px;">
-    単語を追加
-  </button>
-
-  <button type="button" class="word-list-menu-item" data-action="edit-word"
-    style="display: block; width: 100%; text-align: left; background: transparent; color: inherit; box-shadow: none; border-radius: 6px; margin: 0; padding: 12px;">
-    単語を編集
-  </button>
-
-  <button type="button" class="word-list-menu-item" data-action="delete-word"
-    style="display: block; width: 100%; text-align: left; background: transparent; color: inherit; box-shadow: none; border-radius: 6px; margin: 0; padding: 12px;">
-    単語を削除
-  </button>
-
-  <div style="height: 1px; background: #e5e5e5; margin: 6px 4px;"></div>
-
-  <button type="button" class="word-list-menu-item" data-action="edit-list"
-    style="display: block; width: 100%; text-align: left; background: transparent; color: inherit; box-shadow: none; border-radius: 6px; margin: 0; padding: 12px;">
-    リスト名を編集
-  </button>
-
-  <button type="button" class="word-list-menu-item" data-action="delete-list"
-    style="display: block; width: 100%; text-align: left; background: transparent; color: inherit; box-shadow: none; border-radius: 6px; margin: 0; padding: 12px;">
-    リストを削除
-  </button>
-
-</div>
-
-<!-- 単語検索欄 -->
-<div id="word-search-area" hidden
-  style="display: none; margin: 0 0 12px 0;">
-  <div style="display: flex; align-items: center; gap: 8px;">
-    <input
-      id="word-search-input"
-      type="search"
-      placeholder="韓国語・日本語で検索"
-      autocomplete="off"
-      style="flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px;"
-    >
-    <button
-      id="word-search-clear-btn"
-      type="button"
-      aria-label="検索を閉じる"
-      title="検索を閉じる"
-      style="background: transparent; color: inherit; border: none; box-shadow: none; padding: 8px; font-size: 20px; cursor: pointer;"
-    >×</button>
+  <div id="listWordsView" hidden>
+    <div class="word-list-sticky compact-head">
+      <div class="compact-top"><button class="btn small subtle" onclick="showListIndex()">← 戻る</button><strong id="selectedListTitle">初級</strong><button class="btn small subtle" id="renameListButton" type="button" onclick="openRenameList()" hidden>名前変更</button><button class="btn small subtle" id="deleteListButton" type="button" onclick="deleteCustomList()" hidden>削除</button><button class="btn small subtle" id="listSearchToggle" type="button" onclick="toggleListSearch()" aria-label="検索を開く" aria-expanded="false" title="検索">⌕</button><button class="btn small" onclick="openAdd()">＋</button><button class="btn small" onclick="toggleListSettings()" aria-label="表示設定">⚙</button></div>
+      <div class="field list-search-panel" id="listSearchPanel" hidden><input id="search" type="search" placeholder="単語・意味・例文を検索…" oninput="renderWords()" autocomplete="off" aria-label="単語検索"></div>
+      <button type="button" class="range-summary" onclick="togglePageRange()"><span>▤ <span id="rangeSummary">1〜1ページ</span></span><span id="rangeWordCount">6語</span><span>⌄</span></button>
+      <div class="range-panel" id="pageRangePanel" hidden><div class="range-fields"><label>開始ページ<select id="startPage" onchange="validatePageRange('start')"></select></label><label>終了ページ<select id="endPage" onchange="validatePageRange('end')"></select></label></div><button class="btn primary full small" onclick="applyPageRange()">この範囲を表示</button></div>
+      <div class="range-panel" id="listSettingsPanel" hidden><div class="setting-choices"><label><input type="checkbox" id="settingKo" checked onchange="setListVisibility('ko',this.checked)"> 韓国語を表示</label><label><input type="checkbox" id="settingJa" checked onchange="setListVisibility('ja',this.checked)"> 日本語を表示</label><label><input type="checkbox" id="shuffleWords" onchange="toggleWordShuffle(this.checked)"> ランダム表示</label><label><input type="checkbox" id="settingExamples" checked onchange="setListExamples(this.checked)"> 例文を表示</label><label><input type="checkbox" class="dynamicStatusFilter" value="known" checked onchange="renderWords()"> 暗記済み</label><label><input type="checkbox" class="dynamicStatusFilter" value="unseen" checked onchange="renderWords()"> 未確認</label><label><input type="checkbox" class="dynamicStatusFilter" value="unknown" checked onchange="renderWords()"> 未暗記</label></div></div>
+    </div>
+    <p class="tiny" id="selectedListSummary"></p>
+    <div class="word-list" id="wordList"></div>
+    <div id="wordNavigator" class="word-navigator" hidden aria-label="単語の移動と音声再生">
+      <button type="button" onclick="navigateWord(-1)" aria-label="前の単語" title="前の単語">⌃</button>
+      <button type="button" onclick="repeatSelectedWord()" aria-label="リピート再生" title="リピート再生">↻</button>
+      <button type="button" onclick="navigateWord(1)" aria-label="次の単語" title="次の単語">⌄</button>
+    </div>
+    <div class="space"></div>
+    <button class="btn full" onclick="openImport()">⇧ このリストに単語をインポート</button>
   </div>
-  <div id="word-search-count"
-    style="font-size: 13px; margin-top: 6px; color: #666;"></div>
+</section>
+
+
+
+
+<section class="page" id="cards">
+ <div id="cardListView">
+  <div class="section-head"><div><div class="eyebrow">FLASH CARDS</div><h1>カード学習</h1></div></div>
+  <p class="tiny">学習するリストを選択してください。</p>
+  <div id="cardListChoices" class="list-index"></div>
+ </div>
+ <div id="cardSetupView" hidden>
+  <div class="section-head"><div><button class="btn small subtle" onclick="showCardLists()">← リスト選択</button><div class="eyebrow" style="margin-top:12px">QUIZ SETTINGS</div><h1 id="cardSetupTitle">クイズ設定</h1></div></div>
+  <div class="panel" style="display:grid;gap:17px">
+   <div><div class="tiny muted">表示範囲（1ページ＝80語）</div><div class="range-fields"><label>開始ページ<select id="cardStartPage" onchange="validateCardPages('start')"></select></label><label>終了ページ<select id="cardEndPage" onchange="validateCardPages('end')"></select></label></div></div>
+   <div><div class="tiny muted" style="margin-bottom:8px">出題するステータス（複数選択可）</div><div class="setting-choices card-settings"><label><input class="card-status" type="checkbox" value="known" checked onchange="updateCardEstimate()"> 暗記済み</label><label><input class="card-status" type="checkbox" value="unseen" checked onchange="updateCardEstimate()"> 未確認</label><label><input class="card-status" type="checkbox" value="unknown" checked onchange="updateCardEstimate()"> 未暗記</label></div></div>
+   <div class="setting-choices card-settings"><label><input id="cardShuffle" type="checkbox" checked> ランダム出題</label><label><input id="cardAutoVoice" type="checkbox"> 出題時に韓国語の音声を再生</label></div>
+   <p class="tiny" id="cardEstimatedCount">出題予定：4語</p>
+   <button class="btn primary full" onclick="startCardQuiz()">クイズを開始 →</button>
+  </div>
+ </div>
+ <div id="cardQuizView" hidden>
+  <div class="section-head"><div><button class="btn small subtle" onclick="showCardSetup()">← クイズ設定</button><div class="eyebrow" style="margin-top:10px" id="cardListName">初級</div></div><span class="status" id="cardCounter">1 / 4</span></div>
+  <div class="panel card-stage">
+    <div class="eyebrow" id="cardListName">初級</div>
+    <div class="card-ko-line"><div class="card-korean" id="cardKorean">가볍다</div><button type="button" class="audio-btn" onclick="playCardVoice(true)" aria-label="韓国語を再生" title="韓国語を再生"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"/></svg></button></div>
+    <div class="card-meaning" id="cardMeaning">軽い</div>
+    <div class="card-example" id="cardExample" hidden><strong>例文</strong><div id="cardExampleText"></div><div class="muted tiny" id="cardExampleMeaning" style="margin-top:5px"></div></div>
+    <div class="space"></div>
+    <button class="btn full" onclick="revealMeaning()" id="revealBtn">意味を表示する</button>
+    <button class="btn subtle full" style="margin-top:8px" onclick="toggleCardExample()">例文を表示／非表示</button>
+  </div>
+  <div class="card-controls">
+    <button class="btn" onclick="markCard(false)">×　未暗記</button>
+    <button class="btn primary" onclick="markCard(true)">✓　暗記済み</button>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <button class="btn" onclick="prevCard()">← 前へ</button>
+    <button class="btn" onclick="nextCard()">次へ →</button>
+  </div>
+  <p class="tiny" style="margin-top:12px">意味は次のカードに移ると自動で隠れます。暗記状態は試作内のみです。</p>
+ </div>
+</section>
+
+<section class="page" id="settings">
+  <div class="section-head"><div><div class="eyebrow">PREFERENCES</div><h1>設定</h1></div></div>
+  <div class="panel">
+    <h2>クラウド同期</h2>
+    <p>ログイン・ログアウトは右下の☁️ボタンから操作できます。</p>
+    <div class="divider"></div>
+    <div class="row"><span class="muted">接続状態</span><span class="status">接続確認中</span></div>
+    <div class="space"></div><button class="btn full" onclick="document.getElementById('sb-cloud-toggle')?.click()">クラウド設定を開く</button>
+    <div class="notice" style="margin-top:12px">既存のSupabaseアカウントと接続します。</div>
+  </div>
+  <div class="panel">
+    <h2>リストの管理</h2>
+    <button class="btn full" onclick="openImport()">＋ リストを作成／単語をインポート</button>
+    <p class="tiny" style="margin-top:10px">テキストファイルから単語をまとめて登録できます。</p>
+  </div>
+  <div class="panel">
+    <h2>学習画面</h2>
+    <p>・リストでは韓国語と日本語を別々に表示／非表示</p>
+    <p>・カードでは意味と例文を独立して表示／非表示</p>
+    <p>・暗記済み／未暗記の状態を単語ごとに管理</p>
+  </div>
+</section>
+</main>
 </div>
 
-<!-- 単語進捗サマリー -->
-<div id="word-summary" class="word-summary">
-  <div class="status-group">
-    <label class="status-item green">
-      <input type="checkbox" id="hide-correct" >
-      暗記済 <b>0</b>
-    </label>
-    <label class="status-item red">
-      <input type="checkbox" id="hide-incorrect" >
-      未暗記 <b>0</b>
-    </label>
-    <label class="status-item gray">
-      <input type="checkbox" id="hide-unattempted" >
-      未解答 <b>0</b>
-    </label>
-  </div>
-  <div class="summary-total">
-    / 合計 <b>0</b>
-  </div>
-  <div class="progress-bar">
-    <div id="bar-done" class="bar green"></div>
-    <div id="bar-not" class="bar red"></div>
-    <div id="bar-none" class="bar gray"></div>
-  </div>
-</div>
-<div class="scrollable-table" id="scrollable-table" tabindex="0">
-<table>
-<thead>
-<tr>
-<th>
-                                単語
-                                <label>
-<input id="toggle-korean" onchange="toggleKorean()" type="checkbox"/> 
-                                </label>
-</th>
-<th>
-                                意味
-                                <label>
-<input id="toggle-meaning" onchange="toggleMeaning()" type="checkbox"/> 
-                                </label>
-</th>
-<th>暗記状況</th>
-</tr>
-</thead>
-<tbody id="word-list-body">
-<!-- 動的に生成される内容 -->
-</tbody>
-</table>
-</div>
-<div class="word-list-controls">
-<button onclick="showRangeSelection()">🏠ホーム</button>
-<div class="word-list-buttons">
-<button id="up-button" onclick="playPreviousWord()">↑</button>
-<button id="down-button" onclick="playNextWord()">↓</button>
-<button id="repeat-button" onclick="repeatLastWord()">♻︎</button>
-</div>
-</div>
-</div>
-<!-- モーダル -->
-<div class="modal hidden" id="quiz-modal">
-<div class="modal-content">
-<p id="modal-message">前回途中で終了したクイズがあります。再開しますか？※Noを選択すると履歴がリセットされます。</p>
-<div class="modal-buttons">
-<button id="modal-no">No</button>
-<button id="modal-yes">Yes</button>
-</div>
-</div>
-</div>
-<div class="hidden" id="toast"></div><div class="hidden" id="json-output" style="margin-top:20px;"><p>🔒 進捗データを下からコピーして、メモ帳やiCloud Driveに貼り付けて保存してください。</p><textarea id="json-text" readonly="" rows="10" style="width:100%; font-family: monospace; font-size:14px;"></textarea><button onclick="copyToClipboard()" style="margin-top: 10px;">コピーする</button></div>
+<nav class="bottom-nav"><div class="nav-inner">
+<a class="nav-btn active" data-page="home" href="#home"><span class="ico">⌂</span>ホーム</a>
+<a class="nav-btn" data-page="list" href="#list"><span class="ico">☷</span>リスト</a>
+<a class="nav-btn" data-page="cards" href="#cards"><span class="ico">▣</span>カード</a>
+<a class="nav-btn" data-page="settings" href="#settings"><span class="ico">⚙</span>設定</a>
+</div></nav>
 
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js').then(() => {
-      console.log("Service Worker registered");
-    });
-  });
-}
-</script>
+<dialog id="editDialog" style="width:min(520px,calc(100% - 28px));background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:22px">
+  <form id="wordForm">
+    <h2 id="dialogTitle">単語を追加</h2>
+    <div class="field"><label for="wordTargetList">登録先リスト</label><select id="wordTargetList"></select></div>
+    <div class="field"><label for="editKo">韓国語</label><input id="editKo" required></div>
+    <div class="field"><label for="editJa">日本語の意味</label><input id="editJa" required></div>
+    <div class="field"><label for="editEx">例文（韓国語）</label><textarea id="editEx" rows="2"></textarea></div>
+    <div class="field"><label for="editExJa">例文の日本語訳（任意）</label><textarea id="editExJa" rows="2"></textarea></div>
+    <div class="row"><button class="btn" type="button" onclick="document.getElementById('editDialog').close()">キャンセル</button><button class="btn primary" type="submit" id="saveWordBtn">保存</button></div>
+  </form>
+</dialog>
+<dialog id="importDialog" style="width:min(560px,calc(100% - 28px));background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:22px">
+  <form id="importForm">
+    <h2>単語をインポート</h2>
+    <p class="tiny">1行に「韓国語:日本語」の形式で入力します。登録先はここで選べます。</p>
+    <div class="field"><label for="importMode">登録先</label><select id="importMode"><option value="existing">既存リストに追加</option><option value="new">新しいリストを作成して登録</option></select></div>
+    <div class="field" id="existingListField"><label for="importTargetList">追加先リスト</label><select id="importTargetList"></select></div>
+    <div class="field" id="newListField"><label for="newListName">新しいリスト名</label><input id="newListName" placeholder="例：語学堂4級"></div>
+    <div class="field"><label for="importFile">テキストファイル（.txt）</label><input type="file" id="importFile" accept=".txt,text/plain"></div><div class="field"><label for="importText">単語データ</label><textarea id="importText" rows="7" placeholder="한적하다:人通りが少なく静かだ&#10;잠잠하다:騒ぎが収まって静かだ"></textarea></div>
+    <div class="row"><button class="btn" type="button" onclick="document.getElementById('importDialog').close()">キャンセル</button><button class="btn primary" id="doImport" type="submit">取り込む</button></div>
+  </form>
+</dialog>
+<dialog id="actionDialog" style="width:min(520px,calc(100% - 28px));background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:22px">
+  <div class="eyebrow">ADD VOCABULARY</div>
+  <h2 style="margin-top:6px">どの方法で追加しますか？</h2>
+  <p class="tiny">登録先のリストを選んで、単語を追加できます。</p>
+  <div class="choice-list">
+    <button class="choice-btn" onclick="closeActionChooser();openAdd()"><span class="choice-symbol">✎</span><span><strong>1語ずつ追加</strong><small>韓国語・日本語・例文を入力</small></span></button>
+    <button class="choice-btn" onclick="closeActionChooser();openImport()"><span class="choice-symbol">⇧</span><span><strong>まとめてインポート</strong><small>テキストを貼り付けて複数語を登録</small></span></button>
+  </div>
+  <button class="btn full" style="margin-top:14px" onclick="closeActionChooser()">キャンセル</button>
+</dialog>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4CAF50">
+<dialog id="createListDialog" style="width:min(520px,calc(100% - 28px));background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:22px">
+  <form id="createListForm">
+    <div class="eyebrow">NEW WORD LIST</div>
+    <h2 style="margin-top:6px">新しいリストを作成</h2>
+    <p class="tiny">作成したリストには、あとから単語を1語ずつ追加したり、まとめてインポートしたりできます。</p>
+    <div class="field"><label for="createListName">リスト名</label><input id="createListName" placeholder="例：語学堂4級、広告・マーケティング" required></div>
+    <div class="row"><button class="btn" type="button" onclick="document.getElementById('createListDialog').close()">キャンセル</button><button class="btn primary" type="submit" id="createListBtn">リストを作成</button></div>
+  </form>
+</dialog>
+<dialog id="renameListDialog" style="width:min(520px,calc(100% - 28px));background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:20px;padding:22px">
+  <form id="renameListForm">
+    <div class="eyebrow">RENAME WORD LIST</div>
+    <h2 style="margin-top:6px">リスト名を変更</h2>
+    <div class="field"><label for="renameListName">リスト名</label><input id="renameListName" required maxlength="100"></div>
+    <div class="row"><button class="btn" type="button" onclick="document.getElementById('renameListDialog').close()">キャンセル</button><button class="btn primary" type="submit" id="renameListBtn">保存</button></div>
+  </form>
+</dialog>
+<dialog id="wordEditDialog" class="word-edit-dialog"><div class="edit-dialog-inner"><h3>単語を編集</h3><label>韓国語<input id="editWordKo" type="text"></label><label>日本語訳<textarea id="editWordJa" rows="3"></textarea></label><label>韓国語の例文<textarea id="editWordEx" rows="3"></textarea></label><label>例文の日本語訳（任意）<textarea id="editWordExJa" rows="3"></textarea></label><div class="row"><button class="btn" type="button" onclick="document.getElementById('wordEditDialog').close()">キャンセル</button><button class="btn" type="button" id="deleteWordBtn" hidden>単語を削除</button><button class="btn primary" type="button" id="saveWordEdit">保存</button></div></div></dialog>
+<div id="toast" style="position:fixed;left:50%;bottom:95px;transform:translateX(-50%);background:#f4f5f7;color:#111318;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:750;display:none;z-index:20;max-width:90%;text-align:center"></div>
+
 <script src="words.js"></script>
-<script>
-// ---------------------- 基本状態 ----------------------
-let completed = false;
-let selectedList = []; // ← 初期選択は後でDOM読み込み後に決める
-
-// 単語配列マップ（存在する配列名に合わせてここだけ整備）
-const WORD_MAP = {
-  beginner:      beginnerWords,
-  intermediate:  intermediateWords,
-  advanced:      advancedWords,
-  expressionup:  expressionUpWords,
-  Level4:        Level4ofkoreanschool,
-  Level5:        Level5ofkoreanschool,
-};
-// 自作リストの名前を管理
-const CUSTOM_LIST_NAMES = {};
-// 出題用：現在の selectedList から範囲抽出
-function getWordsInRange(start, end, onlyIncorrect) {
-  return selectedList.filter(w =>
-    w.page >= start && w.page <= end &&
-    (!onlyIncorrect || w.status === "未暗記")
-  );
-}
-// Supabaseの自作リストから単語を読み込む
-async function loadCustomWordList(listKey) {
-  const { data: { user }, error: userError } =
-    await supabaseClient.auth.getUser();
-
-  if (userError) throw userError;
-  if (!user) {
-    throw new Error("Supabaseにログインしてください。");
-  }
-
-  const { data: words, error } = await supabaseClient
-    .from("vocab_words")
-    .select("word, meaning, page, example")
-    .eq("user_id", user.id)
-    .eq("list_key", listKey)
-    .order("page")
-    .order("word");
-
-  if (error) throw error;
-
-  selectedList = (words || []).map(item => ({
-    word: item.word,
-    meaning: item.meaning,
-    page: Number(item.page) || 1,
-    example: item.example,
-  }));
-
-  const tableContainer = document.getElementById("scrollable-table");
-  if (tableContainer) {
-    tableContainer.classList.remove("small-text-mode");
-  }
-
-  return selectedList;
-}
-// ---------------------- レベル選択とリスト決定 ----------------------
-function setWordList(listType) {
-  // 安全に現在のレベル配列を取得
-  const base = WORD_MAP[listType] || [];
-  // 直接書き換え防止のためコピー
-  selectedList = base.map(w => ({ ...w }));
-
-  // 表現力UPだけフォント小さめ
-  const tableContainer = document.getElementById('scrollable-table');
-  if (tableContainer) {
-    tableContainer.classList.toggle('small-text-mode', listType === 'expressionup');
-  }
-
-  // （単語一覧やクイズ開始の時点でこの selectedList が使われます）
-}
-
-// ---------------------- ページセレクトの生成 ----------------------
-function maxPageOf(list) {
-  return list.reduce((m, w) => Math.max(m, Number(w.page) || 1), 1);
-}
-
-// あるレベルの最大ページ数から、指定の select を 1..max で作り直す
-function rebuildSelectOptions(selectId, max) {
-  const sel = document.getElementById(selectId);
-  if (!sel) return;
-  sel.innerHTML = '';
-  const frag = document.createDocumentFragment();
-  for (let p = 1; p <= max; p++) {
-    const opt = document.createElement('option');
-    opt.value = String(p);
-    opt.textContent = String(p);
-    frag.appendChild(opt);
-  }
-  sel.appendChild(frag);
-}
-
-// 左右リンク：左を変えたら右の候補を“左以上のみ”に再構築し、値も同期
-function linkStartEnd(startId, endId) {
-  const s = document.getElementById(startId);
-  const e = document.getElementById(endId);
-  if (!s || !e) return;
-
-  // すでにリンク済みなら、右候補の更新だけして終了
-  if (s._linkedTo === endId && e._linkedFrom === startId) {
-    // 最新の全候補を撮り直し
-    e._allOptions = Array.from(e.options).map(o => o.cloneNode(true));
-    // 左以上に絞って値も揃える
-    const startVal = parseInt(s.value, 10);
-    e.innerHTML = '';
-    const frag = document.createDocumentFragment();
-    e._allOptions.forEach(opt => {
-      const v = parseInt(opt.value, 10);
-      if (isNaN(v) || v >= startVal) frag.appendChild(opt.cloneNode(true));
-    });
-    e.appendChild(frag);
-    if (parseInt(e.value, 10) < startVal) e.value = String(startVal);
-    return;
-  }
-
-  // 初回リンク
-  s._linkedTo = endId;
-  e._linkedFrom = startId;
-
-  // 右の全<option>スナップショット
-  e._allOptions = Array.from(e.options).map(o => o.cloneNode(true));
-
-  const rebuildRight = () => {
-    const startVal = parseInt(s.value, 10);
-    if (isNaN(startVal)) return;
-    e.innerHTML = '';
-    const frag = document.createDocumentFragment();
-    e._allOptions.forEach(opt => {
-      const v = parseInt(opt.value, 10);
-      if (isNaN(v) || v >= startVal) frag.appendChild(opt.cloneNode(true));
-    });
-    e.appendChild(frag);
-    const endVal = parseInt(e.value, 10);
-    if (isNaN(endVal) || endVal < startVal) e.value = String(startVal);
-  };
-
-  s.addEventListener('change', () => {
-    if (document.activeElement === e) return; // 右を開いている最中は閉じさせない
-    rebuildRight();
-  });
-
-  // 初期同期
-  rebuildRight();
-}
-
-// レベルセレクタの値から、そのペア（開始/終了）を作り直す
-function populatePageSelectorsFor(levelSelectId, startId, endId) {
-  const lvSel = document.getElementById(levelSelectId);
-  if (!lvSel) return;
-  const level = lvSel.value;
-  const list = WORD_MAP[level] || [];
-  const max = maxPageOf(list);
-
-  rebuildSelectOptions(startId, max);
-  rebuildSelectOptions(endId,   max);
-
-  // 左右リンク（左以上のみ表示＋値同期）
-  linkStartEnd(startId, endId);
-}
-
-// ---------------------- 起動時セットアップ ----------------------
-document.addEventListener('DOMContentLoaded', () => {
-  // それぞれのレベルセレクトでページ選択肢を生成
-  populatePageSelectorsFor('wordlist-level-select', 'wordlist-start-page', 'wordlist-end-page');
-  populatePageSelectorsFor('quiz-level-select',     'start-page',           'end-page');
-
-  // レベル変更時にページ選択肢を作り直す（級ごとの最大ページ数に合わせる）
-  const wlLevel = document.getElementById('wordlist-level-select');
-  // リスト変更時の処理
-  wlLevel && wlLevel.addEventListener('change', async () => {
-    const level = wlLevel.value;
-
-    try {
-      if (level.startsWith('custom:')) {
-        // 自作リストをSupabaseから読み込む
-        await loadCustomWordList(level.slice('custom:'.length));
-
-        // 読み込んだ単語に合わせてページ選択肢を作る
-        const max = maxPageOf(selectedList);
-        rebuildSelectOptions('wordlist-start-page', max);
-        rebuildSelectOptions('wordlist-end-page', max);
-        linkStartEnd('wordlist-start-page', 'wordlist-end-page');
-      } else {
-        // 通常のリスト
-        populatePageSelectorsFor(
-          'wordlist-level-select',
-          'wordlist-start-page',
-          'wordlist-end-page'
-        );
-        setWordList(level);
-      }
-    } catch (error) {
-      console.error('単語リストの読み込みに失敗しました:', error);
-      alert('単語リストの読み込みに失敗しました。ログイン状態や通信を確認してください。');
-    }
-  });
-
-  const qLevel = document.getElementById('quiz-level-select');
-  qLevel && qLevel.addEventListener('change', () => {
-    populatePageSelectorsFor('quiz-level-select', 'start-page', 'end-page');
-    // クイズ用にも selectedList をこのタイミングで切り替えたいなら↓を有効化
-    // setWordList(qLevel.value);
-  });
-
-  // 初期 selectedList（単語一覧の方のレベルに合わせる）
-  if (wlLevel) setWordList(wlLevel.value);
-});
-
-
-        // 出題範囲に基づく単語リストを取得
-function getWordsInRange(start, end, onlyIncorrect) {
-    return selectedList.filter(word => word.page >= start && word.page <= end && (!onlyIncorrect || word.status === "未暗記"));
-}
-
-// クイズ進行状態のフラグを追加
-let isQuizInProgress = false;
-
-function showQuizModal(message, onConfirm, onCancel) {
-    const modal = document.getElementById("quiz-modal");
-    const modalMessage = document.getElementById("modal-message");
-    const yesButton = document.getElementById("modal-yes");
-    const noButton = document.getElementById("modal-no");
-
-    modalMessage.textContent = message;
-    modal.classList.remove("hidden");
-
-    // 「再開」ボタンのクリックイベント
-    yesButton.onclick = () => {
-        modal.classList.add("hidden");
-        onConfirm();
-    };
-
-    // 「新しいクイズを開始」ボタンのクリックイベント
-    noButton.onclick = () => {
-        modal.classList.add("hidden");
-        onCancel();
-    };
-}
-
-function startQuiz() {
-    const startPage = parseInt(document.getElementById("start-page").value);
-    const endPage = parseInt(document.getElementById("end-page").value);
-    const onlyIncorrect = document.getElementById("only-incorrect").checked;
-    const isBeginner = document.getElementById("quiz-level-select").value === "beginner"; // 初級選択ボタンがチェックされているか確認
-
-	const selectedLevel = document.getElementById("quiz-level-select").value;
-	setWordList(selectedLevel);
-
-    if (startPage > endPage) {
-        alert("開始ページは終了ページ以下にしてください。");
-        return;
-    }
-
-    // クイズ進行状況を復元するか、新しく開始するか確認
-    const savedQuizState = localStorage.getItem("quizProgress");
-    if (completed) {
-    // 終了フラグが立っている場合は、確認せずに強制的に新しいクイズを開始
-    startNewQuiz();
-    } else if (savedQuizState) {
-        showQuizModal(
-            "前回途中で終了したクイズがあります。再開しますか？",
-            () => {
-                // 再開処理
-                loadQuizProgress();
-                isQuizInProgress = true;
-                showQuizSection();
-                nextQuestion();
-            },
-            () => {
-                // 新しいクイズを開始
-                startNewQuiz();
-            }
-        );
-    } else {
-        // 新しいクイズを開始
-        startNewQuiz();
-    }
-}
-// 新しいクイズを開始する関数
-function startNewQuiz() {
-    completed = false; // 終了フラグをリセット
-    const startPage = parseInt(document.getElementById("start-page").value);
-    const endPage = parseInt(document.getElementById("end-page").value);
-    const onlyIncorrect = document.getElementById("only-incorrect").checked;
-    const isBeginner = document.getElementById("quiz-level-select").value === "beginner"; // 初級選択ボタンがチェックされているか確認
-    
-    loadAnswersFromStorage();
-    quizWords = getWordsInRange(startPage, endPage, onlyIncorrect);
-
-    if (quizWords.length === 0) {
-        alert("選択範囲内に単語がありません。");
-        return;
-    }
-
-    quizWords = shuffleArray(quizWords);
-    currentQuizIndex = 0;
-    isQuizInProgress = true;
-
-    // 進行状況を初期化
-    updateProgress();
-
-    showQuizSection();
-    nextQuestion();
-}
-	function shuffleArray(array) {
-    	    for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1)); // ランダムなインデックスを生成
-                [array[i], array[j]] = [array[j], array[i]]; // 要素を交換
-    	    }
-    	return array;
-	}
-
-        let quizWords = [];
-        let currentQuizIndex = 0;
-
-function endQuiz() {
-    alert("クイズが終了しました！");
-
-    // クイズ進行状態をリセット
-    isQuizInProgress = false;
-    quizWords = [];
-    currentQuizIndex = 0;
-
-    // ローカルストレージから進行状況を削除
-    localStorage.removeItem("quizProgress");
-
-    // クイズセクションを非表示にして範囲選択画面に戻る
-    showRangeSelection();
-}
-
-// 回答結果を保存
-function saveAnswer(word, status) {
-    let storedAnswers = JSON.parse(localStorage.getItem('quizAnswers')) || [];
-    const existingAnswerIndex = storedAnswers.findIndex(a => a.word === word.word);
-    if (existingAnswerIndex >= 0) {
-        storedAnswers[existingAnswerIndex].status = status;
-    } else {
-        storedAnswers.push({ word: word.word, status: status });
-    }
-    localStorage.setItem('quizAnswers', JSON.stringify(storedAnswers));
-}
-
-// ローカルストレージから解答データを復元し、words配列に反映
-function loadAnswersFromStorage() {
-    const storedAnswers = JSON.parse(localStorage.getItem('quizAnswers')) || [];
-    selectedList.forEach(word => {
-        const storedAnswer = storedAnswers.find(a => a.word === word.word);
-        if (storedAnswer) {
-            word.status = storedAnswer.status; // 正解、不正解、未回答の状態を適用
-        }
-    });
-}
-
-// 自動読み上げ機能の状態をトグルする関数
-function toggleAutoSpeak() {
-    return document.getElementById("auto-speak").checked;
-}
-function markAnswer(isCorrect) {
-    const word = quizWords[currentQuizIndex]; // 現在の単語
-    const resultElement = document.getElementById("result");
-
-    // 意味を表示する
-    document.getElementById('meaning').style.display = 'inline';
-
-    // 「次へ」ボタンを表示する
-    document.getElementById('next-btn').style.display = 'block';
-    // 〇×ボタンを非表示
-    document.getElementById('incorrect-btn').style.display = "none";
-    document.getElementById('correct-btn').style.display = "none";
-
-    // 正解・不正解の判定処理
-    if (isCorrect) {
-        resultElement.style.color = "green";
-        word.status = "暗記済"; 
-    } else {
-        resultElement.style.color = "red";
-        word.status = "未暗記"; 
-    }
-    // **ここで currentQuizIndex を更新**
-    currentQuizIndex++; // 次の問題へ進む
-
-    saveAnswer(word, word.status); // ステータスを保存
-
-    // 進行状況の更新
-    updateProgress();
-
-    // 1秒後に次の問題へ移動する処理をセット（〇ボタンが押された場合は自動で移動）
-    if (isCorrect) {
-        autoNextTimeout = setTimeout(() => {
-            nextQuestion(); // ここを showNextWord() ではなく nextQuestion() にする
-        }, 1000);
-    }
-}
-// 一つ前の問題に移動
-function moveToPrevious() {
-    if (currentQuizIndex > 0) {
-        currentQuizIndex--;
-        nextQuestion();  // 次の問題に進む処理を呼び出す
-    }
-}
-
-// 一つ次の問題に移動
-function moveToNext() {
-    if (currentQuizIndex < quizWords.length - 1) {
-        currentQuizIndex++;
-        nextQuestion();  // 次の問題に進む処理を呼び出す
-    }
-}
-
-let currentWord = 0; // フラッシュカードの現在の単語インデックスを初期化
-let autoNextTimeout;  // 1秒後の自動移動処理を管理する変数
-
-// 次の問題に進む
-function nextQuestion() {
-    clearTimeout(autoNextTimeout);  // 1秒後の自動移動をキャンセル
-
-    // クイズが終了した場合、最後の問題の処理を行う
-    if (currentQuizIndex >= quizWords.length) {
-        alert("フラッシュカード終了！");
-        completed = true;  // 終了状態を示すフラグを立てる
-        showRangeSelection(); // 範囲選択画面に戻る
-        return;
-    }
-
-    speechSynthesis.cancel();
-    if (speechTimeoutId) {
-        clearTimeout(speechTimeoutId);
-        speechTimeoutId = null;
-    }
-
-    // 現在の単語を設定
-    const word = quizWords[currentQuizIndex]; 
-    document.getElementById("word").innerHTML = word.word;
-    document.getElementById("meaning").innerHTML = word.meaning;
-    document.getElementById('meaning').style.display = "none"; 
-    document.getElementById("result").innerHTML = "";
-
-    // 「〇×」ボタンを表示
-    document.getElementById("incorrect-btn").style.display = "inline-block";
-    document.getElementById("correct-btn").style.display = "inline-block";
-    document.getElementById("next-btn").style.display = "none"; // 次へボタン非表示
-
-    saveQuizProgress();
-    updateProgress();  // 進行状況を更新
-
-    // 自動読み上げ機能がオンなら単語を2回読み上げ
-    if (toggleAutoSpeak()) {
-        playWord(word.word);
-
-        // 2回目の再生タイマーを設定
-//        speechTimeoutId = setTimeout(() => {
-//            if (currentQuizIndex === quizWords.indexOf(word)) {
-//                playWord(word.word);
-//            }
-//        }, 2500);
-    }
-}
-
-// 進行状況の更新
-function updateProgress() {
-    const totalQuestions = quizWords.length;
-    const answeredQuestions = currentQuizIndex + 1; // 進行状況の表示は1からカウント
-    const progressText = `${answeredQuestions}/${totalQuestions}`;
-    
-    document.getElementById('progress').textContent = progressText; // 進行状況を表示
-}
-
-// 「戻る」ボタンを押した際の処理
-function showRangeSelection() {
-    hideAllSections();
-    document.getElementById("range-selection").classList.remove("hidden");
-
-    // クイズ進行中でも単語リストや進捗はリセットしない
-}
-function saveQuizProgress() {
-    const quizState = {
-        currentQuizIndex: currentQuizIndex,
-        quizWords: quizWords
-    };
-    localStorage.setItem("quizProgress", JSON.stringify(quizState));
-}
-
-function loadQuizProgress() {
-    const quizState = JSON.parse(localStorage.getItem("quizProgress"));
-    if (quizState) {
-        quizWords = quizState.quizWords || [];
-        currentQuizIndex = quizState.currentQuizIndex || 0;
-    } else {
-        quizWords = [];
-        currentQuizIndex = 0;
-    }
-}
-document.body.addEventListener("click", () => {
-    const dummy = new Audio();
-    dummy.play().catch(() => {});
-}, { once: true });
-// グローバル変数：最後に再生された単語
-let lastPlayedWord = "";
-let speechTimeoutId; // 音声再生タイマーのID  
-let currentWordIndex = 0; // 現在の再生対象単語のインデックス  
-let isAudioUnlocked = false; // ブラウザの音声再生が許可されたかどうか
-let isPlaying = false; // 現在の音声再生状態
-let currentAudio = null;
-
-function playWord(word) {
-	if (!word) {
-        alert("単語が指定されていません。");
-        return;
-    }
-	    // 既存の再生があれば止める
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-        currentAudio = null;
-    }
-
-  const url = `https://ojaajo-sound.vercel.app/api/tts?text=${encodeURIComponent(word)}`;
-  const audio = new Audio(url);
-
-	  audio.play().then(() => {
-	    lastPlayedWord = word;
-	}).catch((err) => {
-	    console.error("音声再生エラー:", err);
-	    showToast("⚠️ 音声の再生に失敗しました。もう一度お試しください。");
-	});
-}
-
-document.addEventListener("keydown", function(event) {
-    if (event.shiftKey) {
-        if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-            if (currentWordIndex >= 0 && currentWordIndex < selectedList.length) {
-                let wordToPlay = selectedList[currentWordIndex].word;
-                lastPlayedWord = wordToPlay; // 矢印キーで再生した単語を記録
-                playWord(wordToPlay);
-            }
-        }
-    }
-});
-// Shiftキー単独で最後に再生した単語を再生
-document.addEventListener("keydown", function(event) {
-    if (event.key === "Shift" && lastPlayedWord) {
-        playWord(lastPlayedWord);
-    }
-});
-// Shiftキーの処理
-document.addEventListener("keydown", function (event) {
-    if (event.key === "Shift" && lastPlayedWord) {
-        // クイズ中かどうかを判定
-        const isQuizActive = !document.getElementById("quiz-section").classList.contains("hidden");
-
-        if (isQuizActive) {
-            // クイズ中の場合：現在の問題の単語を再生
-            const word = quizWords[currentQuizIndex - 1]; // 現在の問題の単語を取得
-            playWord(word.word);
-        } else {
-            // 単語一覧表示中の場合：最後に再生された単語を再生
-            if (lastPlayedWord) {
-                playWord(lastPlayedWord);
-            }
-        }
-    }
-});
-// 矢印キーの処理
-document.addEventListener("keydown", function (event) {
-  // 入力中（INPUT/TEXTAREA/contenteditable）は奪わない
-  const t = event.target;
-  const typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
-  if (typing) return;
-
-  const isQuizActive = !document.getElementById("quiz-section").classList.contains("hidden");
-
-  // --- Shift単独：最後の単語 or クイズ中は現在の単語を再生 ---
-  if (event.key === "Shift") {
-    if (isQuizActive) {
-      // クイズ中：現在の問題の単語を再生
-      if (typeof quizWords !== "undefined" && quizWords[currentQuizIndex - 1]) {
-        playWord(quizWords[currentQuizIndex - 1].word);
-      }
-    } else if (lastPlayedWord) {
-      // 単語一覧表示中：最後に再生された単語を再生
-      playWord(lastPlayedWord);
-    }
-    return;
-  }
-
-  // --- クイズ中は矢印キー無効 ---
-  if (isQuizActive) return;
-
-  // --- 矢印↑↓：画面ボタンと同じ処理に統一 ---
- 
-  // iPad Safariでのフォーカス飛び防止
-  if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-    event.preventDefault();
-    event.stopPropagation(); // ←追加（重要）
-  }
-
-  if (event.key === "ArrowDown") {
-    playNextWord();
-  } else if (event.key === "ArrowUp") {
-    playPreviousWord();
-  }
-});
-
-function playPreviousWord() {
-    const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
-    if (wordListRows.length === 0) return; // 単語リストが空なら何もしない
-
-    if (currentWordIndex > 0) {
-        currentWordIndex--;
-    }
-    const prevWord = wordListRows[currentWordIndex]
-    playWordAtIndex(currentWordIndex, wordListRows);
-    scrollTable("up");
-}
-function playNextWord() {
-    const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
-    if (currentWordIndex < wordListRows.length - 1) {
-        currentWordIndex++;
-    }
-    playWordAtIndex(currentWordIndex, wordListRows);
-    scrollTable("down");
-}
-
-// スクロール量（ピクセル単位）
-const scrollStep = 42;
-
-// 表のスクロールを行う関数
-function scrollTable(direction) {
-    const scrollableTable = document.getElementById("scrollable-table");
-    if (direction === "down") {
-        scrollableTable.scrollTop += scrollStep;
-    } else if (direction === "up") {
-        scrollableTable.scrollTop -= scrollStep;
-    }
-}
-
-// 単語を再生（`currentWordIndex` の変更はここでは行わない）
-function playWordAtIndex(index, wordListRows) {
-    if (!wordListRows || wordListRows.length === 0 || index < 0 || index >= wordListRows.length) return;
-
-    const word = wordListRows[index]
-        .querySelector("td:first-child")
-        .textContent.trim()
-        .replace(/📢/, ""); // スピーカーマークを除去
-
-    playWord(word);
-    lastPlayedWord = word;
-    currentWordIndex = index;
-}
-
-// ボタンのクリックイベント
-// document.getElementById("up-button").addEventListener("click", () => {
-//     const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
-//     if (currentWordIndex > 0) {
-//         currentWordIndex--;
-//     }
-//     playWordAtIndex(currentWordIndex, wordListRows);
-//     scrollTable("up");
-// });
-// document.getElementById("down-button").addEventListener("click", () => {
-//     const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
-//     if (currentWordIndex < wordListRows.length - 1) {
-//         currentWordIndex++;
-//     }
-//     playWordAtIndex(currentWordIndex, wordListRows);
-//     scrollTable("down");
-// });
-
-function repeatLastWord() {
-    if (lastPlayedWord) {
-        playWord(lastPlayedWord);
-    }
-}
-////////////////////// 単語一覧の表示関数/////////////////////////////////////////////
-    // 韓国語の表示/非表示を切り替える関数
-    function toggleKorean() {
-        const isChecked = document.getElementById("toggle-korean").checked;
-        document.querySelectorAll("#word-list-body tr td:first-child").forEach(td => {
-            td.classList.toggle("hidden-korean", isChecked);
-        });
-    }
-    // 意味の表示/非表示を切り替える関数
-    function toggleMeaning() {
-        const isChecked = document.getElementById("toggle-meaning").checked;
-        document.querySelectorAll("#word-list-body tr td:nth-child(2)").forEach(td => {
-            td.classList.toggle("hidden-meaning", isChecked);
-        });
-    }
-
-function playWordFromSpeaker(word) {
-    playWord(word);
-
-    const wordListRows = document.querySelectorAll("#word-list-body tr:not([style*='display: none'])");
-    for (let i = 0; i < wordListRows.length; i++) {
-        const rowWord = wordListRows[i].querySelector("td:first-child").textContent
-            .replace(/📢/, "")
-            .trim();
-        if (rowWord === word) {
-            currentWordIndex = i;
-            break;
-        }
-    }
-}
-
-async function loadProgressFromSupabase(level) {
-    const { data: { user }, error: userError } =
-        await supabaseClient.auth.getUser();
-
-    if (userError || !user) return;
-
-    const dbListKey = level.startsWith("custom:")
-        ? level.slice("custom:".length)
-        : level;
-
-    const { data, error } = await supabaseClient
-        .from("word_progress")
-        .select("word, status")
-        .eq("user_id", user.id)
-        .eq("list_key", dbListKey);
-
-    if (error) {
-        console.error("暗記状況の読み込みエラー:", error);
-        throw error;
-    }
-
-    selectedList.forEach(word => {
-        delete word.status;
-    });
-
-    (data || []).forEach(row => {
-        const wordObj = selectedList.find(
-            word => word.word === row.word
-        );
-
-        if (wordObj) {
-            wordObj.status = row.status;
-        }
-    });
-}
-
-async function showSelectedWordList() {
-    const level = document.getElementById("wordlist-level-select").value;
-
-    try {
-        if (level.startsWith("custom:")) {
-            // 自作リストをSupabaseから読み込む
-            await loadCustomWordList(level.slice("custom:".length));
-        } else {
-            // 通常のリストを読み込む
-            setWordList(level);
-        }
-
-        const startPage = parseInt(
-            document.getElementById("wordlist-start-page").value,
-            10
-        );
-        const endPage = parseInt(
-            document.getElementById("wordlist-end-page").value,
-            10
-        );
-        const shuffle = document.getElementById("wordlist-shuffle").checked;
-
-        const filteredWords = selectedList.filter(word =>
-            (Number(word.page) || 1) >= startPage &&
-            (Number(word.page) || 1) <= endPage
-        );
-
-        if (shuffle) {
-            filteredWords.sort(() => Math.random() - 0.5);
-        }
-// Supabaseから暗記状況を読み込む
-await loadProgressFromSupabase(level);
-
-// 単語一覧を表示
-showWordList(filteredWords, level);
-        requestAnimationFrame(updateWordSummary);
-} catch (error) {
-    const detail = error?.message || String(error);
-    alert("エラー詳細:\n" + detail);
-    console.error("単語リストの表示に失敗しました:", error);
-}
-}
-// ✅ 開始を変えたら終了も同じページに自動同期（右を左に揃える）
-function syncEndToStart(startId, endId) {
-  const s = document.getElementById(startId);
-  const e = document.getElementById(endId);
-  if (!s || !e) return;
-  e.value = s.value;                       // 右を左に揃える
-  e.dispatchEvent(new Event("change"));    // 依存処理があれば発火
-}
-
-// ✅ 左(開始)と右(終了)の連動セットアップ
-function setupLinkedPageSelectors(startId, endId) {
-  const startSel = document.getElementById(startId);
-  const endSel   = document.getElementById(endId);
-  if (!startSel || !endSel) return;
-
-  // 左を変えたら右を同期＆範囲制限
-  startSel.addEventListener("change", () => {
-    const startVal = parseInt(startSel.value, 10);
-    const options  = [...endSel.querySelectorAll("option")];
-
-    // ① 右の選択肢から、左より小さいページを非表示（消す）
-    options.forEach(opt => {
-      const v = parseInt(opt.value, 10);
-      if (isNaN(v)) return;
-      opt.hidden = v < startVal;
-    });
-
-    // ② 現在の右の値が左より小さい場合は自動で揃える
-    const endVal = parseInt(endSel.value, 10);
-    if (isNaN(endVal) || endVal < startVal) {
-      endSel.value = startSel.value;
-    }
-  });
-}
-
-// ✅ ページロード時に一度だけ初期化
-document.addEventListener('DOMContentLoaded', () => {
-  setupLinkedPageSelectors('wordlist-start-page', 'wordlist-end-page');
-  setupLinkedPageSelectors('start-page', 'end-page');
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  setupLinkedPageSelectors('wordlist-start-page', 'wordlist-end-page');
-  setupLinkedPageSelectors('start-page', 'end-page');
-});
-
-function setupLinkedPageSelectors(startId, endId) {
-  const startSel = document.getElementById(startId);
-  const endSel   = document.getElementById(endId);
-  if (!startSel || !endSel) return;
-
-  // ✅ 初回に右側の全<option>を丸ごと退避（クローンして保持）
-  if (!endSel._allOptions) {
-    endSel._allOptions = Array.from(endSel.options).map(o => o.cloneNode(true));
-  }
-
-  const rebuild = () => {
-    const startVal = parseInt(startSel.value, 10);
-    if (isNaN(startVal)) return;
-
-    // ✅ 退避しておいた全候補から、左以上のものだけで右<select>を再生成
-    endSel.innerHTML = '';
-    const frag = document.createDocumentFragment();
-    for (const opt of endSel._allOptions) {
-      const v = parseInt(opt.value, 10);
-      if (isNaN(v) || v >= startVal) {
-        frag.appendChild(opt.cloneNode(true)); // クローンで挿入
-      }
-    }
-    endSel.appendChild(frag);
-
-    // 右の現在値が小さすぎる/未設定なら、左に揃える
-    const endVal = parseInt(endSel.value, 10);
-    if (isNaN(endVal) || endVal < startVal) {
-      endSel.value = String(startVal);
-    }
-
-    // 必要なら依存処理を発火
-    endSel.dispatchEvent(new Event('change'));
-  };
-
-  // 左変更時に右を再構築
-  startSel.addEventListener('change', rebuild);
-
-  // 初期表示でも一度同期（任意だがオススメ）
-  rebuild();
-}
-
-// 単語一覧表示関数（ローカルストレージのデータを適用）
-function showWordList(filteredWords, level) {
-    currentWordIndex = 0;
-    hideAllSections();
-
-    let shuffleCheckbox = document.getElementById("wordlist-shuffle");
-    if (!shuffleCheckbox) return;
-
-    if (shuffleCheckbox.checked) {
-        filteredWords = [...filteredWords].sort(() => Math.random() - 0.5);
-    }
-
-    const wordListBody = document.getElementById("word-list-body");
-    wordListBody.innerHTML = "";
-
-    filteredWords.forEach(word => {
-        let statusClass = "";
-        let statusText = "";
-        if (word.status === "暗記済") {
-            statusClass = "green";
-            statusText = "〇";
-        } else if (word.status === "未暗記") {
-            statusClass = "red";
-            statusText = "×";
-        }
-
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td class="col-word">${word.word}  
-                <span onclick="playWordFromSpeaker('${word.word}')" style="font-size: 12px; cursor: pointer;">📢</span>
-            </td>
-            <td class="col-meaning">${word.meaning}</td>
-            <td class="${statusClass}" onclick="toggleWordStatus(this, '${word.word}')">${statusText}</td>
-        `;
-        wordListBody.appendChild(row);
-    });
-
-    filterWordList();
-    document.getElementById("word-list").classList.remove("hidden");
-}
-
-function toggleWordStatus(cell, wordText) {
-    let currentStatus = cell.textContent.trim();
-    let newStatus = "";
-    let newClass = "";
-
-    if (currentStatus === "〇") {
-        newStatus = "×";
-        newClass = "red";
-    } else if (currentStatus === "×") {
-        newStatus = "";
-        newClass = "";
-    } else {
-        newStatus = "〇";
-        newClass = "green";
-    }
-
-    // セルの見た目を更新
-    cell.textContent = newStatus;
-    cell.className = newClass;
-
-    // データ構造を更新
-    const wordObj = selectedList.find(w => w.word === wordText);
-    if (wordObj) {
-        if (newStatus === "〇") {
-            wordObj.status = "暗記済";
-        } else if (newStatus === "×") {
-            wordObj.status = "未暗記";
-        } else {
-            delete wordObj.status;
-        }
-    }
-
-    // クラウド保存処理に変更を通知
-    const listKey = document.getElementById("wordlist-level-select").value;
-    const status = newStatus === ""
-        ? null
-        : newStatus === "〇" ? "暗記済" : "未暗記";
-
-    window.dispatchEvent(new CustomEvent("word-progress-changed", {
-        detail: {
-            listKey: listKey,
-            word: wordText,
-            status: status
-        }
-    }));
-
-    // フィルターが有効な場合は再適用
-    // filterWordList();
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  const btn = document.getElementById("word-list-show-btn");
-  if (btn) {
-    btn.addEventListener("click", showSelectedWordList); 
-  }
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const scrollableTable = document.getElementById("scrollable-table");
-
-    // iPadでもフォーカスを当てられるようにする
-    scrollableTable.addEventListener("click", () => {
-        scrollableTable.focus();
-    });
-
-});
-
-// document.addEventListener('DOMContentLoaded', function() {
-//     // ボタンのクリックイベントリスナーをここで追加
-//     document.getElementById("intermediate-word-list-btn").addEventListener("click", showIntermediateWordList);
-//     document.getElementById("beginner-word-list-btn").addEventListener("click", showBeginnerWordList);
-//     document.getElementById("start
-        
-
-// 範囲を基に単語一覧を表示する関数
-function showFilteredWordList() {
-    const startPage = parseInt(wordListStartPageSelect.value);
-    const endPage = parseInt(wordListEndPageSelect.value);
-    if (startPage > endPage) {
-        alert("開始ページは終了ページ以下にしてください。");
-        return;
-    }
-    // 現在選択されているリストを取得
-    const filteredWords = selectedList.filter(word => word.page >= startPage && word.page <= endPage);
-    if (filteredWords.length === 0) {
-        alert("選択範囲内に単語がありません。");
-        return;
-    }
-    showWordList(filteredWords);
-}
-function filterWordList() {
-    const hideCorrect = document.getElementById("hide-correct").checked;
-    const hideIncorrect = document.getElementById("hide-incorrect").checked;
-    const hideUnattempted = document.getElementById("hide-unattempted").checked;
-    const wordListBody = document.getElementById("word-list-body");
-    const rows = wordListBody.querySelectorAll("tr");
-
-    rows.forEach(row => {
-        const correctCell = row.querySelector("td:nth-child(3)"); // 正解/不正解状態を表示するセル
-        const statusText = correctCell.textContent;
-        let hideRow = false;
-        if (hideCorrect && statusText === "〇") {
-            hideRow = true;
-        }
-        if (hideIncorrect && statusText === "×") {
-            hideRow = true;
-        }
-        if (hideUnattempted && statusText === "") {
-            hideRow = true;
-        }
-        // 行を非表示にする
-        row.style.display = hideRow ? "none" : "";
-    });
-}
-        // セクションの表示切り替え
-        function showRangeSelection() {
-            hideAllSections();
-            document.getElementById("range-selection").classList.remove("hidden");
-        }
-        function showQuizSection() {
-            hideAllSections();
-            document.getElementById("quiz-section").classList.remove("hidden");
-        }
-        function hideAllSections() {
-            document.querySelectorAll(".section, .table-container").forEach(section => {
-                section.classList.add("hidden");
-            });
-        }
-        showRangeSelection();
-        
-		function updateWordSummary(){
-		  const tbody = document.getElementById('word-list-body');
-		  if(!tbody) return;
-
-		  const rowsAll = [...tbody.querySelectorAll('tr')];
-
-		  const countBy = (rows) => {
-		    let done=0, not=0, none=0;
-		    rows.forEach(tr=>{
-		      const td = tr.querySelector('td:nth-child(3)');
-		      if(!td) return;
-		      const txt = td.textContent.trim();
-		      if (txt === '〇' || td.classList.contains('green')) done++;
-		      else if (txt === '×' || td.classList.contains('red')) not++;
-		      else none++;
-		    });
-		    return {done, not, none, total: done+not+none};
-		  };
-
-		  // ✅ 表示/非表示に関係なく全体をカウント
-		  const c = countBy(rowsAll);
-
-		  // 更新
-		  document.querySelector('.status-item.green b').textContent = c.done;
-		  document.querySelector('.status-item.red b').textContent   = c.not;
-		  document.querySelector('.status-item.gray b').textContent  = c.none;
-		  document.querySelector('.summary-total b').textContent     = c.total;
-
-		  const total = c.total || 1; // 0除算防止
-		  document.getElementById('bar-done').style.width = (c.done/total*100)+'%';
-		  document.getElementById('bar-not').style.width  = (c.not/total*100)+'%';
-		  document.getElementById('bar-none').style.width = (c.none/total*100)+'%';
-		}
-				// --- 自動更新フック ---
-			['showWordList','toggleWordStatus','filterWordList'].forEach(fn=>{
-			  const orig = window[fn];
-			  if(typeof orig==='function'){
-			    window[fn] = function(){
-			      const r = orig.apply(this, arguments);
-			      requestAnimationFrame(updateWordSummary);
-			      return r;
-			    };
-			  }
-			});
-
-// ✅ チェックボックスのON/OFFで即反映（構造に依存しない）
-document.addEventListener("DOMContentLoaded", () => {
-  const ids = ["hide-correct", "hide-incorrect", "hide-unattempted"];
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.addEventListener("change", () => {
-      if (typeof filterWordList === "function") filterWordList();
-      requestAnimationFrame(updateWordSummary);
-    });
-  });
-});
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  const wrap = document.getElementById('scrollable-table');
-  const tbody = document.getElementById('word-list-body');
-
-  const chkWord    = document.getElementById('toggle-col-word');
-  const chkMeaning = document.getElementById('toggle-col-meaning');
-
-  // 列の一括非表示トグル
-  chkWord?.addEventListener('change', () => {
-    wrap.classList.toggle('hide-col-word', chkWord.checked);
-    clearPeek('word');
-  });
-  chkMeaning?.addEventListener('change', () => {
-    wrap.classList.toggle('hide-col-meaning', chkMeaning.checked);
-    clearPeek('meaning');
-  });
-
-  // セル個別トグル（隠れているときだけ効く）
-  tbody?.addEventListener('click', (e) => {
-    const td = e.target.closest('td');
-    if (!td) return;
-
-    // 単語列
-    if (wrap.classList.contains('hide-col-word') && td.classList.contains('col-word')) {
-      e.stopPropagation(); // 他のクリック処理（発音再生など）を止める
-      td.classList.toggle('peek-cell');
-      return;
-    }
-    // 意味列
-    if (wrap.classList.contains('hide-col-meaning') && td.classList.contains('col-meaning')) {
-      e.stopPropagation();
-      td.classList.toggle('peek-cell');
-      return;
-    }
-  });
-
-  function clearPeek(which){
-    const sel = which === 'word' ? 'td.col-word.peek-cell' : 'td.col-meaning.peek-cell';
-    document.querySelectorAll(sel).forEach(td => td.classList.remove('peek-cell'));
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  const menuButton = document.getElementById("word-list-menu-btn");
-  const menu = document.getElementById("word-list-menu");
-
-  if (!menuButton || !menu) return;
-
-  menuButton.addEventListener("click", (event) => {
-    event.stopPropagation();
-    menu.hidden = !menu.hidden;
-  });
-
-  menu.addEventListener("click", (event) => {
-    event.stopPropagation();
-  });
-
-  document.addEventListener("click", () => {
-    menu.hidden = true;
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      menu.hidden = true;
-    }
-  });
-});
-
-/* ===== 単語リスト全体の検索機能 ===== */
-document.addEventListener("DOMContentLoaded", () => {
-  const searchButton = document.getElementById("word-list-search-btn");
-  const searchArea = document.getElementById("word-search-area");
-  const searchInput = document.getElementById("word-search-input");
-  const clearButton = document.getElementById("word-search-clear-btn");
-  const searchCount = document.getElementById("word-search-count");
-  const wordListBody = document.getElementById("word-list-body");
-
-  if (
-    !searchButton ||
-    !searchArea ||
-    !searchInput ||
-    !clearButton ||
-    !searchCount ||
-    !wordListBody
-  ) {
-    console.error("単語検索に必要なHTMLが見つかりません。");
-    return;
-  }
-
-  let searchActive = false;
-
-  function restoreNormalWordList() {
-    const startSelect = document.getElementById("wordlist-start-page");
-    const endSelect = document.getElementById("wordlist-end-page");
-  
-    const startPage = Number(startSelect?.value);
-    const endPage = Number(endSelect?.value);
-  
-    if (
-      !Number.isFinite(startPage) ||
-      !Number.isFinite(endPage) ||
-      startPage > endPage
-    ) {
-      return;
-    }
-  
-    const normalWords = selectedList.filter(word => {
-      const page = Number(word.page);
-      return page >= startPage && page <= endPage;
-    });
-  
-    if (normalWords.length > 0) {
-      showWordList(normalWords);
-    }
-  }
-  // 選択中のリスト全体から検索して結果を表示
-  function renderWordSearchResults() {
-    const query = searchInput.value.trim().toLocaleLowerCase();
-
-    if (!query) {
-      restoreNormalWordList();
-      searchCount.textContent = "韓国語・日本語を入力して検索";
-      return;
-    }
-
-    loadAnswersFromStorage();
-
-    const results = selectedList.filter(word => {
-      const korean = String(word.word || "").toLocaleLowerCase();
-      const meaning = String(word.meaning || "").toLocaleLowerCase();
-
-      return korean.includes(query) || meaning.includes(query);
-    });
-
-    wordListBody.innerHTML = "";
-
-    results.forEach(word => {
-      const row = document.createElement("tr");
-
-      const wordCell = document.createElement("td");
-      wordCell.className = "col-word";
-      wordCell.appendChild(document.createTextNode(word.word + " "));
-
-      const speaker = document.createElement("span");
-      speaker.textContent = "📢";
-      speaker.style.fontSize = "12px";
-      speaker.style.cursor = "pointer";
-      speaker.addEventListener("click", () => {
-        playWordFromSpeaker(word.word);
-      });
-      wordCell.appendChild(speaker);
-
-
-      const meaningCell = document.createElement("td");
-      meaningCell.className = "col-meaning";
-      
-      const meaningParts = String(word.meaning || "").split(/(<br\s*\/?>|&lt;br\s*\/?&gt;)/gi);
-      
-      meaningParts.forEach(part => {
-        if (/^(<br\s*\/?>|&lt;br\s*\/?&gt;)$/i.test(part)) {
-          meaningCell.appendChild(document.createElement("br"));
-        } else {
-          meaningCell.appendChild(document.createTextNode(part));
-        }
-      });
-
-
-      const statusCell = document.createElement("td");
-      let statusText = "";
-
-      if (word.status === "暗記済") {
-        statusText = "〇";
-        statusCell.className = "green";
-      } else if (word.status === "未暗記") {
-        statusText = "×";
-        statusCell.className = "red";
-      }
-
-      statusCell.textContent = statusText;
-      statusCell.addEventListener("click", () => {
-        toggleWordStatus(statusCell, word.word);
-      });
-
-      row.append(wordCell, meaningCell, statusCell);
-      wordListBody.appendChild(row);
-    });
-
-    searchCount.textContent = results.length + "件見つかりました";
-
-    filterWordList();
-
-    if (typeof updateWordSummary === "function") {
-      updateWordSummary();
-    }
-  }
-
-  // 虫眼鏡を押して検索欄を開く
-  searchButton.addEventListener("click", () => {
-    searchActive = true;
-    searchArea.hidden = false;
-    searchArea.style.display = "block";
-    searchInput.value = "";
-    searchCount.textContent = "韓国語・日本語を入力して検索";
-    searchInput.focus();
-  });
-
-  // 入力するたびにリスト全体を検索
-  searchInput.addEventListener("input", () => {
-    if (searchActive) {
-      renderWordSearchResults();
-    }
-  });
-
-  // ×を押して検索を終了し、通常表示に戻す
-  function closeWordSearch() {
-    searchActive = false;
-    searchInput.value = "";
-    searchArea.hidden = true;
-    searchArea.style.display = "none";
-    searchCount.textContent = "";
-  
-   restoreNormalWordList();
-  }
-
-  clearButton.addEventListener("click", closeWordSearch);
-
-  // Escキーでも検索を終了
-  searchInput.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
-      closeWordSearch();
-    }
-  });
-});
-/* ===== 単語リスト全体の検索機能ここまで ===== */
-
-
-////ファイル進捗出力///////////////////////////////////////////////////////////////////////////
-function exportProgress() {
-    const answers = JSON.parse(localStorage.getItem("quizAnswers")) || [];
-    const jsonString = JSON.stringify(answers, null, 2);
-
-    const outputArea = document.getElementById("json-output");
-    const textArea = document.getElementById("json-text");
-
-    textArea.value = jsonString;
-    outputArea.classList.remove("hidden");
-    textArea.scrollTop = 0;
-    textArea.select(); // 自動で全選択
-
-    showToast("コピーして保存してください！");
-}
-
-function importProgress(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (Array.isArray(data)) {
-                localStorage.setItem("quizAnswers", JSON.stringify(data));
-                showToast("暗記状況を読み込みました！");
-                setTimeout(() => location.reload(), 1000);
-            } else {
-                alert("ファイルの形式が正しくありません。");
-            }
-        } catch (error) {
-            alert("読み込みに失敗しました。JSON形式のファイルを選んでください。");
-        }
-    };
-    reader.readAsText(file);
-}
-
-function copyToClipboard() {
-    const textArea = document.getElementById("json-text");
-    textArea.select();
-    document.execCommand("copy");
-    showToast("コピーしました！");
-}
-
-function showToast(message, duration = 3000) {
-    const toast = document.getElementById("toast");
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.classList.add("show");
-
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, duration);
-}
-
-
-async function refreshCustomListOptions() {
-  const select = document.getElementById("custom-list-destination");
-  if (!select) return;
-
-  const previousValue = select.value;
-
-  select.innerHTML = `
-    <option value="new">新しいリストを作成</option>
-  `;
-
-  try {
-    const { data: { user }, error: userError } =
-      await supabaseClient.auth.getUser();
-
-    if (userError) throw userError;
-    if (!user) return;
-
-    const { data: lists, error } = await supabaseClient
-      .from("vocab_lists")
-      .select("list_key, name")
-      .eq("user_id", user.id)
-      .order("name");
-
-    if (error) throw error;
-
-    (lists || []).forEach(list => {
-      const option = document.createElement("option");
-      option.value = list.list_key;
-      option.textContent = list.name;
-      select.appendChild(option);
-    });
-
-    if ([...select.options].some(option => option.value === previousValue)) {
-      select.value = previousValue;
-    }
-  } catch (error) {
-    console.error("単語リスト取得エラー:", error);
-  }
-}
-// 通常の単語一覧の選択欄に、自作リストを追加する
-async function refreshCustomWordListOptions() {
-  const select = document.getElementById("wordlist-level-select");
-  if (!select) return;
-
-  // 以前追加した自作リストの選択肢だけを削除
-  select.querySelectorAll('option[data-custom-list="true"]')
-    .forEach(option => option.remove());
-
-  try {
-    const { data: { user }, error: userError } =
-      await supabaseClient.auth.getUser();
-
-    if (userError) throw userError;
-    if (!user) return;
-
-    const { data: lists, error } = await supabaseClient
-      .from("vocab_lists")
-      .select("list_key, name")
-      .eq("user_id", user.id)
-      .order("name");
-
-    if (error) throw error;
-
-    (lists || []).forEach(list => {
-      const option = document.createElement("option");
-      option.value = `custom:${list.list_key}`;
-      option.textContent = list.name;
-      option.dataset.customList = "true";
-      select.appendChild(option);
-    });
-  } catch (error) {
-    console.error("自作リストの選択肢取得エラー:", error);
-  }
-}
-document.getElementById("custom-list-destination")
-  ?.addEventListener("change", () => {
-    const select = document.getElementById("custom-list-destination");
-    const nameArea = document.getElementById("custom-list-name-area");
-
-    if (nameArea) {
-      nameArea.style.display =
-        select.value === "new" ? "block" : "none";
-    }
-  });
-
-refreshCustomListOptions();
-refreshCustomWordListOptions();
-
-supabaseClient.auth.onAuthStateChange(() => {
-  setTimeout(refreshCustomListOptions, 0);
-});
-
-
-document.getElementById("custom-list-import-btn")?.addEventListener("click", async () => {
-  const fileInput = document.getElementById("custom-list-file");
-  const message = document.getElementById("custom-list-import-message");
-  const button = document.getElementById("custom-list-import-btn");
-  const destination = document.getElementById("custom-list-destination");
-  const nameInput = document.getElementById("custom-list-name");
-
-  const file = fileInput?.files?.[0];
-  const selectedDestination = destination?.value;
-  const newListName = nameInput?.value.trim();
-
-  if (selectedDestination === "new" && !newListName) {
-    message.textContent = "新しいリストの名前を入力してください。";
-    nameInput?.focus();
-    return;
-  }
-
-  if (!selectedDestination) {
-    message.textContent = "登録先のリストを選択してください。";
-    return;
-  }
-
-  if (!file) {
-    message.textContent = ".txtファイルを選択してください。";
-    return;
-  }
-
-  button.disabled = true;
-  message.textContent = "読み込み中です…";
-
-  let createdListKey = null;
-
-  try {
-    const { data: { user }, error: userError } =
-      await supabaseClient.auth.getUser();
-
-    if (userError) throw userError;
-    if (!user) {
-      throw new Error("先にSupabaseへログインしてください。");
-    }
-
-    const fileText = await file.text();
-    const lines = fileText.split(/\r?\n/);
-    const importedWords = [];
-    const seen = new Set();
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
-
-      const colonIndex = line.indexOf(":");
-
-      if (colonIndex < 1) {
-        throw new Error(
-          `${i + 1}行目に「:」がありません。形式を確認してください。`
-        );
-      }
-
-      const word = line.slice(0, colonIndex).trim();
-      const meaning = line.slice(colonIndex + 1).trim();
-
-      if (!word || !meaning) {
-        throw new Error(
-          `${i + 1}行目の単語または意味が空です。`
-        );
-      }
-
-      if (seen.has(word)) continue;
-      seen.add(word);
-
-      importedWords.push({ word, meaning });
-    }
-
-    if (importedWords.length === 0) {
-      throw new Error("登録できる単語がありません。");
-    }
-
-    let listKey;
-    let listName;
-
-    if (selectedDestination === "new") {
-      const { data: sameNameLists, error: nameError } =
-        await supabaseClient
-          .from("vocab_lists")
-          .select("list_key")
-          .eq("user_id", user.id)
-          .eq("name", newListName);
-
-      if (nameError) throw nameError;
-
-      if (sameNameLists && sameNameLists.length > 0) {
-        throw new Error(
-          "同じ名前のリストがすでにあります。既存リストを選ぶか、別の名前を入力してください。"
-        );
-      }
-
-      listKey = `custom_${crypto.randomUUID()}`;
-      listName = newListName;
-      createdListKey = listKey;
-
-      const { error: listError } = await supabaseClient
-        .from("vocab_lists")
-        .insert({
-          user_id: user.id,
-          list_key: listKey,
-          name: listName
-        });
-
-      if (listError) throw listError;
-    } else {
-      listKey = selectedDestination;
-
-      const { data: existingList, error: listError } =
-        await supabaseClient
-          .from("vocab_lists")
-          .select("list_key, name")
-          .eq("list_key", listKey)
-          .eq("user_id", user.id)
-          .single();
-
-      if (listError) throw listError;
-      if (!existingList) {
-        throw new Error("選択したリストが見つかりません。");
-      }
-
-      listName = existingList.name;
-    }
-
-    const { data: existingWords, error: wordsReadError } =
-      await supabaseClient
-        .from("vocab_words")
-        .select("word")
-        .eq("list_key", listKey)
-        .eq("user_id", user.id);
-
-    if (wordsReadError) throw wordsReadError;
-
-    const existingWordSet = new Set(
-      (existingWords || []).map(item => item.word)
-    );
-
-    const newWords = importedWords.filter(
-      item => !existingWordSet.has(item.word)
-    );
-
-    if (newWords.length === 0) {
-      message.textContent =
-        "追加できる新しい単語はありませんでした。";
-
-      if (createdListKey) {
-        await supabaseClient
-          .from("vocab_lists")
-          .delete()
-          .eq("list_key", createdListKey)
-          .eq("user_id", user.id);
-
-        createdListKey = null;
-      }
-
-      await refreshCustomListOptions();
-      return;
-    }
-
-    const existingCount = existingWordSet.size;
-
-    const rows = newWords.map((item, index) => ({
-      user_id: user.id,
-      list_key: listKey,
-      word: item.word,
-      meaning: item.meaning,
-      page: Math.floor((existingCount + index) / 80) + 1,
-      example: null
-    }));
-
-    for (let i = 0; i < rows.length; i += 100) {
-      const { error: insertError } = await supabaseClient
-        .from("vocab_words")
-        .insert(rows.slice(i, i + 100));
-
-      if (insertError) throw insertError;
-    }
-
-    message.textContent =
-      `保存しました！「${listName}」に${newWords.length}語を追加しました。`;
-
-    fileInput.value = "";
-    await refreshCustomListOptions();
-
-  } catch (error) {
-    console.error("単語リストの読み込みエラー:", error);
-
-    if (createdListKey) {
-      await supabaseClient
-        .from("vocab_words")
-        .delete()
-        .eq("list_key", createdListKey)
-        .eq("user_id", (await supabaseClient.auth.getUser()).data.user?.id);
-
-      await supabaseClient
-        .from("vocab_lists")
-        .delete()
-        .eq("list_key", createdListKey);
-    }
-
-    message.textContent =
-      "読み込みに失敗しました: " +
-      (error.message || "原因を確認できませんでした。");
-
-  } finally {
-    button.disabled = false;
-  }
-});
-
-</script>
-</div></body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="new-ui.js?v=20261015-step26"></script>
+</body>
 </html>
