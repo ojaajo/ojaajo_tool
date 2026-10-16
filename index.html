@@ -432,7 +432,7 @@ header > button[onclick*="settings"]{display:none!important}
     <div class="card-example" id="cardExample" hidden><strong>例文</strong><div id="cardExampleText"></div><div class="muted tiny" id="cardExampleMeaning" hidden></div></div>
     <div class="space"></div>
     <button class="btn full" onclick="revealMeaning()" id="revealBtn">意味を表示する</button>
-    <button class="btn subtle full" style="margin-top:8px" onclick="toggleCardExample()">例文を表示／非表示</button>
+    <button class="btn subtle full" style="margin-top:8px" id="cardExampleToggleBtn" onclick="toggleCardExample()">例文を表示</button>
   </div>
   <div class="card-controls">
     <button class="btn" onclick="markCard(false)">×　未暗記</button>

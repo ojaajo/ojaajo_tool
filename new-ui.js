@@ -5,7 +5,67 @@ const WORDS_PER_PAGE=80;
 const names=[['beginner','初級','beginnerWords'],['intermediate','中級','intermediateWords'],['advanced','上級','advancedWords'],['expressionup','表現力UP','expressionUpWords']];
 function el(id){return document.getElementById(id)}
 function safeText(id,s){if(el(id))el(id).textContent=s}
-function go(page){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='list')showListIndex();if(page==='cards')showCardLists();el('appRoot')?.scrollTo(0,0);syncNavigatorVisibility()}
+// Step 37: device-only view snapshots. No vocabulary or progress is stored here.
+const LIST_VIEW_STORE='ojaajo.listViews.v1';
+const LAST_VIEW_STORE='ojaajo.lastView.v1';
+let listViewSnapshots={};
+let initialViewRestored=false;
+let restoringListView=false;
+let viewSaveTimer=null;
+try{const saved=JSON.parse(localStorage.getItem(LIST_VIEW_STORE)||'{}');if(saved&&typeof saved==='object'&&!Array.isArray(saved))listViewSnapshots=saved}catch(e){console.warn('表示状態を読み込めませんでした',e)}
+function saveListView(){
+ if(restoringListView||el('listWordsView')?.hidden||!currentList)return;
+ const root=el('appRoot');
+ listViewSnapshots[currentList]={
+  rangeStart,rangeEnd,search:el('search')?.value||'',searchOpen:!el('listSearchPanel')?.hidden,
+  showKo,showJa,allExamples,shuffleEnabled,
+  statuses:[...document.querySelectorAll('.dynamicStatusFilter:checked')].map(c=>c.value),
+  scrollTop:root?.scrollTop||0,selectedWordIndex,
+  pageRangeOpen:!el('pageRangePanel')?.hidden,settingsOpen:!el('listSettingsPanel')?.hidden
+ };
+ try{localStorage.setItem(LIST_VIEW_STORE,JSON.stringify(listViewSnapshots));localStorage.setItem(LAST_VIEW_STORE,JSON.stringify({page:'list',listKey:currentList}))}catch(e){console.warn('表示状態を保存できませんでした',e)}
+}
+function scheduleListViewSave(){if(restoringListView)return;clearTimeout(viewSaveTimer);viewSaveTimer=setTimeout(saveListView,180)}
+function rememberPage(page){try{localStorage.setItem(LAST_VIEW_STORE,JSON.stringify({page}))}catch(e){}}
+function restoreInitialView(){
+ if(initialViewRestored)return;
+ initialViewRestored=true;
+ let previous;try{previous=JSON.parse(localStorage.getItem(LAST_VIEW_STORE)||'null')}catch(e){}
+ if(previous?.page==='list'&&previous.listKey&&Object.hasOwn(lists,previous.listKey)){
+  go('list');openWordList(previous.listKey);return;
+ }
+ if(previous?.page==='list'){go('list');return}
+ if(['home','cards','settings'].includes(previous?.page)){go(previous.page);return}
+ go('home');
+}
+function restoreListView(key){
+ const state=listViewSnapshots[key]||{};
+ const max=Math.max(1,Math.ceil(activeWords().length/WORDS_PER_PAGE));
+ rangeStart=Math.max(1,Math.min(max,Number(state.rangeStart)||1));
+ rangeEnd=Math.max(rangeStart,Math.min(max,Number(state.rangeEnd)||rangeStart));
+ showKo=state.showKo!==false;showJa=state.showJa!==false;
+ allExamples=state.allExamples!==false;shuffleEnabled=state.shuffleEnabled===true;
+ for(const [id,value] of [['settingKo',showKo],['settingJa',showJa],['settingExamples',allExamples],['shuffleWords',shuffleEnabled]]){if(el(id))el(id).checked=value}
+ const allowed=Array.isArray(state.statuses)?state.statuses:['known','unknown','unseen'];
+ document.querySelectorAll('.dynamicStatusFilter').forEach(c=>c.checked=allowed.includes(c.value));
+ if(el('search'))el('search').value=state.search||'';
+ const searchOpen=!!state.searchOpen||!!state.search;
+ if(el('listSearchPanel'))el('listSearchPanel').hidden=!searchOpen;
+ if(el('listSearchToggle')){el('listSearchToggle').textContent=searchOpen?'×':'⌕';el('listSearchToggle').setAttribute('aria-expanded',String(searchOpen))}
+ if(el('pageRangePanel'))el('pageRangePanel').hidden=!state.pageRangeOpen;
+ if(el('listSettingsPanel'))el('listSettingsPanel').hidden=!state.settingsOpen;
+ refreshPageSelectors();renderWords();
+ const root=el('appRoot');
+ // Wait until the newly rendered list has a measurable scroll height.
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  if(currentList!==key||el('listWordsView')?.hidden)return;
+  if(root)root.scrollTop=Math.max(0,Number(state.scrollTop)||0);
+  selectedWordIndex=Number.isInteger(state.selectedWordIndex)?Math.min(state.selectedWordIndex,visibleWordRows.length-1):-1;
+  visibleWordRows.forEach((item,i)=>item.node.classList.toggle('selected-word',i===selectedWordIndex));
+  restoringListView=false;
+ }));
+}
+function go(page){if(!el('listWordsView')?.hidden)saveListView();if(initialViewRestored&&page!=='list')rememberPage(page);document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));if(page==='list')showListIndex();if(page==='cards')showCardLists();el('appRoot')?.scrollTo(0,0);syncNavigatorVisibility()}
 function activeWords(){return lists[currentList]||[]}
 function updateHomeStats(){
   const words=Object.values(lists).flat();
@@ -66,8 +126,18 @@ function renderCardLists(){
   const root=el('cardListChoices');if(!root)return;
   root.replaceChildren(...Object.keys(lists).map(key=>createListChoice(key,()=>chooseCardList(key))));
 }
-function showListIndex(){el('listIndexView').hidden=false;el('listWordsView').hidden=true;renderListIndex();syncNavigatorVisibility()}
-function openWordList(key){revealedWords.clear();closeListSearch();currentList=key;rangeStart=1;rangeEnd=1;el('listIndexView').hidden=true;el('listWordsView').hidden=false;safeText('selectedListTitle',listNames[key]||key);el('renameListButton').hidden=isBuiltinList(key);el('deleteListButton').hidden=isBuiltinList(key);el('search').value='';refreshPageSelectors();renderWords();el('appRoot')?.scrollTo(0,0);syncNavigatorVisibility()}
+function showListIndex(){saveListView();try{localStorage.setItem(LAST_VIEW_STORE,JSON.stringify({page:'list'}))}catch(e){}el('listIndexView').hidden=false;el('listWordsView').hidden=true;renderListIndex();syncNavigatorVisibility()}
+function openWordList(key){
+ if(!Object.hasOwn(lists,key))return;
+ if(!el('listWordsView')?.hidden)saveListView();
+ restoringListView=true;revealedWords.clear();currentList=key;
+ el('listIndexView').hidden=true;el('listWordsView').hidden=false;
+ safeText('selectedListTitle',listNames[key]||key);
+ el('renameListButton').hidden=isBuiltinList(key);el('deleteListButton').hidden=isBuiltinList(key);
+ restoreListView(key);
+ try{localStorage.setItem(LAST_VIEW_STORE,JSON.stringify({page:'list',listKey:key}))}catch(e){}
+ syncNavigatorVisibility();
+}
 function toggleListSearch(){
   const panel=el('listSearchPanel'),button=el('listSearchToggle');if(!panel||!button)return;
   const opening=panel.hidden;panel.hidden=!opening;
@@ -661,6 +731,7 @@ function renderCard(){
   safeText('cardKorean',w.ko);safeText('cardMeaning',meaningRevealed?w.ja:'…');
   safeText('revealBtn',meaningRevealed?'意味を隠す':'意味を表示する');
   el('cardExample').hidden=!exampleShown;
+  safeText('cardExampleToggleBtn',exampleShown?'例文を非表示':'例文を表示');
   const target=el('cardExampleText');target.replaceChildren();if(w.ex)target.append(buildExampleRows(w.ex,w.exja));else target.textContent='例文は未登録です。';safeText('cardExampleMeaning','');
 }
 function playCardVoice(force=false){
@@ -683,10 +754,10 @@ async function markCard(remembered){
   }catch(error){console.error('カードの暗記状況保存失敗',error);alert('暗記状況を保存できませんでした：'+error.message)}
   finally{cardSaveBusy=false;buttons.forEach(b=>b.disabled=false)}
 }
-function nextCard(){if(!cardDeck.length)return;cardIndex=(cardIndex+1)%cardDeck.length;meaningRevealed=false;exampleShown=false;renderCard();playCardVoice()}
-function prevCard(){if(!cardDeck.length)return;cardIndex=(cardIndex-1+cardDeck.length)%cardDeck.length;meaningRevealed=false;exampleShown=false;renderCard();playCardVoice()}
+function nextCard(){if(!cardDeck.length)return;cardIndex=(cardIndex+1)%cardDeck.length;meaningRevealed=false;renderCard();playCardVoice()}
+function prevCard(){if(!cardDeck.length)return;cardIndex=(cardIndex-1+cardDeck.length)%cardDeck.length;meaningRevealed=false;renderCard();playCardVoice()}
 function mapStatus(s){if(s==='暗記済み'||s==='暗記済'||s==='correct'||s===true)return 'known';if(s==='未暗記'||s==='incorrect'||s===false)return 'unknown';return 'unseen'}
-async function loadRealData(){if(typeof supabaseClient==='undefined'){safeText('cloudStatusText','接続できません');return}try{const {data:auth,error:authErr}=await supabaseClient.auth.getUser();if(authErr)throw authErr;const user=auth?.user;safeText('cloudStatusText',user?'ログイン中：'+user.email:'未ログイン');safeText('cloudStatusBadge',user?'接続中':'未接続');lists={};listNames={};for(const [key,name,variable] of names){const builtin={beginner:typeof beginnerWords!=='undefined'?beginnerWords:[],intermediate:typeof intermediateWords!=='undefined'?intermediateWords:[],advanced:typeof advancedWords!=='undefined'?advancedWords:[],expressionup:typeof expressionUpWords!=='undefined'?expressionUpWords:[]};const source=builtin[key];lists[key]=(Array.isArray(source)?source:[]).map(w=>{const parsed=splitLegacyExample(w.meaning,w.example);return {ko:w.word,ja:parsed.meaning,ex:parsed.example,exja:w.example_meaning||'',status:'unseen',known:false,page:w.page}});listNames[key]=name}if(user){const results=await Promise.all([supabaseClient.from('vocab_lists').select('list_key,name').eq('user_id',user.id),supabaseClient.from('vocab_words').select('list_key,word,meaning,example,example_meaning,page').eq('user_id',user.id).range(0,9999),supabaseClient.from('word_progress').select('list_key,word,status').eq('user_id',user.id).range(0,9999)]);for(const r of results)if(r.error)throw r.error;const [listRows,wordRows,progressRows]=results.map(r=>r.data||[]);for(const row of listRows){listNames[row.list_key]=row.name||row.list_key;lists[row.list_key]=[]}for(const w of wordRows){if(!lists[w.list_key])continue;const parsed=splitLegacyExample(w.meaning,w.example);const existing=isBuiltinList(w.list_key)?lists[w.list_key].find(item=>item.ko===w.word):null;if(existing){existing.ja=parsed.meaning;existing.ex=parsed.example;existing.exja=w.example_meaning||''}else lists[w.list_key].push({ko:w.word,ja:parsed.meaning,ex:parsed.example,exja:w.example_meaning||'',status:'unseen',known:false,page:w.page})}const progress=new Map(progressRows.map(w=>[w.list_key+'\u0000'+w.word,mapStatus(w.status)]));for(const [key,words] of Object.entries(lists))for(const w of words){w.status=progress.get(key+'\u0000'+w.ko)||'unseen';w.known=w.status==='known'}}updateHomeStats();populateExportLists();renderListIndex();renderCardLists();if(!el('listWordsView').hidden)renderWords()}catch(e){console.error('新UI読込失敗',e);safeText('cloudStatusText','読み込みエラー：'+e.message)}}
+async function loadRealData(){if(typeof supabaseClient==='undefined'){safeText('cloudStatusText','接続できません');return}try{const {data:auth,error:authErr}=await supabaseClient.auth.getUser();if(authErr)throw authErr;const user=auth?.user;safeText('cloudStatusText',user?'ログイン中：'+user.email:'未ログイン');safeText('cloudStatusBadge',user?'接続中':'未接続');lists={};listNames={};for(const [key,name,variable] of names){const builtin={beginner:typeof beginnerWords!=='undefined'?beginnerWords:[],intermediate:typeof intermediateWords!=='undefined'?intermediateWords:[],advanced:typeof advancedWords!=='undefined'?advancedWords:[],expressionup:typeof expressionUpWords!=='undefined'?expressionUpWords:[]};const source=builtin[key];lists[key]=(Array.isArray(source)?source:[]).map(w=>{const parsed=splitLegacyExample(w.meaning,w.example);return {ko:w.word,ja:parsed.meaning,ex:parsed.example,exja:w.example_meaning||'',status:'unseen',known:false,page:w.page}});listNames[key]=name}if(user){const results=await Promise.all([supabaseClient.from('vocab_lists').select('list_key,name').eq('user_id',user.id),supabaseClient.from('vocab_words').select('list_key,word,meaning,example,example_meaning,page').eq('user_id',user.id).range(0,9999),supabaseClient.from('word_progress').select('list_key,word,status').eq('user_id',user.id).range(0,9999)]);for(const r of results)if(r.error)throw r.error;const [listRows,wordRows,progressRows]=results.map(r=>r.data||[]);for(const row of listRows){listNames[row.list_key]=row.name||row.list_key;lists[row.list_key]=[]}for(const w of wordRows){if(!lists[w.list_key])continue;const parsed=splitLegacyExample(w.meaning,w.example);const existing=isBuiltinList(w.list_key)?lists[w.list_key].find(item=>item.ko===w.word):null;if(existing){existing.ja=parsed.meaning;existing.ex=parsed.example;existing.exja=w.example_meaning||''}else lists[w.list_key].push({ko:w.word,ja:parsed.meaning,ex:parsed.example,exja:w.example_meaning||'',status:'unseen',known:false,page:w.page})}const progress=new Map(progressRows.map(w=>[w.list_key+'\u0000'+w.word,mapStatus(w.status)]));for(const [key,words] of Object.entries(lists))for(const w of words){w.status=progress.get(key+'\u0000'+w.ko)||'unseen';w.known=w.status==='known'}}updateHomeStats();populateExportLists();renderListIndex();renderCardLists();if(!el('listWordsView').hidden)renderWords();restoreInitialView()}catch(e){console.error('新UI読込失敗',e);safeText('cloudStatusText','読み込みエラー：'+e.message)}}
 // Prevent prototype forms from submitting data until persistence is implemented.
 
 document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();go(b.dataset.page)}));
@@ -694,6 +765,15 @@ supabaseClient.auth.onAuthStateChange(()=>setTimeout(loadRealData,0));
 loadRealData();go('home');
 
 document.addEventListener('DOMContentLoaded',()=>{el('importExpressionExamples')?.addEventListener('click',importExpressionExamples)});
+
+
+// Keep the most recent list view even when Safari suspends or reloads the page.
+el('appRoot')?.addEventListener('scroll',()=>{if(!el('listWordsView')?.hidden)scheduleListViewSave()},{passive:true});
+for(const eventName of ['input','change','click']){
+ el('listWordsView')?.addEventListener(eventName,()=>scheduleListViewSave());
+}
+window.addEventListener('pagehide',()=>{clearTimeout(viewSaveTimer);saveListView()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearTimeout(viewSaveTimer);saveListView()}});
 
 // Step 22: mount the legacy auth UI outside the scrollable .app so Safari cannot clip it.
 function mountCloudPopup(){
