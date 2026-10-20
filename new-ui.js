@@ -18,7 +18,7 @@ function saveListView(){
  const root=el('appRoot');
  listViewSnapshots[currentList]={
   rangeStart,rangeEnd,search:el('search')?.value||'',searchOpen:!el('listSearchPanel')?.hidden,
-  showKo,showJa,allExamples,shuffleEnabled,
+  showKo,showJa,allExamples,shuffleEnabled,examplesOnly:!!el('examplesOnly')?.checked,
   statuses:[...document.querySelectorAll('.dynamicStatusFilter:checked')].map(c=>c.value),
   scrollTop:root?.scrollTop||0,selectedWordIndex,
   pageRangeOpen:!el('pageRangePanel')?.hidden,settingsOpen:!el('listSettingsPanel')?.hidden
@@ -45,6 +45,7 @@ function restoreListView(key){
  rangeEnd=Math.max(rangeStart,Math.min(max,Number(state.rangeEnd)||rangeStart));
  showKo=state.showKo!==false;showJa=state.showJa!==false;
  allExamples=state.allExamples!==false;shuffleEnabled=state.shuffleEnabled===true;
+ if(el('examplesOnly'))el('examplesOnly').checked=state.examplesOnly===true;
  for(const [id,value] of [['settingKo',showKo],['settingJa',showJa],['settingExamples',allExamples],['shuffleWords',shuffleEnabled]]){if(el(id))el(id).checked=value}
  const allowed=Array.isArray(state.statuses)?state.statuses:['known','unknown','unseen'];
  document.querySelectorAll('.dynamicStatusFilter').forEach(c=>c.checked=allowed.includes(c.value));
@@ -228,6 +229,7 @@ function renderWords(){
   const allowed=new Set([...document.querySelectorAll('.dynamicStatusFilter:checked')].map(x=>x.value));
   let words=activeWords().filter(w=>!query||`${w.ko} ${w.ja} ${w.ex||''} ${w.exja||''}`.toLowerCase().includes(query));
   if(!query)words=words.slice((rangeStart-1)*80,rangeEnd*80);
+  if(el('examplesOnly')?.checked)words=words.filter(w=>String(w.ex||'').trim().length>0);
   if(shuffleEnabled)words=[...words].sort(()=>Math.random()-.5);
   words.filter(w=>allowed.has(w.status)).forEach(w=>{
     const a=document.createElement('article');a.className='word';
