@@ -768,7 +768,9 @@ async function fetchAllSupabaseRows(table, columns, userId) {
       .from(table)
       .select(columns)
       .eq("user_id", userId)
-      .order("id", { ascending: true })
+      .order("list_key", { ascending: true })
+      .order("word", { ascending: true })
+      
       .range(start, start + pageSize - 1);
 
     if (error) throw error;
@@ -798,9 +800,10 @@ const results = await Promise.all([
 
   fetchAllSupabaseRows(
     "word_progress",
-    "id,list_key,word,status",
+    "list_key,word,status",
     user.id
   )
+
 ]);
 
 if (results[0].error) {
