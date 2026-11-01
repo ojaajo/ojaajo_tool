@@ -372,7 +372,44 @@ header > button[onclick*="settings"]{display:none!important}
 
 <section class="page" id="list">
   <div id="listIndexView">
-    <div class="section-head"><div><div class="eyebrow">WORD LIBRARY</div><h1>単語リスト</h1></div><button class="btn small" onclick="openCreateList()">＋ 新規作成</button></div>
+    <div class="section-head">
+  <div>
+    <div class="eyebrow">WORD LIBRARY</div>
+    <h1>単語リスト</h1>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button
+      id="globalSearchToggle"
+      class="btn small"
+      type="button"
+      onclick="toggleGlobalSearch()"
+      aria-label="全リスト検索を開く"
+      aria-expanded="false"
+      title="全リスト検索"
+      style="font-size:23px;min-width:42px;"
+    >⌕</button>
+
+    <button class="btn small" onclick="openCreateList()">
+      ＋ 新規作成
+    </button>
+  </div>
+</div>
+
+<div
+  id="globalSearchPanel"
+  class="field list-search-panel"
+  hidden
+>
+  <input
+    id="globalSearchInput"
+    type="search"
+    placeholder="すべてのリストから検索…"
+    autocomplete="off"
+    aria-label="全リスト検索"
+    oninput="renderListIndex()"
+  >
+</div>
     <p class="tiny" style="margin-bottom:14px">リストを選ぶと、そのリストの単語一覧が開きます。</p>
     <div class="list-index" id="listIndex">
       <a class="list-index-card" href="#word-detail"><span class="list-index-icon"><span>33%</span></span><span class="list-index-copy"><strong>初級</strong><small>6語 ・ 暗記済み 2語</small><span class="list-progress"><span class="list-progress-fill" style="width:33.3%"></span></span><span class="list-progress-detail"><span>進捗 33%</span><span>2 / 6語</span></span></span><span class="list-index-arrow">›</span></a>
