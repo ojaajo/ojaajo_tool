@@ -143,7 +143,12 @@ body:has(#word-detail:target) .nav-btn[data-page="list"]{color:var(--accent);bac
 .word-ko-line .korean{min-width:0}
 .card-ko-line{display:flex;justify-content:center;align-items:center;gap:12px;margin:22px 0 10px}
 .card-ko-line .card-korean{margin:0}
-#listSearchToggle{font-size:23px;line-height:1;min-width:36px}
+#listSearchToggle,
+#globalSearchToggle{
+  font-size:23px;
+  line-height:1;
+  min-width:36px;
+}
 
 /* Step 10: two independent ellipsis controls and floating navigator */
 .word-reveal{background:transparent;color:#aeb6c4;border:1px dashed #48505b;border-radius:8px;min-width:44px;min-height:32px;padding:2px 10px;font-size:20px;cursor:pointer;text-align:left}
@@ -387,7 +392,7 @@ header > button[onclick*="settings"]{display:none!important}
       aria-label="全リスト検索を開く"
       aria-expanded="false"
       title="全リスト検索"
-      style="font-size:23px;min-width:42px;"
+      style="font-size:23px;line-height:1;min-width:36px;padding:7px 10px;"
     >⌕</button>
 
     <button class="btn small" onclick="openCreateList()">
