@@ -139,6 +139,34 @@ function openWordList(key){
  try{localStorage.setItem(LAST_VIEW_STORE,JSON.stringify({page:'list',listKey:key}))}catch(e){}
  syncNavigatorVisibility();
 }
+// 全単語リスト検索の開閉
+function toggleGlobalSearch() {
+  const panel = document.getElementById("globalSearchPanel");
+  const button = document.getElementById("globalSearchToggle");
+  const input = document.getElementById("globalSearchInput");
+
+  if (!panel || !button || !input) return;
+
+  const opening = panel.hidden;
+
+  panel.hidden = !opening;
+
+  button.setAttribute("aria-expanded", String(opening));
+  button.setAttribute(
+    "aria-label",
+    opening ? "全リスト検索を閉じる" : "全リスト検索を開く"
+  );
+
+  button.textContent = opening ? "×" : "⌕";
+
+  if (opening) {
+    input.focus();
+  } else {
+    input.blur();
+    input.value = "";
+    renderListIndex();
+  }
+}
 function toggleListSearch(){
   const panel=el('listSearchPanel'),button=el('listSearchToggle');if(!panel||!button)return;
   const opening=panel.hidden;panel.hidden=!opening;
