@@ -132,9 +132,25 @@ function renderListIndex() {
 
   root.replaceChildren();
 
-  for (const key of Object.keys(lists)) {
-    const words = lists[key] || [];
-
+    const sortedKeys = Object.keys(lists)
+      .map(key => {
+        const words = lists[key] || [];
+    
+        const count = query
+          ? words.filter(w =>
+              `${w.ko || ""} ${w.ja || ""} ${w.ex || ""} ${w.exja || ""}`
+                .toLowerCase()
+                .includes(query)
+            ).length
+          : 0;
+    
+        return { key, count };
+      })
+      .filter(item => !query || item.count > 0)
+      .sort((a, b) => query ? b.count - a.count : 0);
+    
+    for (const { key } of sortedKeys) {
+      const words = lists[key] || [];
     const matches = query
       ? words.filter(w =>
           `${w.ko || ""} ${w.ja || ""} ${w.ex || ""} ${w.exja || ""}`
