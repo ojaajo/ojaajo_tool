@@ -119,9 +119,74 @@ function createListChoice(key, onSelect){
   button.append(ring,copy,arrow);button.addEventListener('click',onSelect);
   return button;
 }
-function renderListIndex(){
-  const root=el('listIndex');if(!root)return;
-  root.replaceChildren(...Object.keys(lists).map(key=>createListChoice(key,()=>openWordList(key))));
+function renderListIndex() {
+  const root = el("listIndex");
+  if (!root) return;
+
+  const input = el("globalSearchInput");
+  const panel = el("globalSearchPanel");
+
+  const query = panel && !panel.hidden
+    ? (input?.value || "").trim().toLowerCase()
+    : "";
+
+  root.replaceChildren();
+
+  for (const key of Object.keys(lists)) {
+    const words = lists[key] || [];
+
+    const matches = query
+      ? words.filter(w =>
+          `${w.ko || ""} ${w.ja || ""} ${w.ex || ""} ${w.exja || ""}`
+            .toLowerCase()
+            .includes(query)
+        )
+      : [];
+
+    const card = createListChoice(key, () => {
+      openWordList(key);
+
+      if (query) {
+        const search = el("search");
+        const searchPanel = el("listSearchPanel");
+        const searchButton = el("listSearchToggle");
+
+        if (search) search.value = query;
+        if (searchPanel) searchPanel.hidden = false;
+
+        if (searchButton) {
+          searchButton.textContent = "×";
+          searchButton.setAttribute("aria-expanded", "true");
+          searchButton.setAttribute("aria-label", "検索を閉じる");
+        }
+
+        renderWords();
+        scheduleListViewSave();
+      }
+    });
+
+    if (query) {
+      const badge = document.createElement("span");
+
+      badge.className = "global-search-count";
+      badge.textContent = `${matches.length}件`;
+
+      badge.style.cssText = `
+        display: inline-block;
+        margin-top: 8px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: ${matches.length ? "#303b29" : "#30343c"};
+        color: ${matches.length ? "#b7f36b" : "#9ba2b0"};
+        font-size: 12px;
+        font-weight: 700;
+      `;
+
+      card.querySelector(".list-index-copy")?.append(badge);
+    }
+
+    root.append(card);
+  }
 }
 function renderCardLists(){
   const root=el('cardListChoices');if(!root)return;
