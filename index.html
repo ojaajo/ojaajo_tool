@@ -285,6 +285,14 @@ section:has(#sb-auth-status) a{color:#b7f36b!important}
 .example-remove-btn:hover{color:#ff9d9d}
 .example-add-btn{width:100%;border:1px dashed #596453!important;background:#202822!important;color:#b7f36b!important}
 .word-edit-dialog{max-height:90dvh;overflow-y:auto}
+/* iPhone Safariの入力時の自動ズーム対策 */
+@media (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
 </style>
 <style>
 /* Supabase cloud control stays above the new bottom navigation */
