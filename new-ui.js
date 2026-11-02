@@ -519,7 +519,19 @@ function addWordExamplePair(ko='',ja=''){
  const head=document.createElement('div');head.className='example-editor-pair-head';
  const number=document.createElement('span');
  const remove=document.createElement('button');remove.type='button';remove.className='example-remove-btn';remove.textContent='削除';
- remove.onclick=()=>{pair.remove();renumberWordExamplePairs()};head.append(number,remove);
+ remove.onclick = () => {
+  const pending = pair.dataset.pendingDelete !== "true";
+
+  pair.dataset.pendingDelete = String(pending);
+
+  remove.textContent = pending ? "削除予定" : "削除";
+  remove.style.color = pending ? "#ff6b6b" : "";
+
+  // 削除予定の例文は表示したままにする
+  pair.style.opacity = pending ? "0.65" : "1";
+};
+
+head.append(number, remove);
  const fields=document.createElement('div');fields.className='example-editor-pair-fields';
  for(const [cls,labelText,value] of [['edit-pair-ko','韓国語の例文',ko],['edit-pair-ja','日本語訳（任意）',ja]]){
   const label=document.createElement('label');label.textContent=labelText;
@@ -533,8 +545,9 @@ function renumberWordExamplePairs(){
  [...el('editExamplePairs').children].forEach((node,i)=>node.querySelector('.example-editor-pair-head span').textContent='例文 '+(i+1));
 }
 function collectWordExamplePairs(){
- const pairs=[...el('editExamplePairs').children].map(node=>({ko:node.querySelector('.edit-pair-ko').value.trim(),ja:node.querySelector('.edit-pair-ja').value.trim()}));
- if(pairs.some(p=>!p.ko&&p.ja))throw new Error('日本語訳だけが入力されている例文があります。韓国語も入力してください。');
+ const pairs = [...el("editExamplePairs").children]
+  .filter(node => node.dataset.pendingDelete !== "true")
+  .map(node => ({ if(pairs.some(p=>!p.ko&&p.ja))throw new Error('日本語訳だけが入力されている例文があります。韓国語も入力してください。');
  if(pairs.some(p=>p.ko.includes('\n')||p.ja.includes('\n')))throw new Error('1組につき例文は1文ずつ入力してください。');
  const valid=pairs.filter(p=>p.ko);
  return {ex:valid.map(p=>p.ko).join('\n'),exja:valid.map(p=>p.ja).join('\n')};
@@ -548,7 +561,29 @@ async function openWordEditor(w){
   el('deleteWordBtn').onclick=()=>deleteCustomWord(listKey,original);
   el('saveWordEdit').onclick=async()=>{
     const button=el('saveWordEdit');if(button.disabled)return;
-    const ko=el('editWordKo').value.trim(),ja=el('editWordJa').value.trim();let ex,exja;try{({ex,exja}=collectWordExamplePairs())}catch(error){alert(error.message);return}
+    const ko = el("editWordKo").value.trim();
+    const ja = el("editWordJa").value.trim();
+    
+    const pendingPairs = [
+      ...el("editExamplePairs").children
+    ].filter(node => node.dataset.pendingDelete === "true");
+    
+    if (pendingPairs.length > 0) {
+      const confirmed = confirm(
+        `${pendingPairs.length}件の例文を削除して保存しますか？`
+      );
+    
+      if (!confirmed) return;
+    }
+    
+    let ex, exja;
+    
+    try {
+      ({ ex, exja } = collectWordExamplePairs());
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
     if(!ko||!ja){alert('韓国語と日本語訳は必須です。');return}
     try{validateExampleLines(ex,exja)}catch(error){alert(error.message);return}
     if(isBuiltinList(listKey)&&ko!==original){alert('標準リストの単語そのものは変更できません。意味と例文を編集してください。');return}
