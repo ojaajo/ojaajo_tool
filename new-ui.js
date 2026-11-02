@@ -286,12 +286,40 @@ let selectedWordIndex=-1;
 let visibleWordRows=[];
 let currentAudio=null;
 const revealedWords=new Set();
-function voiceFromOldApp(word){
-  if(!word)return;
-  if(currentAudio){currentAudio.pause();currentAudio.currentTime=0}
-  const audio=new Audio('https://ojaajo-sound.vercel.app/api/tts?text='+encodeURIComponent(word));
-  currentAudio=audio;
-  audio.play().catch(err=>{console.error('旧音声の再生に失敗',err);alert('音声の再生に失敗しました。通信状態を確認してください。')});
+function voiceFromOldApp(word) {
+  if (!word) return;
+
+  // 前の音声を停止
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+
+  const audio = new Audio(
+    "https://ojaajo-sound.vercel.app/api/tts?text=" +
+    encodeURIComponent(word)
+  );
+
+  currentAudio = audio;
+
+  audio.play().catch(err => {
+    // すでに別の音声へ切り替わっている場合は無視
+    if (currentAudio !== audio) return;
+
+    // 再生中断は通信エラーとして扱わない
+    if (err.name === "AbortError") return;
+
+    console.error("音声再生エラー", err);
+
+    alert("音声を再生できませんでした。");
+  });
+
+  audio.addEventListener("ended", () => {
+    if (currentAudio === audio) {
+      currentAudio = null;
+    }
+  });
 }
 function navigateWord(delta){
   if(!visibleWordRows.length)return;
