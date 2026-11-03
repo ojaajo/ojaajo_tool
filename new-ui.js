@@ -544,13 +544,34 @@ head.append(number, remove);
 function renumberWordExamplePairs(){
  [...el('editExamplePairs').children].forEach((node,i)=>node.querySelector('.example-editor-pair-head span').textContent='例文 '+(i+1));
 }
-function collectWordExamplePairs(){
- const pairs = [...el("editExamplePairs").children]
-  .filter(node => node.dataset.pendingDelete !== "true")
-  .map(node => ({ if(pairs.some(p=>!p.ko&&p.ja))throw new Error('日本語訳だけが入力されている例文があります。韓国語も入力してください。');
- if(pairs.some(p=>p.ko.includes('\n')||p.ja.includes('\n')))throw new Error('1組につき例文は1文ずつ入力してください。');
- const valid=pairs.filter(p=>p.ko);
- return {ex:valid.map(p=>p.ko).join('\n'),exja:valid.map(p=>p.ja).join('\n')};
+function collectWordExamplePairs() {
+  const pairs = [...el("editExamplePairs").children]
+    .filter(node => node.dataset.pendingDelete !== "true")
+    .map(node => ({
+      ko: node.querySelector(".edit-pair-ko").value.trim(),
+      ja: node.querySelector(".edit-pair-ja").value.trim()
+    }));
+
+  if (pairs.some(p => !p.ko && p.ja)) {
+    throw new Error(
+      "日本語訳だけが入力されている例文があります。韓国語も入力してください。"
+    );
+  }
+
+  if (pairs.some(p =>
+    p.ko.includes("\n") || p.ja.includes("\n")
+  )) {
+    throw new Error(
+      "1組につき例文は1文ずつ入力してください。"
+    );
+  }
+
+  const valid = pairs.filter(p => p.ko);
+
+  return {
+    ex: valid.map(p => p.ko).join("\n"),
+    exja: valid.map(p => p.ja).join("\n")
+  };
 }
 async function openWordEditor(w){
   const dialog=el('wordEditDialog');if(!dialog)return;
