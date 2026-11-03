@@ -321,16 +321,41 @@ function voiceFromOldApp(word) {
     }
   });
 }
-function navigateWord(delta){
-  if(!visibleWordRows.length)return;
-  selectedWordIndex=Math.max(0,Math.min(visibleWordRows.length-1,selectedWordIndex+delta));
-  focusSelectedWord(true);
+function navigateWord(delta) {
+  if (!visibleWordRows.length) return;
+
+  selectedWordIndex = Math.max(
+    0,
+    Math.min(
+      visibleWordRows.length - 1,
+      selectedWordIndex + delta
+    )
+  );
+
+  focusSelectedWord(true, true);
 }
-function focusSelectedWord(shouldPlay){
-  visibleWordRows.forEach((item,i)=>item.node.classList.toggle('selected-word',i===selectedWordIndex));
-  const item=visibleWordRows[selectedWordIndex];if(!item)return;
-  item.node.scrollIntoView({behavior:'smooth',block:'center'});
-  if(shouldPlay)voiceFromOldApp(item.word.ko);
+function focusSelectedWord(shouldPlay, shouldScroll = false) {
+  visibleWordRows.forEach((item, i) => {
+    item.node.classList.toggle(
+      "selected-word",
+      i === selectedWordIndex
+    );
+  });
+
+  const item = visibleWordRows[selectedWordIndex];
+  if (!item) return;
+
+  // 必要な場合だけスクロールする
+  if (shouldScroll) {
+    item.node.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest"
+    });
+  }
+
+  if (shouldPlay) {
+    voiceFromOldApp(item.word.ko);
+  }
 }
 function repeatSelectedWord(){
   if(!visibleWordRows.length)return;
