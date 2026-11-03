@@ -418,7 +418,14 @@ function renderWords(){
     menu.addEventListener('click',()=>openWordEditor(w));right.append(status,menu);top.append(body,right);a.append(top);
     if(allExamples && String(w.ex||'').trim()){const ex=document.createElement('div');ex.className='example example-line';ex.append(buildExampleRows(w.ex,w.exja));a.append(ex)}
     const rowIndex=visibleWordRows.length;visibleWordRows.push({node:a,word:w});
-    a.addEventListener('click',e=>{if(e.target.closest('button'))return;selectedWordIndex=rowIndex;focusSelectedWord(false)});
+    a.addEventListener("click", e => {
+      // カード内のどこを操作しても、この単語を選択する
+      selectedWordIndex = rowIndex;
+    
+      // 選択状態だけを更新する
+      // 音声再生やスクロールは行わない
+      focusSelectedWord(false, false);
+    });
     root.append(a);
   });
   const list=activeWords();safeText('selectedListSummary',`${list.length}語 ・ 暗記済み ${list.filter(w=>w.known).length}語`);
