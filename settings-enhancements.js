@@ -148,20 +148,63 @@ if(n){
 }
 // The original navigation function is used by the arrow buttons.
 // Override only the scroll placement and auto-voice preference.
-if(typeof window.focusSelectedWord==='function'){
- window.focusSelectedWord=function(shouldPlay){
-  if(!Array.isArray(visibleWordRows)||!visibleWordRows.length)return;
-  visibleWordRows.forEach((item,i)=>item.node.classList.toggle('selected-word',i===selectedWordIndex));
-  const item=visibleWordRows[selectedWordIndex];if(!item)return;
-  const container=$('appRoot');
-  if(container){
-   const cr=container.getBoundingClientRect(),wr=item.node.getBoundingClientRect();
-   const target=cr.top+cr.height*(pref.scroll/100);
-   const desired=container.scrollTop+(wr.top+wr.height/2-target);
-   container.scrollTo({top:clamp(desired,0,container.scrollHeight-container.clientHeight),behavior:'smooth'});
-  }else item.node.scrollIntoView({behavior:'smooth',block:'center'});
-  if(shouldPlay&&pref.autoVoice&&typeof window.voiceFromOldApp==='function')window.voiceFromOldApp(item.word.ko);
- };
+if (typeof window.focusSelectedWord === "function") {
+  window.focusSelectedWord = function(
+    shouldPlay,
+    shouldScroll = false
+  ) {
+    if (!Array.isArray(visibleWordRows)) return;
+
+    // 選択状態だけを更新
+    visibleWordRows.forEach((item, i) => {
+      item.node.classList.toggle(
+        "selected-word",
+        i === selectedWordIndex
+      );
+    });
+
+    const item = visibleWordRows[selectedWordIndex];
+    if (!item) return;
+
+    // 上下矢印から要求された場合だけスクロール
+    if (shouldScroll) {
+      const container = $("appRoot");
+
+      if (container) {
+        const cr = container.getBoundingClientRect();
+        const wr = item.node.getBoundingClientRect();
+
+        const target = cr.top + cr.height * (pref.scroll / 100);
+
+        const desired =
+          container.scrollTop +
+          (wr.top + wr.height / 2 - target);
+
+        container.scrollTo({
+          top: clamp(
+            desired,
+            0,
+            container.scrollHeight - container.clientHeight
+          ),
+          behavior: "smooth"
+        });
+      } else {
+        item.node.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest"
+        });
+      }
+    }
+
+    // 音声の自動再生設定は維持
+    if (
+      shouldPlay &&
+      pref.autoVoice &&
+      typeof window.voiceFromOldApp === "function"
+    ) {
+      window.voiceFromOldApp(item.word.ko);
+    }
+  };
 }
 let authToken=0;
 const authFeedback=text=>{$('prefAuthFeedback').textContent=text;};
