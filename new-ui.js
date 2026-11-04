@@ -20,7 +20,8 @@ function saveListView(){
   rangeStart,rangeEnd,search:el('search')?.value||'',searchOpen:!el('listSearchPanel')?.hidden,
   showKo,showJa,allExamples,shuffleEnabled,examplesOnly:!!el('examplesOnly')?.checked,
   statuses:[...document.querySelectorAll('.dynamicStatusFilter:checked')].map(c=>c.value),
-  scrollTop:root?.scrollTop||0,selectedWordIndex,
+  scrollTop: root?.scrollTop || 0,
+  selectedWordKey,
   pageRangeOpen:!el('pageRangePanel')?.hidden,settingsOpen:!el('listSettingsPanel')?.hidden
  };
  try{localStorage.setItem(LIST_VIEW_STORE,JSON.stringify(listViewSnapshots));localStorage.setItem(LAST_VIEW_STORE,JSON.stringify({page:'list',listKey:currentList}))}catch(e){console.warn('表示状態を保存できませんでした',e)}
@@ -55,14 +56,14 @@ function restoreListView(key){
  if(el('listSearchToggle')){el('listSearchToggle').textContent=searchOpen?'×':'⌕';el('listSearchToggle').setAttribute('aria-expanded',String(searchOpen))}
  if(el('pageRangePanel'))el('pageRangePanel').hidden=!state.pageRangeOpen;
  if(el('listSettingsPanel'))el('listSettingsPanel').hidden=!state.settingsOpen;
- refreshPageSelectors();renderWords();
+ selectedWordKey = state.selectedWordKey || null;
+ refreshPageSelectors();
+ renderWords();
  const root=el('appRoot');
  // Wait until the newly rendered list has a measurable scroll height.
  requestAnimationFrame(()=>requestAnimationFrame(()=>{
   if(currentList!==key||el('listWordsView')?.hidden)return;
   if(root)root.scrollTop=Math.max(0,Number(state.scrollTop)||0);
-  selectedWordIndex=Number.isInteger(state.selectedWordIndex)?Math.min(state.selectedWordIndex,visibleWordRows.length-1):-1;
-  visibleWordRows.forEach((item,i)=>item.node.classList.toggle('selected-word',i===selectedWordIndex));
   restoringListView=false;
  }));
 }
@@ -282,8 +283,9 @@ function applyPageRange(){rangeStart=+el('startPage').value;rangeEnd=+el('endPag
 function setListVisibility(which,on){if(which==='ko')showKo=on;else showJa=on;revealedWords.clear();renderWords()}
 function setListExamples(on){allExamples=on;renderWords()}
 function toggleWordShuffle(on){shuffleEnabled=on;renderWords()}
-let selectedWordIndex=-1;
-let visibleWordRows=[];
+let selectedWordIndex = -1;
+let selectedWordKey = null;
+let visibleWordRows = [];
 let currentAudio=null;
 const revealedWords=new Set();
 function voiceFromOldApp(word) {
@@ -331,8 +333,9 @@ function navigateWord(delta) {
       selectedWordIndex + delta
     )
   );
-
+  selectedWordKey = visibleWordRows[selectedWordIndex].word.ko;
   focusSelectedWord(true, true);
+  scheduleListViewSave();
 }
 function focusSelectedWord(shouldPlay, shouldScroll = false) {
   visibleWordRows.forEach((item, i) => {
@@ -386,7 +389,9 @@ function validateExampleLines(ex,exja){
 }
 function renderWords(){
   const root=el('wordList');if(!root)return;
-  root.replaceChildren();visibleWordRows=[];selectedWordIndex=-1;
+  root.replaceChildren();
+  visibleWordRows = [];
+  selectedWordIndex = -1;
   const query=(el('search')?.value||'').trim().toLowerCase();
   const allowed=new Set([...document.querySelectorAll('.dynamicStatusFilter:checked')].map(x=>x.value));
   let words=activeWords().filter(w=>!query||`${w.ko} ${w.ja} ${w.ex||''} ${w.exja||''}`.toLowerCase().includes(query));
@@ -418,17 +423,35 @@ function renderWords(){
     menu.addEventListener('click',()=>openWordEditor(w));right.append(status,menu);top.append(body,right);a.append(top);
     if(allExamples && String(w.ex||'').trim()){const ex=document.createElement('div');ex.className='example example-line';ex.append(buildExampleRows(w.ex,w.exja));a.append(ex)}
     const rowIndex=visibleWordRows.length;visibleWordRows.push({node:a,word:w});
-    a.addEventListener("click", e => {
-      // カード内のどこを操作しても、この単語を選択する
+    a.addEventListener("click", () => {
       selectedWordIndex = rowIndex;
+      selectedWordKey = w.ko;
     
-      // 選択状態だけを更新する
-      // 音声再生やスクロールは行わない
       focusSelectedWord(false, false);
+      scheduleListViewSave();
     });
     root.append(a);
   });
   const list=activeWords();safeText('selectedListSummary',`${list.length}語 ・ 暗記済み ${list.filter(w=>w.known).length}語`);
+  // 再描画後、以前選択していた単語を探す
+  if (selectedWordKey !== null) {
+    selectedWordIndex = visibleWordRows.findIndex(
+      item => item.word.ko === selectedWordKey
+    );
+  
+    // 表示対象から外れた場合は選択を解除
+    if (selectedWordIndex === -1) {
+      selectedWordKey = null;
+    }
+  }
+  
+  // スクロールせずに選択状態だけ復元
+  visibleWordRows.forEach((item, i) => {
+    item.node.classList.toggle(
+      "selected-word",
+      i === selectedWordIndex
+    );
+  });
   syncNavigatorVisibility();
 }
 // Keep the floating navigator outside the iOS scroll container so it stays visible.
