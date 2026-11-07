@@ -137,13 +137,15 @@
     rangeButton.title = '表示ページ範囲';
     rangeButton.setAttribute('aria-label','表示ページ範囲');
     rangeButton.setAttribute('aria-controls','pageRangePanel');
+    
     rangeButton.innerHTML = `
       <svg viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="1.8"
         stroke-linecap="round" stroke-linejoin="round"
         aria-hidden="true">
-        <rect x="3" y="4" width="18" height="16" rx="2"/>
-        <path d="M3 10h18M9 10v10M15 10v10"/>
+        <path d="M4 7h16"/>
+        <path d="M7 12h10"/>
+        <path d="M10 17h4"/>
       </svg>`;
 
     const settingsButton = document.createElement('button');
