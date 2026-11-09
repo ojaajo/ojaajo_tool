@@ -240,5 +240,198 @@ $('prefLogout').addEventListener('click',async()=>{
 const client=getClient();if(client)client.auth.onAuthStateChange(()=>setTimeout(updateAccount,0));
 // Refresh when returning to settings, without relying on a separate window property.
 document.querySelector('.nav-btn[data-page="settings"]')?.addEventListener('click',()=>setTimeout(updateAccount,0));
+
+// 単語リストのレスポンシブ表示設定
+(() => {
+  const STORAGE_KEY = 'ojaajo-word-example-layout-v1';
+  const validModes = ['auto', 'vertical', 'columns'];
+
+  let mode = 'auto';
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (validModes.includes(saved)) mode = saved;
+  } catch (_) {}
+
+  // 設定画面に追加
+  const panel = document.createElement('div');
+  panel.className = 'panel';
+  panel.innerHTML = `
+    <h2>単語リストの表示</h2>
+    <p class="pref-subtitle">
+      韓国語の例文と日本語訳の配置を変更します。
+    </p>
+    <div class="pref-control">
+      <label for="prefWordExampleLayout">表示形式</label>
+      <select id="prefWordExampleLayout">
+        <option value="auto">自動（画面幅に合わせる）</option>
+        <option value="vertical">縦並び</option>
+        <option value="columns">左右2列</option>
+      </select>
+    </div>
+    <p class="pref-note" id="prefWordExampleLayoutHelp"></p>
+  `;
+
+  // ナビゲーション設定の前に配置
+  settings.insertBefore(panel, nav);
+
+  const select = document.getElementById('prefWordExampleLayout');
+  const help = document.getElementById('prefWordExampleLayoutHelp');
+
+  const style = document.createElement('style');
+  style.textContent = `
+    /* 通常は既存の2列表示 */
+    #listWordsView .example-pair {
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    }
+
+    /* 縦並び表示 */
+    html[data-word-example-layout="vertical"]
+    #listWordsView .example-pair {
+      grid-template-columns: minmax(0,1fr);
+      row-gap: 3px;
+    }
+
+    html[data-word-example-layout="vertical"]
+    #listWordsView .example-pair + .example-pair {
+      margin-top: 10px;
+    }
+
+    /* 自動設定時、狭い画面は縦並び */
+    @media (max-width: 767px) {
+      html[data-word-example-layout="auto"]
+      #listWordsView .example-pair {
+        grid-template-columns: minmax(0,1fr);
+        row-gap: 3px;
+      }
+
+      html[data-word-example-layout="auto"]
+      #listWordsView .example-pair + .example-pair {
+        margin-top: 10px;
+      }
+    }
+
+    /* 例文を折りたたむ場合 */
+    html[data-word-example-layout="vertical"]
+    #listWordsView .example-pairs:not(.examples-expanded)
+    > .example-pair:nth-child(n+2) {
+      display: none;
+    }
+
+    @media (max-width: 767px) {
+      html[data-word-example-layout="auto"]
+      #listWordsView .example-pairs:not(.examples-expanded)
+      > .example-pair:nth-child(n+2) {
+        display: none;
+      }
+    }
+
+    /* 展開ボタン */
+    #listWordsView .example-expand-button {
+      display: none;
+      margin-top: 9px;
+      padding: 5px 0;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    html[data-word-example-layout="vertical"]
+    #listWordsView .example-expand-button {
+      display: block;
+    }
+
+    @media (max-width: 767px) {
+      html[data-word-example-layout="auto"]
+      #listWordsView .example-expand-button {
+        display: block;
+      }
+    }
+
+    #listWordsView .example-pairs.examples-expanded
+    > .example-pair {
+      display: grid;
+    }
+
+    /* 例文訳のない場合は1列 */
+    #listWordsView .example-pair.no-translation {
+      grid-template-columns: minmax(0,1fr);
+    }
+  `;
+  document.head.appendChild(style);
+
+  function updateMode() {
+    document.documentElement.dataset.wordExampleLayout = mode;
+    select.value = mode;
+
+    help.textContent = {
+      auto: '767px以下では縦並び・最初の1件表示。768px以上では左右2列・全件表示。',
+      vertical: '画面幅に関係なく縦並び。最初の1件を表示し、残りは展開できます。',
+      columns: '画面幅に関係なく左右2列。すべての例文を表示します。'
+    }[mode];
+  }
+
+  select.addEventListener('change', () => {
+    mode = select.value;
+    try {
+      localStorage.setItem(STORAGE_KEY, mode);
+    } catch (_) {}
+    updateMode();
+  });
+
+  // 単語一覧の例文に展開ボタンを追加
+  const wordList = document.getElementById('wordList');
+
+  function prepareExampleButtons() {
+    if (!wordList) return;
+
+    wordList.querySelectorAll('.example-pairs').forEach(wrapper => {
+      if (wrapper.querySelector('.example-expand-button')) return;
+
+      const count = wrapper.querySelectorAll(':scope > .example-pair').length;
+      if (count <= 1) return;
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'example-expand-button';
+      button.textContent = `残り${count - 1}件の例文を表示 ▼`;
+      button.setAttribute('aria-expanded', 'false');
+
+      button.addEventListener('click', () => {
+        const expanded = wrapper.classList.toggle('examples-expanded');
+        button.setAttribute('aria-expanded', String(expanded));
+        button.textContent = expanded
+          ? '例文を閉じる ▲'
+          : `残り${count - 1}件の例文を表示 ▼`;
+      });
+
+      wrapper.appendChild(button);
+    });
+  }
+
+  if (wordList) {
+    const observer = new MutationObserver(prepareExampleButtons);
+    observer.observe(wordList, {
+      childList: true,
+      subtree: true
+    });
+    prepareExampleButtons();
+  }
+
+  // 既存の「すべて初期化」にも対応
+  document.getElementById('prefResetAll')?.addEventListener('click', () => {
+    mode = 'auto';
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (_) {}
+    updateMode();
+  });
+
+  updateMode();
+})();
+
 updateAccount();reflect();
 })();
