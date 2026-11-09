@@ -465,6 +465,47 @@ header > button[onclick*="settings"]{display:none!important}
  </div>
  <div id="cardSetupView" hidden>
   <div class="section-head"><div><button class="btn small subtle" onclick="showCardLists()">← リスト選択</button><div class="eyebrow" style="margin-top:12px">QUIZ SETTINGS</div><h1 id="cardSetupTitle">クイズ設定</h1></div></div>
+  
+<!-- 前回のカード学習履歴 -->
+<div id="cardResumePanel" class="panel" hidden
+     style="margin-bottom:14px;padding:17px;">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+    <div>
+      <div class="tiny" style="color:var(--accent);margin-bottom:6px;">
+        前回の学習
+      </div>
+      <div id="cardResumePosition"
+           style="font-size:21px;font-weight:750;">
+        1 / 100語
+      </div>
+    </div>
+
+    <div id="cardResumePercent"
+         class="muted"
+         style="font-size:14px;">
+      0%
+    </div>
+  </div>
+
+  <div style="height:6px;background:#353b44;border-radius:99px;overflow:hidden;margin:14px 0;">
+    <div id="cardResumeProgress"
+         style="height:100%;width:0%;background:var(--accent);border-radius:99px;">
+    </div>
+  </div>
+
+  <div id="cardResumeSettings"
+       class="tiny muted"
+       style="margin-bottom:14px;line-height:1.6;">
+  </div>
+
+  <button type="button"
+          class="btn primary full"
+          onclick="resumeCardQuiz()">
+    続きから再開 →
+  </button>
+</div>
+
   <div class="panel" style="display:grid;gap:17px">
    <div><div class="tiny muted">表示範囲（1ページ＝80語）</div><div class="range-fields"><label>開始ページ<select id="cardStartPage" onchange="validateCardPages('start')"></select></label><label>終了ページ<select id="cardEndPage" onchange="validateCardPages('end')"></select></label></div></div>
    <div><div class="tiny muted" style="margin-bottom:8px">出題するステータス（複数選択可）</div><div class="setting-choices card-settings"><label><input class="card-status" type="checkbox" value="known" checked onchange="updateCardEstimate()"> 暗記済み</label><label><input class="card-status" type="checkbox" value="unseen" checked onchange="updateCardEstimate()"> 未確認</label><label><input class="card-status" type="checkbox" value="unknown" checked onchange="updateCardEstimate()"> 未暗記</label></div></div>
