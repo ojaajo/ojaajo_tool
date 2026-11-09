@@ -936,6 +936,166 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // Card learning: settings and navigation use real words and shared progress persistence.
 let cardListKey='beginner',cardDeck=[],cardIndex=0,meaningRevealed=false,exampleShown=false;
+
+// カード学習の途中再開（端末内保存）
+const CARD_SESSION_PREFIX = 'ojaajo_card_session_v1_';
+
+function cardSessionKey(key = cardListKey) {
+  return CARD_SESSION_PREFIX + key;
+}
+
+function getCardSession(key = cardListKey) {
+  try {
+    const raw = localStorage.getItem(cardSessionKey(key));
+    if (!raw) return null;
+
+    const session = JSON.parse(raw);
+    const words = lists[key];
+
+    if (!Array.isArray(words) ||
+        !Array.isArray(session.deck) ||
+        !Array.isArray(session.wordKeys) ||
+        !session.deck.length ||
+        session.deck.length !== session.wordKeys.length ||
+        !Number.isInteger(session.index) ||
+        session.index < 0 ||
+        session.index >= session.deck.length ||
+        !session.settings) {
+      return null;
+    }
+
+    // 単語の追加・削除・並べ替えによる履歴のずれを検出
+    const valid = session.deck.every((index, position) =>
+      Number.isInteger(index) &&
+      index >= 0 &&
+      index < words.length &&
+      words[index]?.ko === session.wordKeys[position]
+    );
+
+    if (!valid) return null;
+
+    return session;
+  } catch (error) {
+    console.warn('カード履歴の読み込み失敗', error);
+    return null;
+  }
+}
+
+function saveCardSession() {
+  if (!cardDeck.length || !lists[cardListKey]) return;
+
+  const settings = {
+    startPage: el('cardStartPage').value,
+    endPage: el('cardEndPage').value,
+    statuses: [
+      ...document.querySelectorAll('.card-status:checked')
+    ].map(input => input.value),
+    shuffle: el('cardShuffle').checked,
+    autoVoice: el('cardAutoVoice').checked
+  };
+
+  const session = {
+    version: 1,
+    deck: [...cardDeck],
+    wordKeys: cardDeck.map(index => lists[cardListKey][index]?.ko),
+    index: cardIndex,
+    settings,
+    savedAt: Date.now()
+  };
+
+  try {
+    localStorage.setItem(
+      cardSessionKey(),
+      JSON.stringify(session)
+    );
+  } catch (error) {
+    console.warn('カード履歴の保存失敗', error);
+  }
+}
+
+function updateCardResumePanel() {
+  const panel = el('cardResumePanel');
+  if (!panel) return;
+
+  const session = getCardSession();
+  panel.hidden = !session;
+
+  if (!session) return;
+
+  const current = session.index + 1;
+  const total = session.deck.length;
+  const percent = Math.round(current / total * 100);
+  const settings = session.settings;
+
+  safeText('cardResumePosition', `${current} / ${total}語`);
+  safeText('cardResumePercent', `${percent}%`);
+
+  el('cardResumeProgress').style.width = `${percent}%`;
+
+  const statusNames = {
+    known: '暗記済み',
+    unseen: '未確認',
+    unknown: '未暗記'
+  };
+
+  const statusText = settings.statuses
+    .map(value => statusNames[value])
+    .filter(Boolean)
+    .join('・');
+
+  const rangeText =
+    `${settings.startPage}〜${settings.endPage}ページ`;
+
+  const shuffleText = settings.shuffle
+    ? 'ランダム出題'
+    : '順番に出題';
+
+  const voiceText = settings.autoVoice
+    ? '自動音声ON'
+    : '自動音声OFF';
+
+  safeText(
+    'cardResumeSettings',
+    `${rangeText} · ${shuffleText}\n${statusText} · ${voiceText}`
+  );
+}
+
+function resumeCardQuiz() {
+  const session = getCardSession();
+
+  if (!session) {
+    alert('前回の学習履歴を復元できません。単語リストが変更された可能性があります。');
+    updateCardResumePanel();
+    return;
+  }
+
+  const settings = session.settings;
+
+  el('cardStartPage').value = settings.startPage;
+  el('cardEndPage').value = settings.endPage;
+
+  document.querySelectorAll('.card-status').forEach(input => {
+    input.checked = settings.statuses.includes(input.value);
+  });
+
+  el('cardShuffle').checked = !!settings.shuffle;
+  el('cardAutoVoice').checked = !!settings.autoVoice;
+
+  cardDeck = [...session.deck];
+  cardIndex = session.index;
+
+  meaningRevealed = false;
+  exampleShown = false;
+
+  el('cardListView').hidden = true;
+  el('cardSetupView').hidden = true;
+  el('cardQuizView').hidden = false;
+
+  renderCard();
+  playCardVoice();
+  window.scrollTo(0, 0);
+}
+
 function showCardLists(){el('cardListView').hidden=false;el('cardSetupView').hidden=true;el('cardQuizView').hidden=true;renderCardLists()}
 function chooseCardList(key){
   if(!lists[key])return;
@@ -951,7 +1111,16 @@ function chooseCardList(key){
   el('cardShuffle').checked=true;el('cardAutoVoice').checked=false;
   showCardSetup();window.scrollTo(0,0);
 }
-function showCardSetup(){el('cardListView').hidden=true;el('cardSetupView').hidden=false;el('cardQuizView').hidden=true;updateCardEstimate()}
+
+function showCardSetup() {
+  el('cardListView').hidden = true;
+  el('cardSetupView').hidden = false;
+  el('cardQuizView').hidden = true;
+
+  updateCardEstimate();
+  updateCardResumePanel();
+}
+
 function validateCardPages(changed){
   const a=el('cardStartPage'),b=el('cardEndPage');
   if(Number(a.value)>Number(b.value)){if(changed==='start')b.value=a.value;else a.value=b.value}
@@ -964,14 +1133,37 @@ function buildCardDeck(){
   return (lists[cardListKey]||[]).map((_,i)=>i).slice(from,to).filter(i=>allowed.has(lists[cardListKey][i].status));
 }
 function updateCardEstimate(){safeText('cardEstimatedCount',`出題予定：${buildCardDeck().length}語`)}
-function startCardQuiz(){
-  cardDeck=buildCardDeck();
-  if(!cardDeck.length){alert('対象の単語がありません。表示範囲やステータスを確認してください。');return}
-  if(el('cardShuffle').checked){for(let i=cardDeck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cardDeck[i],cardDeck[j]]=[cardDeck[j],cardDeck[i]]}}
-  cardIndex=0;meaningRevealed=false;exampleShown=false;
-  el('cardListView').hidden=true;el('cardSetupView').hidden=true;el('cardQuizView').hidden=false;
-  renderCard();playCardVoice();window.scrollTo(0,0);
+
+function startCardQuiz() {
+  cardDeck = buildCardDeck();
+
+  if (!cardDeck.length) {
+    alert('対象の単語がありません。表示範囲やステータスを確認してください。');
+    return;
+  }
+
+  if (el('cardShuffle').checked) {
+    for (let i = cardDeck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cardDeck[i], cardDeck[j]] = [cardDeck[j], cardDeck[i]];
+    }
+  }
+
+  cardIndex = 0;
+  meaningRevealed = false;
+  exampleShown = false;
+
+  el('cardListView').hidden = true;
+  el('cardSetupView').hidden = true;
+  el('cardQuizView').hidden = false;
+
+  saveCardSession();
+
+  renderCard();
+  playCardVoice();
+  window.scrollTo(0, 0);
 }
+
 function currentCardWord(){return (lists[cardListKey]||[])[cardDeck[cardIndex]]}
 function renderCard(){
   if(el('cardQuizView').hidden)return;
@@ -1004,8 +1196,28 @@ async function markCard(remembered){
   }catch(error){console.error('カードの暗記状況保存失敗',error);alert('暗記状況を保存できませんでした：'+error.message)}
   finally{cardSaveBusy=false;buttons.forEach(b=>b.disabled=false)}
 }
-function nextCard(){if(!cardDeck.length)return;cardIndex=(cardIndex+1)%cardDeck.length;meaningRevealed=false;renderCard();playCardVoice()}
-function prevCard(){if(!cardDeck.length)return;cardIndex=(cardIndex-1+cardDeck.length)%cardDeck.length;meaningRevealed=false;renderCard();playCardVoice()}
+
+function nextCard() {
+  if (!cardDeck.length) return;
+
+  cardIndex = (cardIndex + 1) % cardDeck.length;
+  meaningRevealed = false;
+
+  saveCardSession();
+  renderCard();
+  playCardVoice();
+}
+
+function prevCard() {
+  if (!cardDeck.length) return;
+
+  cardIndex = (cardIndex - 1 + cardDeck.length) % cardDeck.length;
+  meaningRevealed = false;
+
+  saveCardSession();
+  renderCard();
+  playCardVoice();
+}
 
 async function fetchAllSupabaseRows(table, columns, userId) {
   const pageSize = 500;
