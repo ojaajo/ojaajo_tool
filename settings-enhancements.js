@@ -246,6 +246,13 @@ document.querySelector('.nav-btn[data-page="settings"]')?.addEventListener('clic
   const STORAGE_KEY = 'ojaajo-word-example-layout-v1';
   const validModes = ['auto', 'vertical', 'columns'];
 
+  const LINE_KEY = 'ojaajo-word-example-accent-line-v1';
+  
+  let accentLine = true;
+  
+  try {
+    accentLine = localStorage.getItem(LINE_KEY) !== 'off';
+  } catch (_) {}
   let mode = 'auto';
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -269,16 +276,47 @@ document.querySelector('.nav-btn[data-page="settings"]')?.addEventListener('clic
       </select>
     </div>
     <p class="pref-note" id="prefWordExampleLayoutHelp"></p>
-  `;
+    <label class="pref-check" for="prefWordExampleAccentLine">
+      <span>例文左側の黄緑の縦線を表示</span>
+      <input type="checkbox" id="prefWordExampleAccentLine">
+    </label>
+    
+    <p class="pref-note">
+      単語の訳と例文の間の横線は常時表示します。
+      例文はすべて表示します。
+    </p>
+    `;
 
   // ナビゲーション設定の前に配置
   settings.insertBefore(panel, nav);
 
   const select = document.getElementById('prefWordExampleLayout');
   const help = document.getElementById('prefWordExampleLayoutHelp');
-
+  const lineCheck = document.getElementById(
+    'prefWordExampleAccentLine'
+  );
   const style = document.createElement('style');
   style.textContent = `
+      /* 単語の訳と例文全体の間に横線を表示 */
+    #listWordsView .example.example-line {
+      border-top: 1px solid var(--line);
+      margin-top: 12px;
+      padding-top: 12px;
+    }
+    
+    /* 黄緑の縦線：ON */
+    html[data-word-example-accent-line="on"]
+    #listWordsView .example.example-line {
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+    }
+    
+    /* 黄緑の縦線：OFF */
+    html[data-word-example-accent-line="off"]
+    #listWordsView .example.example-line {
+      border-left: 0;
+      padding-left: 0;
+    }
     /* 通常は既存の2列表示 */
     #listWordsView .example-pair {
       grid-template-columns: minmax(0,1fr) minmax(0,1fr);
@@ -310,52 +348,6 @@ document.querySelector('.nav-btn[data-page="settings"]')?.addEventListener('clic
       }
     }
 
-    /* 例文を折りたたむ場合 */
-    html[data-word-example-layout="vertical"]
-    #listWordsView .example-pairs:not(.examples-expanded)
-    > .example-pair:nth-child(n+2) {
-      display: none;
-    }
-
-    @media (max-width: 767px) {
-      html[data-word-example-layout="auto"]
-      #listWordsView .example-pairs:not(.examples-expanded)
-      > .example-pair:nth-child(n+2) {
-        display: none;
-      }
-    }
-
-    /* 展開ボタン */
-    #listWordsView .example-expand-button {
-      display: none;
-      margin-top: 9px;
-      padding: 5px 0;
-      border: 0;
-      background: transparent;
-      color: var(--accent);
-      font: inherit;
-      font-size: 12px;
-      cursor: pointer;
-      text-align: left;
-    }
-
-    html[data-word-example-layout="vertical"]
-    #listWordsView .example-expand-button {
-      display: block;
-    }
-
-    @media (max-width: 767px) {
-      html[data-word-example-layout="auto"]
-      #listWordsView .example-expand-button {
-        display: block;
-      }
-    }
-
-    #listWordsView .example-pairs.examples-expanded
-    > .example-pair {
-      display: grid;
-    }
-
     /* 例文訳のない場合は1列 */
     #listWordsView .example-pair.no-translation {
       grid-template-columns: minmax(0,1fr);
@@ -367,6 +359,10 @@ document.querySelector('.nav-btn[data-page="settings"]')?.addEventListener('clic
     document.documentElement.dataset.wordExampleLayout = mode;
     select.value = mode;
 
+    document.documentElement.dataset.wordExampleAccentLine =
+      accentLine ? 'on' : 'off';
+    
+    lineCheck.checked = accentLine;
     help.textContent = {
       auto: '767px以下では縦並び・最初の1件表示。768px以上では左右2列・全件表示。',
       vertical: '画面幅に関係なく縦並び。最初の1件を表示し、残りは展開できます。',
@@ -381,52 +377,28 @@ document.querySelector('.nav-btn[data-page="settings"]')?.addEventListener('clic
     } catch (_) {}
     updateMode();
   });
-
-  // 単語一覧の例文に展開ボタンを追加
-  const wordList = document.getElementById('wordList');
-
-  function prepareExampleButtons() {
-    if (!wordList) return;
-
-    wordList.querySelectorAll('.example-pairs').forEach(wrapper => {
-      if (wrapper.querySelector('.example-expand-button')) return;
-
-      const count = wrapper.querySelectorAll(':scope > .example-pair').length;
-      if (count <= 1) return;
-
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'example-expand-button';
-      button.textContent = `残り${count - 1}件の例文を表示 ▼`;
-      button.setAttribute('aria-expanded', 'false');
-
-      button.addEventListener('click', () => {
-        const expanded = wrapper.classList.toggle('examples-expanded');
-        button.setAttribute('aria-expanded', String(expanded));
-        button.textContent = expanded
-          ? '例文を閉じる ▲'
-          : `残り${count - 1}件の例文を表示 ▼`;
-      });
-
-      wrapper.appendChild(button);
-    });
-  }
-
-  if (wordList) {
-    const observer = new MutationObserver(prepareExampleButtons);
-    observer.observe(wordList, {
-      childList: true,
-      subtree: true
-    });
-    prepareExampleButtons();
-  }
-
+  lineCheck.addEventListener('change', () => {
+    accentLine = lineCheck.checked;
+  
+    try {
+      localStorage.setItem(
+        LINE_KEY,
+        accentLine ? 'on' : 'off'
+      );
+    } catch (_) {}
+  
+    updateMode();
+  });
   // 既存の「すべて初期化」にも対応
   document.getElementById('prefResetAll')?.addEventListener('click', () => {
     mode = 'auto';
+    accentLine = true;
+    
     try {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(LINE_KEY);
     } catch (_) {}
+    
     updateMode();
   });
 
